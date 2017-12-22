@@ -1,0 +1,3 @@
+[submodule "3rd-party/seastar"]
+	path = 3rd-party/seastar
+	url = ssh://git@github.com/cpv-project/seastar
