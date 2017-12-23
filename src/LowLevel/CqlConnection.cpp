@@ -1,4 +1,5 @@
 #include <core/reactor.hh>
+#include "../Utility/CqlObject.hpp"
 
 namespace cql {
 	class CqlConnection {
