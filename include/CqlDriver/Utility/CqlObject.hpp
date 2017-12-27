@@ -20,8 +20,11 @@ namespace cql {
 #endif
 
 		/** Constructor */
-		CqlObject(std::unique_ptr<T> ptr) :
+		CqlObject(std::unique_ptr<T>&& ptr) :
 			ptr_(std::move(ptr)) { }
+
+		/** Constructor */
+		CqlObject(CqlObject&&) = default;
 
 		/** Destructor */
 		~CqlObject() {
@@ -47,12 +50,13 @@ namespace cql {
 			return ptr_.get();
 		}
 
-	private:
-		static std::vector<T>& getFreeList() {
+		/** Get the thread local storage of objects */
+		static std::vector<std::unique_ptr<T>>& getFreeList() {
 			static thread_local std::vector<std::unique_ptr<T>> freeList;
 			return freeList;
 		}
 
+	private:
 		std::unique_ptr<T> ptr_;
 	};
 
@@ -61,14 +65,14 @@ namespace cql {
 	CqlObject<T> makeObject(Args&&... args) {
 		auto& freeList = CqlObject<T>::getFreeList();
 		if (freeList.empty()) {
-			auto object = CqlObject<T>(std::make_unique<T>());
+			CqlObject<T> object(std::make_unique<T>());
 			object->reset(std::forward<Args>(args)...);
 			return object;
 		} else {
 			auto object = std::move(freeList.back());
-			freeList.popBack();
+			freeList.pop_back();
 			object->reset(std::forward<Args>(args)...);
-			return object;
+			return std::move(object);
 		}
 	}
 }
