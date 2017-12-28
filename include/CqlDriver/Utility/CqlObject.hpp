@@ -29,7 +29,7 @@ namespace cql {
 		/** Destructor */
 		~CqlObject() {
 			auto& freeList = getFreeList();
-			if (freeList.size() < Capacity) {
+			if (ptr_ != nullptr && freeList.size() < Capacity) {
 				ptr_->freeResources();
 				freeList.emplace_back(std::move(ptr_));
 			}
@@ -72,7 +72,7 @@ namespace cql {
 			auto object = std::move(freeList.back());
 			freeList.pop_back();
 			object->reset(std::forward<Args>(args)...);
-			return std::move(object);
+			return object;
 		}
 	}
 }
