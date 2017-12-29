@@ -1,9 +1,7 @@
 #pragma once
 #include <stdexcept>
 #include "../Utility/StringUtils.hpp"
-
-// convenient macro to tell where is the line that includes this code
-#define CQL_CODEINFO cql::joinString("", "[", __FILE__, ":", __LINE__, ":", __PRETTY_FUNCTION__, "]")
+#include "../Utility/CodeInfo.hpp"
 
 namespace cql {
 	/**
@@ -14,8 +12,8 @@ namespace cql {
 	public:
 		/** Constructor */
 		template <class... Args>
-		CqlException(const std::string& codeInfo, Args&&... args) :
-			runtime_error(joinString(" ", codeInfo, std::forward<Args>(args)...)) { }
+		CqlException(CodeInfo&& codeInfo, Args&&... args) :
+			runtime_error(joinString(" ", std::move(codeInfo).str(), std::forward<Args>(args)...)) { }
 	};
 }
 

@@ -15,6 +15,6 @@ cd ../..
 mkdir -p bin/debug
 cd bin/debug
 cmake -DCMAKE_BUILD_TYPE=Debug ../../src
-make
+make V=1
 cd ../..
 

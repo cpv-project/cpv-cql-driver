@@ -15,6 +15,6 @@ cd ../..
 mkdir -p bin/release
 cd bin/release
 cmake -DCMAKE_BUILD_TYPE=Release ../../src
-make
+make V=1
 cd ../..
 
