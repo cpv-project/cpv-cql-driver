@@ -2,7 +2,8 @@ cmake_minimum_required (VERSION 2.8.11)
 project (CqlDriver)
 
 FILE(GLOB_RECURSE Files ./*.cpp)
-add_library(${PROJECT_NAME} STATIC ${Files})
+FILE(GLOB_RECURSE Headers ../include/*.hpp)
+add_library(${PROJECT_NAME} STATIC ${Files} ${Headers})
 
 include_directories(../include)
 target_link_libraries(${PROJECT_NAME})
