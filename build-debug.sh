@@ -5,10 +5,11 @@ set -e
 # build seastar
 # use single core because it require so much memory (require atleast 3.5G for per core)
 cd 3rd-party/seastar
-if [ ! -f build.ninja ]; then
-	./configure.py --mode=all --with libseastar.a --with seastar.pc --enable-dpdk
+if [ ! -f build-debug.ninja ]; then
+	./configure.py --mode=debug --with libseastar.a --with seastar.pc
+	mv build.ninja build-debug.ninja
 fi
-ninja -j1
+ninja -j1 -f build-debug.ninja
 cd ../..
 
 # build cql driver

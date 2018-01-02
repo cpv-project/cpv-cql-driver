@@ -20,5 +20,5 @@ docker run \
 sh ssl_generate_db.sh ssl-1 || true
 sh ssl_generate_db.sh ssl-2 || true
 sh docker_new_db.sh ssl-1 "-p 9044:9042"
-sh docker_new_db.sh ssl-2 "-p 9045:9042" "--seeds $(docker inspect --format='{{ .NetworkSettings.IPAddress }}' test-ssl-1)"
+sh docker_new_db.sh ssl-2 "-p 9045:9042" "--seeds $(docker inspect --format='{{ .NetworkSettings.IPAddress }}' db-ssl-1)"
 

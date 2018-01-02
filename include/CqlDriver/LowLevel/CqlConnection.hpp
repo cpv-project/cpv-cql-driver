@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <net/api.hh>
+#include <core/reactor.hh>
 #include "CqlAuthenticatorBase.hpp"
 
 namespace cql {
@@ -11,14 +12,14 @@ namespace cql {
 	 */
 	class CqlConnection {
 	public:
+		/** Wait for connection ready */
+		seastar::future<> ready();
+
 		/** Constructor */
 		CqlConnection(
 			const seastar::socket_address& address,
 			bool connectWithSsl,
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
-
-		/** Wait for connection ready */
-		seastar::future<> ready();
 
 	private:
 		seastar::socket_address address_;
