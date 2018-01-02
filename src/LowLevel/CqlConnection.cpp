@@ -1,3 +1,4 @@
+#include <CqlDriver/Exceptions/CqlNetworkException.hpp>
 #include "CqlConnection.hpp"
 
 namespace cql {
@@ -6,19 +7,25 @@ namespace cql {
 		if (isReady_) {
 			return seastar::make_ready_future<>();
 		}
-		return seastar::engine().net().connect(address_).then([this] (seastar::connected_socket&& fd) {
+		return seastar::futurize_apply([this] {
+			return connector_->connect(address_);
+		}).then([this] (seastar::connected_socket&& fd) {
 			socket_ = std::move(fd);
 			isReady_ = true;
+		}).then([] {
+			std::cout << "connect success" << std::endl;
+		}).handle_exception([] (std::exception_ptr ex) {
+			throw CqlNetworkException(CQL_CODEINFO, ex);
 		});
 	}
 
 	/** Constructor */
 	CqlConnection::CqlConnection(
 		const seastar::socket_address& address,
-		bool connectWithSsl,
+		const seastar::shared_ptr<CqlConnectorBase>& connector,
 		const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator) :
 		address_(address),
-		connectWithSsl_(connectWithSsl),
+		connector_(connector),
 		authenticator_(authenticator),
 		socket_(),
 		isReady_(false) { }

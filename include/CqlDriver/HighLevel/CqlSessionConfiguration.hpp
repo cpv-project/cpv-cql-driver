@@ -60,6 +60,12 @@ namespace cql {
 		/** Constructor */
 		CqlSessionConfiguration();
 
+		/** Disable copy and move */
+		CqlSessionConfiguration(const CqlSessionConfiguration&) = delete;
+		CqlSessionConfiguration(CqlSessionConfiguration&&) = delete;
+		void operator=(const CqlSessionConfiguration&) = delete;
+		void operator=(CqlSessionConfiguration&&) = delete;
+
 	private:
 		std::unique_ptr<CqlSessionConfigurationImpl> impl_;
 	};

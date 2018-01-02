@@ -1,7 +1,6 @@
 #pragma once
 #include <CqlDriver/Utility/StringUtils.hpp>
 #include <core/app-template.hh>
-#include <utility>
 #include <gtest/gtest.h>
 
 namespace cql {

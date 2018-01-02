@@ -2,6 +2,7 @@
 #include <memory>
 #include <net/api.hh>
 #include <core/reactor.hh>
+#include "Connectors/CqlConnectorBase.hpp"
 #include "Authenticators/CqlAuthenticatorBase.hpp"
 
 namespace cql {
@@ -18,12 +19,12 @@ namespace cql {
 		/** Constructor */
 		CqlConnection(
 			const seastar::socket_address& address,
-			bool connectWithSsl,
+			const seastar::shared_ptr<CqlConnectorBase>& connector,
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
 
 	private:
 		seastar::socket_address address_;
-		bool connectWithSsl_;
+		seastar::shared_ptr<CqlConnectorBase> connector_;
 		seastar::shared_ptr<CqlAuthenticatorBase> authenticator_;
 
 		seastar::connected_socket socket_;
