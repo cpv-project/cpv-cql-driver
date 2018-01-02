@@ -2,12 +2,14 @@ cmake_minimum_required (VERSION 2.8.11)
 project (CqlDriver)
 
 FILE(GLOB_RECURSE Files ./*.cpp)
-FILE(GLOB_RECURSE Headers ../include/*.hpp)
-add_library(${PROJECT_NAME} STATIC ${Files} ${Headers})
+FILE(GLOB_RECURSE PublicHeaders ../include/*.hpp)
+FILE(GLOB_RECURSE InternalHeaders ../src/*.hpp)
+add_library(${PROJECT_NAME} STATIC ${Files} ${PublicHeaders} ${InternalHeaders})
 
+# set compile options
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 include_directories(../include)
 target_link_libraries(${PROJECT_NAME})
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # get flags from seastar pkgconfig
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")

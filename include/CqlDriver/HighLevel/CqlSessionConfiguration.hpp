@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 #include <net/socket_defs.hh>
 
 namespace cql {
-	/**
-	 * The all in one configuration
-	 */
+	class CqlSessionConfigurationImpl;
+
+	/** High level cql database client configuration */
 	class CqlSessionConfiguration {
 	public:
 		/**
@@ -23,26 +24,19 @@ namespace cql {
 		 */
 		void addServerAddress(seastar::socket_address address);
 
-		/** Clear all database server addresses. */
-		void clearServerAddresses();
-
 		/**
-		 * Set whether the database connection should use ssl.
+		 * Connect database with SSL and verify with the given pem certificate.
 		 * Either all database connections use ssl or none,
 		 * per server configuration is unsupported (think of auto discover).
-		 * The default value is false.
+		 * If this function is not called then the connection will use plain tcp.
 		 */
-		void setConnectWithSsl(bool value);
+		void connectWithSsl(const std::string& pem);
 
 		/**
-		 * Set the username for authentication,
-		 * empty mean authentication is not required by database server.
-		 * The default value is empty.
+		 * Set the username and password for authentication.
+		 * If this function is not called then no password authentication will perform.
 		 */
-		void setUsername(std::string username);
-
-		/** Set the password for authentication. */
-		void setPassword(std::string password);
+		void authenticateWithPassword(const std::string& username, const std::string& password);
 
 		/**
 		 * Set the maximum database connection pool size.
@@ -60,34 +54,14 @@ namespace cql {
 		 */
 		void setAutoDiscoverServerAddress(bool value);
 
-		/** Get the database server address list. */
-		const std::vector<seastar::socket_address>& getServerAddresses() const&;
-
-		/** Get whether the database connection should use ssl. */
-		bool getConnectWithSsl() const;
-
-		/** Get the username for authentication, */
-		const std::string& getUsername() const&;
-
-		/** Get the password for authentication. */
-		const std::string& getPassword() const&;
-
-		/** Get the maximum database connection pool size. */
-		std::size_t getMaxPoolSize() const;
-
-		/** Get whether to discover new server addresses by the events sent from database server. */
-		bool getAutoDiscoverServerAddresses() const;
+		/** Get the implementation pointer, only for internal usage */
+		const std::unique_ptr<CqlSessionConfigurationImpl>& getImpl() const&;
 
 		/** Constructor */
 		CqlSessionConfiguration();
 
 	private:
-		std::vector<seastar::socket_address> serverAddresses_;
-		bool connectWithSsl_;
-		std::string username_;
-		std::string password_;
-		std::size_t maxPoolSize_;
-		bool autoDiscoverServerAddresses_;
+		std::unique_ptr<CqlSessionConfigurationImpl> impl_;
 	};
 }
 

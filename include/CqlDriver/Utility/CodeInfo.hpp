@@ -15,7 +15,7 @@ namespace cql {
 		std::string str() && { return std::move(str_); }
 
 		/** Constructor */
-		explicit CodeInfo(std::string str) :
+		explicit CodeInfo(std::string&& str) :
 			str_(std::move(str)) { }
 
 	private:

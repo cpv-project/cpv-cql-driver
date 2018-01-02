@@ -1,9 +1,15 @@
-#include <CqlDriver/LowLevel/CqlConnection.hpp>
+#include "CqlConnection.hpp"
 
 namespace cql {
 	/** Wait for connection ready */
 	seastar::future<> CqlConnection::ready() {
-		return seastar::make_ready_future<>();
+		if (isReady_) {
+			return seastar::make_ready_future<>();
+		}
+		return seastar::engine().net().connect(address_).then([this] (seastar::connected_socket&& fd) {
+			socket_ = std::move(fd);
+			isReady_ = true;
+		});
 	}
 
 	/** Constructor */
@@ -13,6 +19,8 @@ namespace cql {
 		const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator) :
 		address_(address),
 		connectWithSsl_(connectWithSsl),
-		authenticator_(authenticator) { }
+		authenticator_(authenticator),
+		socket_(),
+		isReady_(false) { }
 }
 

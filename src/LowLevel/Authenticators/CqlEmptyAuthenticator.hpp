@@ -2,7 +2,7 @@
 #include "CqlAuthenticatorBase.hpp"
 
 namespace cql {
-	class CqlAuthenticatorPassword : public CqlAuthenticatorBase {
+	class CqlEmptyAuthenticator : public CqlAuthenticatorBase {
 	};
 }
 
