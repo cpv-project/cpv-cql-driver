@@ -12,7 +12,7 @@ include_directories(../include)
 target_link_libraries(${PROJECT_NAME})
 
 # get flags from seastar pkgconfig
-if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+if (CMAKE_BUILD_TYPE MATCHES Debug)
 	set(SEASTAR_PC_PATH ../../3rd-party/seastar/build/debug/seastar.pc)
 else()
 	set(SEASTAR_PC_PATH ../../3rd-party/seastar/build/release/seastar.pc)

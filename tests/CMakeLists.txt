@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME} ${Files} ${PublicHeaders} ${InternalHeaders})
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(LIBCQLDRIVER_PATH "${CMAKE_SOURCE_DIR}/../bin/debug/libCqlDriver.a")
 add_subdirectory(../3rd-party/googletest googletest EXCLUDE_FROM_ALL)
-include_directories(../src)
+include_directories(../src ../tests)
 target_link_libraries(${PROJECT_NAME} gtest_main ${LIBCQLDRIVER_PATH})
 
 # add predefined macros
