@@ -5,7 +5,8 @@
 #include <net/socket_defs.hh>
 
 namespace cql {
-	class CqlSessionConfigurationImpl;
+	/** Internal data struct */
+	class CqlSessionConfigurationData;
 
 	/** High level cql database client configuration */
 	class CqlSessionConfiguration {
@@ -30,7 +31,7 @@ namespace cql {
 		 * per server configuration is unsupported (think of auto discover).
 		 * If this function is not called then the connection will use plain tcp.
 		 */
-		void connectWithSsl(const std::string& pem);
+		void connectWithSsl();
 
 		/**
 		 * Set the username and password for authentication.
@@ -54,8 +55,8 @@ namespace cql {
 		 */
 		void setAutoDiscoverServerAddress(bool value);
 
-		/** Get the implementation pointer, only for internal usage */
-		const std::unique_ptr<CqlSessionConfigurationImpl>& getImpl() const&;
+		/** Get the data pointer, only for internal usage */
+		const std::unique_ptr<CqlSessionConfigurationData>& getData() const&;
 
 		/** Constructor */
 		CqlSessionConfiguration();
@@ -67,7 +68,7 @@ namespace cql {
 		void operator=(CqlSessionConfiguration&&) = delete;
 
 	private:
-		std::unique_ptr<CqlSessionConfigurationImpl> impl_;
+		std::unique_ptr<CqlSessionConfigurationData> data_;
 	};
 }
 

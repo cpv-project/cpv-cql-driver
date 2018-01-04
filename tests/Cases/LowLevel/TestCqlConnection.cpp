@@ -17,7 +17,7 @@ TEST_FUTURE(TestConnection, waitForReadySimple) {
 TEST_FUTURE(TestConnection, waitForReadySsl) {
 	auto connection = seastar::make_shared<cql::CqlConnection>(
 		seastar::make_ipv4_address({ DB_SSL_1_IP, DB_SSL_1_PORT }),
-		seastar::make_shared<cql::CqlTcpConnector>(),
+		seastar::make_shared<cql::CqlSslConnector>(),
 		seastar::make_shared<cql::CqlEmptyAuthenticator>());
 	return connection->ready();
 }

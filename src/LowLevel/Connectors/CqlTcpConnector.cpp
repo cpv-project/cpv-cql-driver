@@ -1,4 +1,3 @@
-#include <CqlDriver/Exceptions/CqlNotImplementedException.hpp>
 #include <core/reactor.hh>
 #include "CqlTcpConnector.hpp"
 

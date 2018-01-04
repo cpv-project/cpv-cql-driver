@@ -1,19 +1,23 @@
-#include <CqlDriver/Exceptions/CqlNotImplementedException.hpp>
 #include "CqlSslConnector.hpp"
 
 namespace cql {
 	/* Setup the connection */
 	seastar::future<seastar::connected_socket> CqlSslConnector::connect(
 		const seastar::socket_address& address) const {
-		// TODO
-		throw CqlNotImplementedException(CQL_CODEINFO);
+		if (initialized_.available() && !initialized_.failed()) {
+			// fast path
+			return seastar::tls::connect(certificates_, address, "");
+		} else {
+			// slow path
+			return initialized_.get_future().then([c = certificates_, a = address] {
+				return seastar::tls::connect(c, a, "");
+			});
+		}
 	}
 
 	/** Constructor */
-	CqlSslConnector::CqlSslConnector(const std::string& pem) :
-		pem_(pem),
-		certificates_(seastar::make_shared<seastar::tls::certificate_credentials>()) {
-		certificates_->set_x509_trust(pem_, seastar::tls::x509_crt_format::PEM);
-	}
+	CqlSslConnector::CqlSslConnector() :
+		certificates_(seastar::make_shared<seastar::tls::certificate_credentials>()),
+		initialized_(certificates_->set_system_trust()) { }
 }
 

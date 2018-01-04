@@ -7,9 +7,9 @@
 #include "../LowLevel/Authenticators/CqlAuthenticatorBase.hpp"
 
 namespace cql {
-	class CqlSessionConfigurationImpl {
+	class CqlSessionConfigurationData {
 	public:
-		CqlSessionConfigurationImpl();
+		CqlSessionConfigurationData();
 
 		std::vector<seastar::socket_address> serverAddresses;
 		seastar::shared_ptr<CqlConnectorBase> connector;
