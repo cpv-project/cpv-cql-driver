@@ -4,7 +4,7 @@
 #include "CqlConnectorBase.hpp"
 
 namespace cql {
-	/** TODO */
+	/** Connect database server with plain tcp connection */
 	class CqlTcpConnector : public CqlConnectorBase {
 	public:
 		/* Setup the connection */

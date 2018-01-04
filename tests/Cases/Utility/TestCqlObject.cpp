@@ -1,5 +1,5 @@
 #include <CqlDriver/Utility/CqlObject.hpp>
-#include <gtest/gtest.h>
+#include <TestUtility/GTestUtils.hpp>
 
 namespace {
 	struct Foo {

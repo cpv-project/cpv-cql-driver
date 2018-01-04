@@ -1,5 +1,5 @@
 #include <CqlDriver/Utility/StringUtils.hpp>
-#include <gtest/gtest.h>
+#include <TestUtility/GTestUtils.hpp>
 
 TEST(TestStringUtils, split) {
 	std::vector<std::string> results;

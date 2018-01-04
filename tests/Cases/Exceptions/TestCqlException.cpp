@@ -1,5 +1,5 @@
 #include <CqlDriver/Exceptions/CqlException.hpp>
-#include <gtest/gtest.h>
+#include <TestUtility/GTestUtils.hpp>
 
 TEST(TestCqlException, construct) {
 	cql::CqlException exception(CQL_CODEINFO, "some error");

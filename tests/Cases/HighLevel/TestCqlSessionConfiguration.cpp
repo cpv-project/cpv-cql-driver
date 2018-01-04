@@ -1,6 +1,6 @@
 #include <CqlDriver/HighLevel/CqlSessionConfiguration.hpp>
-#include <gtest/gtest.h>
 #include <HighLevel/CqlSessionConfigurationImpl.hpp>
+#include <TestUtility/GTestUtils.hpp>
 
 TEST(TestSessionConfiguration, properties) {
 	cql::CqlSessionConfiguration configuration;

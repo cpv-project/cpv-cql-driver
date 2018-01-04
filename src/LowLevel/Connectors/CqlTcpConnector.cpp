@@ -1,12 +1,12 @@
 #include <CqlDriver/Exceptions/CqlNotImplementedException.hpp>
+#include <core/reactor.hh>
 #include "CqlTcpConnector.hpp"
 
 namespace cql {
 	/* Setup the connection */
 	seastar::future<seastar::connected_socket> CqlTcpConnector::connect(
 		const seastar::socket_address& address) const {
-		// TODO
-		throw CqlNotImplementedException(CQL_CODEINFO);
+		return seastar::engine().net().connect(address);
 	}
 
 	/** Constructor */
