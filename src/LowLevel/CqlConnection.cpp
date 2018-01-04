@@ -7,11 +7,12 @@ namespace cql {
 		if (isReady_) {
 			return seastar::make_ready_future<>();
 		}
-		return seastar::futurize_apply([this] {
-			return connector_->connect(address_);
-		}).then([this] (seastar::connected_socket&& fd) {
-			socket_ = std::move(fd);
-			isReady_ = true;
+		auto self = shared_from_this();
+		return seastar::futurize_apply([self] {
+			return self->connector_->connect(self->address_);
+		}).then([self] (seastar::connected_socket&& fd) {
+			self->socket_ = std::move(fd);
+			self->isReady_ = true;
 		}).then([] {
 			std::cout << "connect success" << std::endl;
 		}).handle_exception([] (std::exception_ptr ex) {

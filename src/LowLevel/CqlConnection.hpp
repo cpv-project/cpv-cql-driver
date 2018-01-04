@@ -11,7 +11,8 @@ namespace cql {
 	 * Example:
 	 * TODO
 	 */
-	class CqlConnection {
+	class CqlConnection :
+		public seastar::enable_shared_from_this<CqlConnection> {
 	public:
 		/** Wait for connection ready */
 		seastar::future<> ready();
