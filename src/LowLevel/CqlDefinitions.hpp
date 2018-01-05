@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 
 namespace cql {
 	// For more information, check the cql protocol definition on:
@@ -38,16 +39,29 @@ namespace cql {
 		Max_ = 0x11 // only for array definition
 	};
 
+	/** Write the text description of message type to stream */
+	std::ostream& operator<<(std::ostream& stream, CqlMessageType type);
+
 	/**
 	 * Flags in message header
 	 * The value of this enum is the `flags` in frame header.
 	 */
 	enum class CqlMessageHeaderFlags {
+		None = 0,
 		Compression = 1,
 		Tracing = 2,
 		CustomPayload = 4,
 		Warning = 8,
 		UseBeta = 16
 	};
+
+	/** Or operation */
+	CqlMessageHeaderFlags operator|(CqlMessageHeaderFlags a, CqlMessageHeaderFlags b);
+
+	/** And operation */
+	CqlMessageHeaderFlags operator&(CqlMessageHeaderFlags a, CqlMessageHeaderFlags b);
+
+	/** Write the text description of header flags to stream */
+	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags);
 }
 
