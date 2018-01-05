@@ -12,13 +12,6 @@ namespace cql {
 	template <class T>
 	class CqlObject {
 	public:
-		/** How many objects can store in free list per thread */
-#if defined(CQL_OBJECT_FREELIST_CAPACITY)
-		static const std::size_t Capacity = CQL_OBJECT_FREELIST_CAPACITY;
-#else
-		static const std::size_t Capacity = 128;
-#endif
-
 		/** Constructor */
 		CqlObject(std::unique_ptr<T>&& ptr) :
 			ptr_(std::move(ptr)) { }
@@ -29,7 +22,7 @@ namespace cql {
 		/** Destructor */
 		~CqlObject() {
 			auto& freeList = getFreeList();
-			if (ptr_ != nullptr && freeList.size() < Capacity) {
+			if (ptr_ != nullptr && freeList.size() < getCapacity()) {
 				ptr_->freeResources();
 				freeList.emplace_back(std::move(ptr_));
 			}
@@ -54,6 +47,12 @@ namespace cql {
 		static std::vector<std::unique_ptr<T>>& getFreeList() {
 			static thread_local std::vector<std::unique_ptr<T>> freeList;
 			return freeList;
+		}
+
+		/** Get the modifiable capacity value, defines how many objects can store in free list per thread */
+		static std::size_t& getCapacity() {
+			static std::size_t capacity = 128;
+			return capacity;
 		}
 
 	private:

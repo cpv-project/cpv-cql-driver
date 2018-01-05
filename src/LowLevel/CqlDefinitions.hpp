@@ -2,12 +2,6 @@
 
 namespace cql {
 	/**
-	 * Default cql version used in this client
-	 * Since scylla using v4 now (2018-01-05) so here also use v4 by default.
-	 */
-	static const std::size_t DefaultCqlVerion = 4;
-
-	/**
 	 * Message direction, either request or response
 	 * The value of this enum can use to calculate the `version` in frame header,
 	 * for example: header.version = static_cast<std::size_t>(direction) | DefaultCqlVerion;
