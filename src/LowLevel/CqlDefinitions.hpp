@@ -1,6 +1,9 @@
 #pragma once
 
 namespace cql {
+	// For more information, check the cql protocol definition on:
+	// https://github.com/apache/cassandra/blob/trunk/doc/native_protocol_v5.spec
+
 	/**
 	 * Message direction, either request or response
 	 * The value of this enum can use to calculate the `version` in frame header,
@@ -33,6 +36,18 @@ namespace cql {
 		AuthResponse = 0xf,
 		AuthSuccess = 0x10,
 		Max_ = 0x11 // only for array definition
+	};
+
+	/**
+	 * Flags in message header
+	 * The value of this enum is the `flags` in frame header.
+	 */
+	enum class CqlMessageHeaderFlags {
+		Compression = 1,
+		Tracing = 2,
+		CustomPayload = 4,
+		Warning = 8,
+		UseBeta = 16
 	};
 }
 
