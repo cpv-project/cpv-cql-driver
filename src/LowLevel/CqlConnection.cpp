@@ -13,10 +13,8 @@ namespace cql {
 		}).then([self] (seastar::connected_socket&& fd) {
 			self->socket_ = std::move(fd);
 			self->isReady_ = true;
-		}).then([] {
-			std::cout << "connect success" << std::endl;
-		}).handle_exception([] (std::exception_ptr ex) {
-			throw CqlNetworkException(CQL_CODEINFO, ex);
+		}).handle_exception([self] (std::exception_ptr ex) {
+			throw CqlNetworkException(CQL_CODEINFO, "connect to", self->address_, "failed:", ex);
 		});
 	}
 
