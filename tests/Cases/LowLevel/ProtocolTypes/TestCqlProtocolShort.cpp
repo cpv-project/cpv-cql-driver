@@ -1,3 +1,4 @@
+#include <CqlDriver/Exceptions/CqlInternalException.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolShort.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
@@ -26,5 +27,13 @@ TEST(TestCqlProtocolShort, decode) {
 	value.decode(ptr, end);
 	ASSERT_TRUE(ptr == end);
 	ASSERT_EQ(value.get(), 0x1234);
+}
+
+TEST(TestCqlProtocolShort, decodeError) {
+	cql::CqlProtocolShort value(0);
+	seastar::sstring data("\x12");
+	auto ptr = data.c_str();
+	auto end = ptr + data.size();
+	ASSERT_THROWS(cql::CqlInternalException, value.decode(ptr, end));
 }
 

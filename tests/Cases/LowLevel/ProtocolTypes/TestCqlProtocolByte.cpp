@@ -1,3 +1,4 @@
+#include <CqlDriver/Exceptions/CqlInternalException.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolByte.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
@@ -26,5 +27,13 @@ TEST(TestCqlProtocolByte, decode) {
 	value.decode(ptr, end);
 	ASSERT_TRUE(ptr == end);
 	ASSERT_EQ(value.get(), 123);
+}
+
+TEST(TestCqlProtocolByte, decodeError) {
+	cql::CqlProtocolByte value(0);
+	seastar::sstring data;
+	auto ptr = data.c_str();
+	auto end = ptr + data.size();
+	ASSERT_THROWS(cql::CqlInternalException, value.decode(ptr, end));
 }
 
