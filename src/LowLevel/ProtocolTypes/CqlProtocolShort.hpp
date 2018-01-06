@@ -1,21 +1,15 @@
 #pragma once
-#include <cstdint>
-#include <core/sstring.hh>
+#include "CqlProtocolIntegerBase.hpp"
 
 namespace cql {
 	/** A 2 bytes unsigned integer */
-	class CqlProtocolShort {
+	class CqlProtocolShort : protected CqlProtocolIntegerBase<std::uint16_t> {
 	public:
-		std::uint16_t get() const { return value_; }
-		void set(std::uint16_t value) { value_ = value; }
-
-		void encode(seastar::sstring& data) const;
-		void decode(const char*& ptr, const char* end);
-
-		explicit CqlProtocolShort(std::uint16_t value) : value_(value) {}
-
-	private:
-		std::uint16_t value_;
+		using CqlProtocolIntegerBase::get;
+		using CqlProtocolIntegerBase::set;
+		using CqlProtocolIntegerBase::encode;
+		using CqlProtocolIntegerBase::decode;
+		using CqlProtocolIntegerBase::CqlProtocolIntegerBase;
 	};
 }
 

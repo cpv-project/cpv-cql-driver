@@ -1,33 +1,32 @@
 #pragma once
-#include <cstdint>
-#include <core/sstring.hh>
+#include "CqlProtocolSizedStringBase.hpp"
 
 namespace cql {
+	/** [bytes] can be either null or normal state */
+	enum class CqlProtocolBytesState { Normal = 0, Null = -1 };
+
 	/**
 	 * A [int] n, followed by n bytes if n >= 0,
 	 * if n < 0, no bytes should follow and the value represented is `null`.
 	 */
-	class CqlProtocolBytes {
+	class CqlProtocolBytes : protected CqlProtocolSizedStringBase<
+		std::int32_t,
+		CqlProtocolBytesState,
+		CqlProtocolBytesState::Null, // default state is null
+		CqlProtocolBytesState::Normal> {
 	public:
-		using LengthType = std::int32_t;
+		using CqlProtocolSizedStringBase::get;
+		using CqlProtocolSizedStringBase::encode;
+		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
 
-		const seastar::sstring& get() const& { return value_; }
-		seastar::sstring& get() & { return value_; }
-		bool isNull() const { return isNull_; }
-
-		void encode(seastar::sstring& data) const;
-		void decode(const char*& ptr, const char* end);
-
-		/** Construct null bytes */
-		CqlProtocolBytes() : value_(), isNull_(true) { }
-
-		/** Construct non-null bytes */
-		explicit CqlProtocolBytes(seastar::sstring&& value) :
-			value_(std::move(value)), isNull_(false) {}
-
-	private:
-		seastar::sstring value_;
-		bool isNull_;
+		bool isNull() const { return state_ == CqlProtocolBytesState::Null; }
+		void decode(const char*& ptr, const char* end) {
+			CqlProtocolSizedStringBase::decode(ptr, end);
+			if (state_ != CqlProtocolBytesState::Normal) {
+				// the specification didn't said negative value other than -1 is invalid
+				state_ = CqlProtocolBytesState::Null;
+			}
+		}
 	};
 }
 

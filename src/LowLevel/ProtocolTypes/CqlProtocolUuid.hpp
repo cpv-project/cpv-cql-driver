@@ -27,7 +27,7 @@ namespace cql {
 		explicit CqlProtocolUuid(std::pair<std::uint64_t, std::uint64_t> value);
 		explicit CqlProtocolUuid(std::uint64_t highBits, std::uint64_t lowBits);
 
-	private:
+	protected:
 		std::uint64_t highBits_;
 		std::uint64_t lowBits_;
 	};

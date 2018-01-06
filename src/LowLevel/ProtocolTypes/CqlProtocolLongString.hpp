@@ -1,25 +1,29 @@
 #pragma once
-#include <cstdint>
-#include <core/sstring.hh>
+#include "CqlProtocolSizedStringBase.hpp"
 
 namespace cql {
+	/** [string] can't be null or not set, only normal state */
+	enum class CqlProtocolLongStringState { Normal = 0 };
+
 	/**
 	 * A [int] n, followed by n bytes representing an UTF-8 string
 	 */
-	class CqlProtocolLongString {
+	class CqlProtocolLongString : protected CqlProtocolSizedStringBase<
+		std::int32_t,
+		CqlProtocolLongStringState,
+		CqlProtocolLongStringState::Normal,
+		CqlProtocolLongStringState::Normal> {
 	public:
-		using LengthType = std::int32_t;
+		using CqlProtocolSizedStringBase::get;
+		using CqlProtocolSizedStringBase::encode;
+		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
 
-		const seastar::sstring& get() const& { return value_; }
-		seastar::sstring& get() & { return value_; }
-
-		void encode(seastar::sstring& data) const;
-		void decode(const char*& ptr, const char* end);
-
-		explicit CqlProtocolLongString(seastar::sstring&& value) : value_(std::move(value)) {}
-
-	private:
-		seastar::sstring value_;
+		void decode(const char*& ptr, const char* end) {
+			CqlProtocolSizedStringBase::decode(ptr, end);
+			if (state_ != CqlProtocolLongStringState::Normal) {
+				throw CqlDecodeException(CQL_CODEINFO, "string length is negative");
+			}
+		}
 	};
 }
 

@@ -1,20 +1,24 @@
 #pragma once
-#include <cstdint>
-#include <core/sstring.hh>
-#include "CqlProtocolString.hpp"
+#include "CqlProtocolSizedStringBase.hpp"
 
 namespace cql {
+	/** [short bytes] can't be null or not set, only normal state */
+	enum class CqlProtocolShortBytesState { Normal = 0 };
+
 	/**
 	 * A [short] n, followed by n bytes if n >= 0,
 	 * different to CqlProtocolBytes, CqlProtocolShortBytes can't represent `null`
 	 */
-	class CqlProtocolShortBytes : private CqlProtocolString {
+	class CqlProtocolShortBytes : protected CqlProtocolSizedStringBase<
+		std::uint16_t,
+		CqlProtocolShortBytesState,
+		CqlProtocolShortBytesState::Normal,
+		CqlProtocolShortBytesState::Normal> {
 	public:
-		using CqlProtocolString::LengthType;
-		using CqlProtocolString::get;
-		using CqlProtocolString::encode;
-		using CqlProtocolString::decode;
-		using CqlProtocolString::CqlProtocolString;
+		using CqlProtocolSizedStringBase::get;
+		using CqlProtocolSizedStringBase::encode;
+		using CqlProtocolSizedStringBase::decode;
+		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
 	};
 }
 
