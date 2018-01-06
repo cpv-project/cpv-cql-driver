@@ -22,7 +22,7 @@ namespace cql {
 		CqlProtocolBytes() : value_(), isNull_(true) { }
 
 		/** Construct non-null bytes */
-		CqlProtocolBytes(seastar::sstring&& value) :
+		explicit CqlProtocolBytes(seastar::sstring&& value) :
 			value_(std::move(value)), isNull_(false) {}
 
 	private:

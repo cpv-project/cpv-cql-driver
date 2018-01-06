@@ -16,7 +16,7 @@ namespace cql {
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
-		CqlProtocolString(seastar::sstring&& value) : value_(std::move(value)) {}
+		explicit CqlProtocolString(seastar::sstring&& value) : value_(std::move(value)) {}
 
 	private:
 		seastar::sstring value_;
