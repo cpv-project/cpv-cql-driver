@@ -1,4 +1,4 @@
-#include <CqlDriver/Exceptions/CqlInternalException.hpp>
+#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
 #include <CqlDriver/Exceptions/CqlFormatException.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolUuid.hpp>
 #include <TestUtility/GTestUtils.hpp>

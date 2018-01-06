@@ -1,5 +1,5 @@
 #include "CqlProtocolLong.hpp"
-#include <CqlDriver/Exceptions/CqlInternalException.hpp>
+#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
 #include <core/byteorder.hh>
 
 namespace cql {
@@ -10,7 +10,7 @@ namespace cql {
 
 	void CqlProtocolLong::decode(const char*& ptr, const char* end) {
 		if (ptr + sizeof(value_) > end) {
-			throw CqlInternalException(CQL_CODEINFO, "decode failed: length not enough");
+			throw CqlDecodeException(CQL_CODEINFO, "length not enough");
 		}
 		std::memcpy(&value_, ptr, sizeof(value_));
 		value_ = seastar::be_to_cpu(value_);

@@ -1,4 +1,4 @@
-#include <CqlDriver/Exceptions/CqlInternalException.hpp>
+#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolString.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
@@ -56,14 +56,14 @@ TEST(TestCqlProtocolString, decodeError) {
 		seastar::sstring data("\x00", 1);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
-		ASSERT_THROWS(cql::CqlInternalException, value.decode(ptr, end));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolString value("");
 		seastar::sstring data("\x00\x02""a", 3);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
-		ASSERT_THROWS(cql::CqlInternalException, value.decode(ptr, end));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 }
 

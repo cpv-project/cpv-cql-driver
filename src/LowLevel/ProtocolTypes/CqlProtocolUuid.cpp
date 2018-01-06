@@ -1,5 +1,5 @@
 #include "CqlProtocolUuid.hpp"
-#include <CqlDriver/Exceptions/CqlInternalException.hpp>
+#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
 #include <CqlDriver/Exceptions/CqlFormatException.hpp>
 #include <CqlDriver/Utility/StringUtils.hpp>
 #include <core/byteorder.hh>
@@ -64,7 +64,7 @@ namespace cql {
 	void CqlProtocolUuid::decode(const char*& ptr, const char* end) {
 		static const constexpr std::size_t length = sizeof(highBits_) + sizeof(lowBits_);
 		if (ptr + length > end) {
-			throw CqlInternalException(CQL_CODEINFO, "decode failed: length not enough");
+			throw CqlDecodeException(CQL_CODEINFO, "length not enough");
 		}
 		std::memcpy(&highBits_, ptr, sizeof(highBits_));
 		std::memcpy(&lowBits_, ptr + sizeof(highBits_), sizeof(lowBits_));
