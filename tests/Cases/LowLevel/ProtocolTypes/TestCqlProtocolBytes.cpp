@@ -42,6 +42,14 @@ TEST(TestCqlProtocolBytes, decode) {
 		ASSERT_FALSE(value.isNull());
 	}
 	{
+		seastar::sstring data("\x00\x00\x00\x02""ab", 6);
+		auto ptr = data.c_str();
+		auto end = ptr + data.size();
+		value.decode(ptr, end);
+		ASSERT_EQ(value.get(), "ab");
+		ASSERT_FALSE(value.isNull());
+	}
+	{
 		seastar::sstring data("\xff\xff\xff\xff");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
@@ -64,14 +72,14 @@ TEST(TestCqlProtocolBytes, decode) {
 TEST(TestCqlProtocolBytes, decodeError) {
 	{
 		cql::CqlProtocolBytes value;
-		seastar::sstring data("\x00");
+		seastar::sstring data("\x00", 1);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlInternalException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolBytes value;
-		seastar::sstring data("\x00\x00\x00\x02""a");
+		seastar::sstring data("\x00\x00\x00\x02""a", 5);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlInternalException, value.decode(ptr, end));

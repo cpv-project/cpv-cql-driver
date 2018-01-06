@@ -9,6 +9,8 @@ namespace cql {
 	 */
 	class CqlProtocolBytes {
 	public:
+		using LengthType = std::int32_t;
+
 		const seastar::sstring& get() const& { return value_; }
 		seastar::sstring& get() & { return value_; }
 		bool isNull() const { return isNull_; }
