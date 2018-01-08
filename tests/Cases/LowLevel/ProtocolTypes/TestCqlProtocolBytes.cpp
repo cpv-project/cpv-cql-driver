@@ -38,6 +38,7 @@ TEST(TestCqlProtocolBytes, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get(), "abc");
 		ASSERT_FALSE(value.isNull());
 	}
@@ -46,6 +47,7 @@ TEST(TestCqlProtocolBytes, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get(), "ab");
 		ASSERT_FALSE(value.isNull());
 	}

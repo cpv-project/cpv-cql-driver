@@ -35,6 +35,7 @@ TEST(TestCqlProtocolStringList, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get().size(), 2);
 		ASSERT_EQ(value.get().at(0).get(), "abc");
 		ASSERT_EQ(value.get().at(1).get(), "aaaaa");
@@ -44,6 +45,7 @@ TEST(TestCqlProtocolStringList, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get().size(), 1);
 		ASSERT_EQ(value.get().at(0).get(), "aa");
 	}
@@ -52,6 +54,7 @@ TEST(TestCqlProtocolStringList, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_TRUE(value.get().empty());
 	}
 	{
@@ -65,6 +68,7 @@ TEST(TestCqlProtocolStringList, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get().size(), longList.get().size());
 		for (std::size_t i = 1, j = longList.get().size(); i < j; ++i) {
 			ASSERT_EQ(value.get()[i].get(), longList.get()[i].get());

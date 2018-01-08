@@ -46,6 +46,7 @@ TEST(TestCqlProtocolStringMap, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get().size(), 2);
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("apple")).get(), "dog");
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("orange")).get(), "cat");
@@ -57,6 +58,7 @@ TEST(TestCqlProtocolStringMap, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get().size(), 1);
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("apple")).get(), "dog");
 	}
@@ -65,6 +67,7 @@ TEST(TestCqlProtocolStringMap, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_TRUE(value.get().empty());
 	}
 }

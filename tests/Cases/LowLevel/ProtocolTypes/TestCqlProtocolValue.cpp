@@ -53,6 +53,7 @@ TEST(TestCqlProtocolValue, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get(), "abc");
 		ASSERT_EQ(value.state(), cql::CqlProtocolValueState::Normal);
 	}
@@ -61,6 +62,7 @@ TEST(TestCqlProtocolValue, decode) {
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
+		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get(), "ab");
 		ASSERT_EQ(value.state(), cql::CqlProtocolValueState::Normal);
 	}
