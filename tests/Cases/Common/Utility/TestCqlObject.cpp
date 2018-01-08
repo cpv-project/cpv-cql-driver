@@ -1,4 +1,4 @@
-#include <CqlDriver/Utility/CqlObject.hpp>
+#include <CqlDriver/Common/Utility/CqlObject.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 namespace {

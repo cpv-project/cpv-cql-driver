@@ -4,7 +4,7 @@
 #include <limits>
 #include <core/sstring.hh>
 #include <core/byteorder.hh>
-#include <CqlDriver/Exceptions/CqlEncodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlEncodeException.hpp>
 
 namespace cql {
 	/**

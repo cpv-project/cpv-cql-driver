@@ -1,5 +1,5 @@
-#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
-#include <CqlDriver/Exceptions/CqlFormatException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlFormatException.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolUuid.hpp>
 #include <TestUtility/GTestUtils.hpp>
 

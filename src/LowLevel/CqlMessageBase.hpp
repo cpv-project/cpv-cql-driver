@@ -1,5 +1,5 @@
 #pragma once
-#include <CqlDriver/Utility/CqlObject.hpp>
+#include <CqlDriver/Common/Utility/CqlObject.hpp>
 #include "CqlDefinitions.hpp"
 #include "CqlMessageHeader.hpp"
 #include "CqlConnectionInfo.hpp"

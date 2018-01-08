@@ -1,4 +1,4 @@
-#include <CqlDriver/Utility/StringUtils.hpp>
+#include <CqlDriver/Common/Utility/StringUtils.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestStringUtils, split) {

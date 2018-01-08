@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <core/sstring.hh>
 #include <core/byteorder.hh>
-#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 
 namespace cql {
 	/**

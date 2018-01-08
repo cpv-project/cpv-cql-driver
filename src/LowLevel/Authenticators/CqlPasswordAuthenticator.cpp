@@ -1,4 +1,4 @@
-#include <CqlDriver/Exceptions/CqlNotImplementedException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include "CqlPasswordAuthenticator.hpp"
 
 namespace cql {

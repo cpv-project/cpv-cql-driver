@@ -1,4 +1,4 @@
-#include <CqlDriver/Exceptions/CqlNetworkException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlNetworkException.hpp>
 #include "CqlConnection.hpp"
 
 namespace cql {

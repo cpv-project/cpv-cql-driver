@@ -1,4 +1,4 @@
-#include <CqlDriver/Utility/CodeInfo.hpp>
+#include <CqlDriver/Common/Utility/CodeInfo.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestCodeInfo, construct) {

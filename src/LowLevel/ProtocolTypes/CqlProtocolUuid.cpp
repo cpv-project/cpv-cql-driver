@@ -1,7 +1,7 @@
 #include "CqlProtocolUuid.hpp"
-#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
-#include <CqlDriver/Exceptions/CqlFormatException.hpp>
-#include <CqlDriver/Utility/StringUtils.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlFormatException.hpp>
+#include <CqlDriver/Common/Utility/StringUtils.hpp>
 #include <core/byteorder.hh>
 #include <random>
 

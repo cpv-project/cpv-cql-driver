@@ -2,8 +2,8 @@
 #include <unordered_map>
 #include <core/sstring.hh>
 #include <core/byteorder.hh>
-#include <CqlDriver/Exceptions/CqlEncodeException.hpp>
-#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlEncodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 
 namespace cql {
 	/** Default hash function for map key */

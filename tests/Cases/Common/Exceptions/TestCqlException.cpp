@@ -1,4 +1,4 @@
-#include <CqlDriver/Exceptions/CqlException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlException.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestCqlException, construct) {

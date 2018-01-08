@@ -1,4 +1,4 @@
-#include <CqlDriver/Exceptions/CqlDecodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolShortBytes.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
