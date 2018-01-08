@@ -61,7 +61,7 @@ namespace cql {
 		CqlProtocolListBase() : value_() { }
 		explicit CqlProtocolListBase(VectorType&& value) : value_(std::move(value)) { }
 
-	private:
+	protected:
 		VectorType value_;
 	};
 }

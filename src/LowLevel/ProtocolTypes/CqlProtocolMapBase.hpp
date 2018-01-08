@@ -70,7 +70,7 @@ namespace cql {
 		CqlProtocolMapBase() : value_() { }
 		explicit CqlProtocolMapBase(MapType&& value) : value_(std::move(value)) { }
 
-	private:
+	protected:
 		MapType value_;
 	};
 }

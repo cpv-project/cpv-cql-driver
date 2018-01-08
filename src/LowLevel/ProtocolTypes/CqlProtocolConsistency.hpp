@@ -1,4 +1,5 @@
 #pragma once
+#include <CqlDriver/Common/CqlCommonDefinitions.hpp>
 #include "CqlProtocolIntegerBase.hpp"
 
 namespace cql {
@@ -8,11 +9,14 @@ namespace cql {
 	 */
 	class CqlProtocolConsistency : protected CqlProtocolIntegerBase<std::uint16_t> {
 	public:
-		using CqlProtocolIntegerBase::get;
-		using CqlProtocolIntegerBase::set;
 		using CqlProtocolIntegerBase::encode;
 		using CqlProtocolIntegerBase::decode;
-		using CqlProtocolIntegerBase::CqlProtocolIntegerBase;
+
+		CqlConsistencyLevel get() const { return static_cast<CqlConsistencyLevel>(value_); }
+		void set(CqlConsistencyLevel level) { value_ = static_cast<decltype(value_)>(level); }
+
+		explicit CqlProtocolConsistency(CqlConsistencyLevel level) { set(level); }
+		CqlProtocolConsistency() : CqlProtocolConsistency(CqlConsistencyLevel::Any) { }
 	};
 }
 
