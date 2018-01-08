@@ -54,6 +54,22 @@ TEST(TestCqlProtocolStringList, decode) {
 		value.decode(ptr, end);
 		ASSERT_TRUE(value.get().empty());
 	}
+	{
+		cql::CqlProtocolStringList longList;
+		for (std::size_t i = 0, j = cql::CqlProtocolStringList::SmallSizeBoundary + 3; i < j; ++i) {
+			longList.get().emplace_back(
+				seastar::sstring(reinterpret_cast<const char*>(&i), sizeof(i)));
+		}
+		seastar::sstring data;
+		longList.encode(data);
+		auto ptr = data.c_str();
+		auto end = ptr + data.size();
+		value.decode(ptr, end);
+		ASSERT_EQ(value.get().size(), longList.get().size());
+		for (std::size_t i = 0, j = longList.get().size(); i < j; ++i) {
+			ASSERT_EQ(value.get()[i].get(), longList.get()[i].get());
+		}
+	}
 }
 
 TEST(TestCqlProtocolStringList, decodeError) {

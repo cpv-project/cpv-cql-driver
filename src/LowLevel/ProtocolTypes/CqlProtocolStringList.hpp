@@ -1,29 +1,19 @@
 #pragma once
-#include <cstdint>
-#include <vector>
-#include <core/sstring.hh>
+#include "CqlProtocolListBase.hpp"
 #include "CqlProtocolString.hpp"
 
 namespace cql {
 	/**
 	 * A [short] n, followed by n [string]
 	 */
-	class CqlProtocolStringList {
+	class CqlProtocolStringList :
+		private CqlProtocolListBase<std::uint16_t, CqlProtocolString> {
 	public:
-		using LengthType = std::uint16_t;
-
-		const std::vector<CqlProtocolString>& get() const& { return values_; }
-		std::vector<CqlProtocolString>& get() & { return values_; }
-
-		void encode(seastar::sstring& data) const;
-		void decode(const char*& ptr, const char* end);
-
-		CqlProtocolStringList() : values_() { }
-		CqlProtocolStringList(std::vector<CqlProtocolString>&& values) :
-			values_(std::move(values)) { }
-
-	private:
-		std::vector<CqlProtocolString> values_;
+		using CqlProtocolListBase::SmallSizeBoundary;
+		using CqlProtocolListBase::get;
+		using CqlProtocolListBase::encode;
+		using CqlProtocolListBase::decode;
+		using CqlProtocolListBase::CqlProtocolListBase;
 	};
 }
 
