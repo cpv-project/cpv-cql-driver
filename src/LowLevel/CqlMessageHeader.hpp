@@ -1,7 +1,7 @@
 #pragma once
 #include <core/sstring.hh>
 #include <core/temporary_buffer.hh>
-#include "CqlDefinitions.hpp"
+#include "CqlLowLevelDefinitions.hpp"
 #include "CqlConnectionInfo.hpp"
 #include "ProtocolTypes/CqlProtocolByte.hpp"
 #include "ProtocolTypes/CqlProtocolShort.hpp"

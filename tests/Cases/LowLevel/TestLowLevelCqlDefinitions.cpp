@@ -1,8 +1,8 @@
 #include <CqlDriver/Common/Utility/StringUtils.hpp>
-#include <LowLevel/CqlDefinitions.hpp>
+#include <LowLevel/CqlLowLevelDefinitions.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlDefinitions, messageTypeToString) {
+TEST(TestCqlLowLevelDefinitions, messageTypeToString) {
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Error), "Error");
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::StartUp), "StartUp");
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Ready), "Ready");
@@ -22,7 +22,7 @@ TEST(TestCqlDefinitions, messageTypeToString) {
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType(-1)), "Unknow");
 }
 
-TEST(TestCqlDefinitions, messageHeaderFlagsToString) {
+TEST(TestCqlLowLevelDefinitions, messageHeaderFlagsToString) {
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageHeaderFlags::None), "");
 	ASSERT_EQ(
 		cql::joinString("", cql::CqlMessageHeaderFlags::Compression | cql::CqlMessageHeaderFlags::Tracing),

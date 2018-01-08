@@ -63,19 +63,5 @@ namespace cql {
 
 	/** Write the text description of header flags to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags);
-
-	enum class CqlConsistencyLevel {
-		Any = 0,
-		One = 1,
-		Two = 2,
-		Three = 3,
-		Quorum = 4,
-		All = 5,
-		LocalQuorum = 6,
-		EachQuorum = 7,
-		Serial = 8,
-		LocalSerial = 9,
-		LocalOne = 0xa
-	};
 }
 
