@@ -14,9 +14,10 @@ namespace cql {
 	class CqlProtocolListBase {
 	public:
 		static const std::size_t SmallSizeBoundary = 255;
+		using VectorType = std::vector<ElementType>;
 
-		const std::vector<ElementType>& get() const& { return value_; }
-		std::vector<ElementType>& get() & { return value_; }
+		const VectorType& get() const& { return value_; }
+		VectorType& get() & { return value_; }
 
 		void encode(seastar::sstring& data) const {
 			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {
@@ -58,11 +59,10 @@ namespace cql {
 		}
 
 		CqlProtocolListBase() : value_() { }
-		explicit CqlProtocolListBase(std::vector<ElementType>&& value) :
-			value_(std::move(value)) { }
+		explicit CqlProtocolListBase(VectorType&& value) : value_(std::move(value)) { }
 
 	private:
-		std::vector<ElementType> value_;
+		VectorType value_;
 	};
 }
 

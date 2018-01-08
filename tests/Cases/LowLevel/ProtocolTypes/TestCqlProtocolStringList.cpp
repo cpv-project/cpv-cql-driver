@@ -56,7 +56,7 @@ TEST(TestCqlProtocolStringList, decode) {
 	}
 	{
 		cql::CqlProtocolStringList longList;
-		for (std::size_t i = 0, j = cql::CqlProtocolStringList::SmallSizeBoundary + 3; i < j; ++i) {
+		for (std::size_t i = 1, j = cql::CqlProtocolStringList::SmallSizeBoundary + 3; i < j; ++i) {
 			longList.get().emplace_back(
 				seastar::sstring(reinterpret_cast<const char*>(&i), sizeof(i)));
 		}
@@ -66,7 +66,7 @@ TEST(TestCqlProtocolStringList, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_EQ(value.get().size(), longList.get().size());
-		for (std::size_t i = 0, j = longList.get().size(); i < j; ++i) {
+		for (std::size_t i = 1, j = longList.get().size(); i < j; ++i) {
 			ASSERT_EQ(value.get()[i].get(), longList.get()[i].get());
 		}
 	}
@@ -75,21 +75,21 @@ TEST(TestCqlProtocolStringList, decode) {
 TEST(TestCqlProtocolStringList, decodeError) {
 	{
 		cql::CqlProtocolStringList value;
-		seastar::sstring data("\x00", 1);
+		seastar::sstring data("\x01", 1);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolStringList value;
-		seastar::sstring data("\x00\x02""\x00\x03""abc", 7);
+		seastar::sstring data("\x01\x02""\x00\x03""abc", 7);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolStringList value;
-		seastar::sstring data("\x00\x02""\x00\x03""abc""\x00\x05""aaaa", 13);
+		seastar::sstring data("\x01\x02""\x00\x03""abc""\x00\x05""aaaa", 13);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
