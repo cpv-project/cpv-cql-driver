@@ -2,7 +2,6 @@
 #include <LowLevel/ProtocolTypes/CqlProtocolStringMap.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-
 TEST(TestCqlProtocolStringMap, getset) {
 	cql::CqlProtocolStringMap value({
 		{ cql::CqlProtocolString("apple"), cql::CqlProtocolString("dog") },

@@ -54,7 +54,7 @@ namespace cql {
 		}
 
 		CqlProtocolSizedStringBase() : value_(), state_(DefaultState) { }
-		CqlProtocolSizedStringBase(StateType state) : value_(), state_(state) { }
+		explicit CqlProtocolSizedStringBase(StateType state) : value_(), state_(state) { }
 		explicit CqlProtocolSizedStringBase(seastar::sstring&& value) :
 			value_(std::move(value)), state_(NormalState) {}
 
