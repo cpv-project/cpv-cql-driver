@@ -51,11 +51,18 @@ namespace cql {
 		// read header
 		std::uint8_t header = static_cast<std::uint8_t>(*ptr);
 		std::size_t extraBytes = 0;
+#if defined(__i386__) || defined(__amd64__)
+		static const constexpr std::size_t bitsDistance = (sizeof(unsigned int) - 1) * 8;
+		static_assert(bitsDistance > 0, "ensure ~(header << bitsDistance) != 0");
+		extraBytes = __builtin_clz(~(static_cast<unsigned int>(header) << bitsDistance));
+		header = static_cast<uint8_t>(header << extraBytes) >> extraBytes;
+#else
 		while (header & 0b10000000) {
-			++extraBytes; // OPTIMIZE: use not and clz here to improve performance
+			++extraBytes;
 			header <<= 1;
 		}
 		header >>= extraBytes;
+#endif
 		++ptr;
 		// read extra bytes
 		if (ptr + extraBytes > end) {
