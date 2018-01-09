@@ -10,7 +10,7 @@ namespace cql {
 	 */
 	class CqlProtocolInetAddr {
 	public:
-		const seastar::net::inet_address& get() const& { return value_; }
+		seastar::net::inet_address get() const { return value_; }
 		void set(const seastar::net::inet_address& value) & { value_ = value; }
 
 		void encode(seastar::sstring& data) const;
