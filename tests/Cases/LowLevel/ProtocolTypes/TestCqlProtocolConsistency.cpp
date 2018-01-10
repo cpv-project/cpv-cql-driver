@@ -2,7 +2,7 @@
 #include <LowLevel/ProtocolTypes/CqlProtocolConsistency.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlProtocolConsistency, all) {
+TEST(TestCqlProtocolConsistency, getset) {
 	cql::CqlProtocolConsistency value(cql::CqlConsistencyLevel::One);
 	ASSERT_EQ(value.get(), cql::CqlConsistencyLevel::One);
 	value.set(cql::CqlConsistencyLevel::Quorum);

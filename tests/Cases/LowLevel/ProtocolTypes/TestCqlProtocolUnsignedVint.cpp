@@ -2,7 +2,7 @@
 #include <LowLevel/ProtocolTypes/CqlProtocolUnsignedVint.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlProtocolUnsignedVint, all) {
+TEST(TestCqlProtocolUnsignedVint, getset) {
 	cql::CqlProtocolUnsignedVint value(1);
 	ASSERT_EQ(value.get(), 1);
 	value.set(0x7fff0000aaaaeeee);

@@ -2,7 +2,7 @@
 #include <LowLevel/ProtocolTypes/CqlProtocolShort.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlProtocolShort, all) {
+TEST(TestCqlProtocolShort, getset) {
 	cql::CqlProtocolShort value(1);
 	ASSERT_EQ(value.get(), 1);
 	value.set(12321);

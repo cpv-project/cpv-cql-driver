@@ -27,5 +27,46 @@ namespace cql {
 		}
 		return stream;
 	}
+
+	/** Write the text description of column type to stream */
+	std::ostream& operator<<(std::ostream& stream, CqlColumnType type) {
+		static auto staticNames = [] {
+			std::array<const char*, static_cast<std::size_t>(CqlColumnType::Max_)> names;
+			names[static_cast<std::size_t>(CqlColumnType::Custom)] = "Custom";
+			names[static_cast<std::size_t>(CqlColumnType::Ascii)] = "Ascii";
+			names[static_cast<std::size_t>(CqlColumnType::BigInt)] = "BigInt";
+			names[static_cast<std::size_t>(CqlColumnType::Blob)] = "Blob";
+			names[static_cast<std::size_t>(CqlColumnType::Boolean)] = "Boolean";
+			names[static_cast<std::size_t>(CqlColumnType::Counter)] = "Counter";
+			names[static_cast<std::size_t>(CqlColumnType::Decimal)] = "Decimal";
+			names[static_cast<std::size_t>(CqlColumnType::Double)] = "Double";
+			names[static_cast<std::size_t>(CqlColumnType::Float)] = "Float";
+			names[static_cast<std::size_t>(CqlColumnType::Int)] = "Int";
+			names[static_cast<std::size_t>(CqlColumnType::Timestamp)] = "Timestamp";
+			names[static_cast<std::size_t>(CqlColumnType::Uuid)] = "Uuid";
+			names[static_cast<std::size_t>(CqlColumnType::VarChar)] = "VarChar";
+			names[static_cast<std::size_t>(CqlColumnType::VarInt)] = "VarInt";
+			names[static_cast<std::size_t>(CqlColumnType::TimeUuid)] = "TimeUuid";
+			names[static_cast<std::size_t>(CqlColumnType::Inet)] = "Inet";
+			names[static_cast<std::size_t>(CqlColumnType::Date)] = "Date";
+			names[static_cast<std::size_t>(CqlColumnType::Time)] = "Time";
+			names[static_cast<std::size_t>(CqlColumnType::SmallInt)] = "SmallInt";
+			names[static_cast<std::size_t>(CqlColumnType::TinyInt)] = "TinyInt";
+			names[static_cast<std::size_t>(CqlColumnType::Duration)] = "Duration";
+			names[static_cast<std::size_t>(CqlColumnType::List)] = "List";
+			names[static_cast<std::size_t>(CqlColumnType::Map)] = "Map";
+			names[static_cast<std::size_t>(CqlColumnType::Set)] = "Set";
+			names[static_cast<std::size_t>(CqlColumnType::Udt)] = "Udt";
+			names[static_cast<std::size_t>(CqlColumnType::Tuple)] = "Tuple";
+			return names;
+		}();
+		auto index = static_cast<std::size_t>(type);
+		if (index >= staticNames.size() || staticNames[index] == nullptr) {
+			stream << "Unknow";
+		} else {
+			stream << staticNames[index];
+		}
+		return stream;
+	}
 }
 

@@ -2,7 +2,7 @@
 #include <LowLevel/ProtocolTypes/CqlProtocolVint.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlProtocolVint, all) { // TODO: rename to getset
+TEST(TestCqlProtocolVint, getset) {
 	cql::CqlProtocolVint value(1);
 	ASSERT_EQ(value.get(), 1);
 	value.set(0x7fff0000aaaaeeee);

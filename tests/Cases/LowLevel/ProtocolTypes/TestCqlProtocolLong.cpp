@@ -2,7 +2,7 @@
 #include <LowLevel/ProtocolTypes/CqlProtocolLong.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlProtocolLong, all) {
+TEST(TestCqlProtocolLong, getset) {
 	cql::CqlProtocolLong value(1);
 	ASSERT_EQ(value.get(), 1);
 	value.set(0x7fff0000aaaaeeee);
