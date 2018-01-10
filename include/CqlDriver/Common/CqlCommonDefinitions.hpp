@@ -62,5 +62,11 @@ namespace cql {
 
 	/** Write the text description of column type to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlColumnType type);
+
+	/** The full class name of the IAuthenticator in use */
+	namespace AuthenticatorClasses {
+		static const char* AllowAllAuthenticator = "AllowAllAuthenticator";
+		static const char* PasswordAuthenticator = "PasswordAuthenticator";
+	}
 }
 

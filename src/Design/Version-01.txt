@@ -1,0 +1,61 @@
+CqlSessionConfiguration [Common, byvalue]
+	setMaxPoolSize()
+	setDnsCacheTime()
+
+CqlNodeConfiguration [Common, byvalue]
+	setAddress(hostname, port)
+	setUseSsl()
+	setUseCompression()
+	setPasswordAuthentication(username, password)
+	...
+	getIpAddress(ipAddress, dnsCacheTime)
+	updateIpAddress(ipAddress)
+
+CqlNodeCollection [Common, shared_ptr]
+	chooseOneNode()
+	reportFailure(nodeConfiguration)
+	reportSuccess(nodeConfiguration)
+	create(initialNodes)
+
+CqlSessionFactory [HighLevel, shared_ptr]
+	getSession()
+	create(sessionConfiguration, nodeCollection)
+
+CqlSession [HighLevel, CqlObject]
+	...
+
+CqlConnectionPool [LowLevel, shared_ptr]
+	getConnection()
+	CqlConnectionPool(sessionConfiguration, nodeCollection)
+
+CqlConnectionInfo [LowLevel, byvalue]
+	getVersion()
+	getHeaderSize()
+	getMaximumMessageBodySize()
+	getCompressor()
+	useVersion()
+	useCompressor(compressor)
+
+CqlConnection [LowLevel, shared_ptr]
+	CqlConnection(sessionConfiguration, nodeConfiguration)
+
+==========================================
+
+auto factory = CqlSessionFactory.create(
+	CqlSessionConfiguration()
+		.setMaxPoolSize(100)
+		.setDnsCacheTime(std::chrono::milliseconds(15000)),
+	CqlNodeCollection.create({
+		CqlNodeConfiguration()
+			.setUseAddress("127.0.0.1")
+			.setUseSsl(true)
+			.setUseCompression(true)
+			.setPasswordAuthentication("abc", "123456"),
+		CqlNodeConfiguration()
+			.setUseAddress("127.0.0.1")
+			.setUseSsl(true)
+			.setUseCompression(true)
+			.setPasswordAuthentication("abc", "123456")
+	}));
+auto session = factory.getSession();
+

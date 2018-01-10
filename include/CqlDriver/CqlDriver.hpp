@@ -13,7 +13,10 @@
 #include "Common/Utility/CodeInfo.hpp"
 #include "Common/Utility/CqlObject.hpp"
 #include "Common/Utility/StringUtils.hpp"
+#include "Common/CqlCommonDefinitions.hpp"
+#include "Common/CqlNodeCollection.hpp"
+#include "Common/CqlNodeConfiguration.hpp"
+#include "Common/CqlSessionConfiguration.hpp"
 #include "HighLevel/CqlSession.hpp"
-#include "HighLevel/CqlSessionConfiguration.hpp"
 #include "HighLevel/CqlSessionFactory.hpp"
 
