@@ -13,6 +13,9 @@ namespace cql {
 
 		/** Report connect to this node has been successful */
 		void reportSuccess(const seastar::shared_ptr<CqlNodeConfiguration>& node) override;
+
+		/** Constructor */
+		CqlNodeCollectionImpl(const std::vector<CqlNodeConfiguration>& initialNodes);
 	};
 }
 

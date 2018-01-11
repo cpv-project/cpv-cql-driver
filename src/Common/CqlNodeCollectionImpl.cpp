@@ -16,5 +16,10 @@ namespace cql {
 	void CqlNodeCollectionImpl::reportSuccess(const seastar::shared_ptr<CqlNodeConfiguration>& node) {
 		throw cql::CqlNotImplementedException(CQL_CODEINFO, "not implemented");
 	}
+
+	/** Constructor */
+	CqlNodeCollectionImpl::CqlNodeCollectionImpl(const std::vector<CqlNodeConfiguration>&) {
+		throw cql::CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+	}
 }
 

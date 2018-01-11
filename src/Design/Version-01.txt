@@ -21,7 +21,7 @@ CqlSessionFactory [HighLevel, shared_ptr]
 	getSession()
 	create(sessionConfiguration, nodeCollection)
 
-CqlSession [HighLevel, CqlObject]
+CqlSession [HighLevel, unique_ptr]
 	...
 
 CqlConnectionPool [LowLevel, shared_ptr]

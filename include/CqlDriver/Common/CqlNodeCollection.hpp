@@ -16,8 +16,12 @@ namespace cql {
 		/** Report connect to this node has been successful */
 		virtual void reportSuccess(const seastar::shared_ptr<CqlNodeConfiguration>& node) = 0;
 
+		/** Virtual destructor */
+		virtual ~CqlNodeCollection() = default;
+
 		/** Create a default implementation of CqlNodeCollection */
-		static seastar::shared_ptr<CqlNodeCollection> create(std::vector<CqlNodeConfiguration>&& initialNodes);
+		static seastar::shared_ptr<CqlNodeCollection> create(
+			const std::vector<CqlNodeConfiguration>& initialNodes);
 	};
 }
 
