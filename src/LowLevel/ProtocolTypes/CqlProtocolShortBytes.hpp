@@ -9,7 +9,7 @@ namespace cql {
 	 * A [short] n, followed by n bytes if n >= 0,
 	 * different to CqlProtocolBytes, CqlProtocolShortBytes can't represent `null`
 	 */
-	class CqlProtocolShortBytes : protected CqlProtocolSizedStringBase<
+	class CqlProtocolShortBytes : private CqlProtocolSizedStringBase<
 		std::uint16_t,
 		CqlProtocolShortBytesState,
 		CqlProtocolShortBytesState::Normal,

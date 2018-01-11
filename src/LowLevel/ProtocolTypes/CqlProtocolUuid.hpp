@@ -7,7 +7,7 @@ namespace cql {
 	/**
 	 * A 16 bytes long uuid
 	 * Example:
-	 * TODO
+	 * CqlProtocolUuid uuid("00112233-4455-6677-8899-aabbccddeeff");
 	 */
 	class CqlProtocolUuid {
 	public:
@@ -27,7 +27,7 @@ namespace cql {
 		explicit CqlProtocolUuid(std::pair<std::uint64_t, std::uint64_t> value);
 		explicit CqlProtocolUuid(std::uint64_t highBits, std::uint64_t lowBits);
 
-	protected:
+	private:
 		std::uint64_t highBits_;
 		std::uint64_t lowBits_;
 	};

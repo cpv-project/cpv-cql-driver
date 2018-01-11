@@ -7,7 +7,7 @@ namespace cql {
 	 * A [short] n, followed by n [string]
 	 */
 	class CqlProtocolStringList :
-		protected CqlProtocolListBase<std::uint16_t, CqlProtocolString> {
+		private CqlProtocolListBase<std::uint16_t, CqlProtocolString> {
 	public:
 		using CqlProtocolListBase::SmallSizeBoundary;
 		using CqlProtocolListBase::get;

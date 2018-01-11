@@ -20,7 +20,7 @@ namespace cql {
 		explicit CqlProtocolInetAddr(const seastar::net::inet_address& value) :
 			value_(value) { }
 
-	protected:
+	private:
 		seastar::net::inet_address value_;
 	};
 }

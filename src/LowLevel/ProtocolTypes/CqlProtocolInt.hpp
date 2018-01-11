@@ -3,7 +3,7 @@
 
 namespace cql {
 	/** A 4 bytes signed integer */
-	class CqlProtocolInt : protected CqlProtocolIntegerBase<std::int32_t> {
+	class CqlProtocolInt : private CqlProtocolIntegerBase<std::int32_t> {
 	public:
 		using CqlProtocolIntegerBase::get;
 		using CqlProtocolIntegerBase::set;

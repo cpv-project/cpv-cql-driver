@@ -9,7 +9,7 @@ namespace cql {
 	 * A [int] n, followed by n bytes if n >= 0,
 	 * if n < 0, no bytes should follow and the value represented is `null`.
 	 */
-	class CqlProtocolBytes : protected CqlProtocolSizedStringBase<
+	class CqlProtocolBytes : private CqlProtocolSizedStringBase<
 		std::int32_t,
 		CqlProtocolBytesState,
 		CqlProtocolBytesState::Null, // default state is null

@@ -7,7 +7,7 @@ namespace cql {
 	 * A consistency level specification
 	 * This is a [short] representing a consistency level.
 	 */
-	class CqlProtocolConsistency : protected CqlProtocolIntegerBase<std::uint16_t> {
+	class CqlProtocolConsistency : private CqlProtocolIntegerBase<std::uint16_t> {
 	public:
 		using CqlProtocolIntegerBase::encode;
 		using CqlProtocolIntegerBase::decode;

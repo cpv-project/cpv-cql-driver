@@ -6,7 +6,7 @@ namespace cql {
 	 * A unsigned variable length integer
 	 * See the comments in CqlProtocolVariableIntegerBase
 	 */
-	class CqlProtocolUnsignedVint : protected CqlProtocolVariableIntegerBase {
+	class CqlProtocolUnsignedVint : private CqlProtocolVariableIntegerBase {
 	public:
 		using CqlProtocolVariableIntegerBase::get;
 		using CqlProtocolVariableIntegerBase::set;

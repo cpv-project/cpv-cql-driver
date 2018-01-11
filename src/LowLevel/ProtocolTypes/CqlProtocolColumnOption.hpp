@@ -61,7 +61,7 @@ namespace cql {
 		explicit CqlProtocolColumnOption(const CqlProtocolColumnOptionTuplePayload& payload) :
 			type_(), payload_() { set(cql::CqlColumnType::Tuple); setTuplePayload(payload); }
 
-	protected:
+	private:
 		CqlColumnType type_;
 		seastar::sstring payload_;
 	};
@@ -83,7 +83,7 @@ namespace cql {
 		explicit CqlProtocolColumnOptionCustomPayload(CqlProtocolString&& value) :
 			value_(std::move(value)) { }
 
-	protected:
+	private:
 		CqlProtocolString value_;
 	};
 
@@ -104,7 +104,7 @@ namespace cql {
 		explicit CqlProtocolColumnOptionListPayload(CqlProtocolColumnOption&& elementType) :
 			elementType_(std::move(elementType)) { }
 
-	protected:
+	private:
 		CqlProtocolColumnOption elementType_;
 	};
 
@@ -131,7 +131,7 @@ namespace cql {
 			keyType_(std::move(keyType)),
 			valueType_(std::move(valueType)) { }
 
-	protected:
+	private:
 		CqlProtocolColumnOption keyType_;
 		CqlProtocolColumnOption valueType_;
 	};
@@ -153,7 +153,7 @@ namespace cql {
 		explicit CqlProtocolColumnOptionSetPayload(CqlProtocolColumnOption&& elementType) :
 			elementType_(std::move(elementType)) { }
 
-	protected:
+	private:
 		CqlProtocolColumnOption elementType_;
 	};
 
@@ -191,7 +191,7 @@ namespace cql {
 			udtName_(std::move(udtName)),
 			fields_(std::move(fields)) { }
 
-	protected:
+	private:
 		CqlProtocolString keySpace_;
 		CqlProtocolString udtName_;
 		FieldsType fields_;
@@ -215,7 +215,7 @@ namespace cql {
 		explicit CqlProtocolColumnOptionTuplePayload(TypesType&& types) :
 			types_(std::move(types)) { }
 
-	protected:
+	private:
 		TypesType types_;
 	};
 }

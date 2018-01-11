@@ -3,7 +3,7 @@
 
 namespace cql {
 	/** TODO */
-	class CqlEmptyAuthenticator : public CqlAuthenticatorBase {
+	class CqlAllowAllAuthenticator : public CqlAuthenticatorBase {
 	public:
 		/** Perform the authentication */
 		seastar::future<> authenticate(CqlConnection&) const override;

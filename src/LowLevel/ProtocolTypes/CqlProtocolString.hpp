@@ -8,7 +8,7 @@ namespace cql {
 	/**
 	 * A [short] n, followed by n bytes representing an UTF-8 string
 	 */
-	class CqlProtocolString : protected CqlProtocolSizedStringBase<
+	class CqlProtocolString : private CqlProtocolSizedStringBase<
 		std::uint16_t,
 		CqlProtocolStringState,
 		CqlProtocolStringState::Normal,

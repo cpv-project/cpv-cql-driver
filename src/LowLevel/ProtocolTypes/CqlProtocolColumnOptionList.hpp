@@ -7,7 +7,7 @@ namespace cql {
 	 * A [short] n, followed by n [option]
 	 */
 	class CqlProtocolColumnOptionList :
-		protected CqlProtocolListBase<std::uint16_t, CqlProtocolColumnOption> {
+		private CqlProtocolListBase<std::uint16_t, CqlProtocolColumnOption> {
 	public:
 		using CqlProtocolListBase::SmallSizeBoundary;
 		using CqlProtocolListBase::get;

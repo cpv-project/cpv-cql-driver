@@ -7,7 +7,7 @@ namespace cql {
 	 * This is encoded using zig-zag encoding and then sent like an [unsigned int]
 	 * For example: 0 = 0, -1 = 1, 1 = 2, -2 = 3, 2 = 4, -3 = 5, 3 = 6 and so forth
 	 */
-	class CqlProtocolVint : protected CqlProtocolVariableIntegerBase {
+	class CqlProtocolVint : private CqlProtocolVariableIntegerBase {
 	public:
 		using CqlProtocolVariableIntegerBase::encode;
 		using CqlProtocolVariableIntegerBase::decode;

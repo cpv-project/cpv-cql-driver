@@ -3,7 +3,7 @@
 
 namespace cql {
 	/** A 2 bytes unsigned integer */
-	class CqlProtocolShort : protected CqlProtocolIntegerBase<std::uint16_t> {
+	class CqlProtocolShort : private CqlProtocolIntegerBase<std::uint16_t> {
 	public:
 		using CqlProtocolIntegerBase::get;
 		using CqlProtocolIntegerBase::set;

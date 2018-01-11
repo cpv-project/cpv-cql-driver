@@ -11,7 +11,7 @@ namespace cql {
 	 * if n == -2, no byte should follow and the value represented is `not set`.
 	 * n < -2 is an invalid value and results in an error.
 	 */
-	class CqlProtocolValue : protected CqlProtocolSizedStringBase<
+	class CqlProtocolValue : private CqlProtocolSizedStringBase<
 		std::int32_t,
 		CqlProtocolValueState,
 		CqlProtocolValueState::NotSet, // default state is not set
