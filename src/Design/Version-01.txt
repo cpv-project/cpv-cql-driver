@@ -21,7 +21,7 @@ CqlSessionFactory [HighLevel, shared_ptr]
 	getSession()
 	create(sessionConfiguration, nodeCollection)
 
-CqlSession [HighLevel, unique_ptr]
+CqlSession [HighLevel, CqlObject]
 	...
 
 CqlConnectionPool [LowLevel, shared_ptr]
@@ -58,4 +58,38 @@ auto factory = CqlSessionFactory.create(
 			.setPasswordAuthentication("abc", "123456")
 	}));
 auto session = factory.getSession();
+
+==========================================
+
+CqlConnection
+	sendMessage(message)
+		push message and promise to queue
+		start sender if not started
+		wait future
+
+	startSender()
+		repeat while queue not empty
+			take message from queue
+			send message
+			resolve promise
+		set sender started flag to false
+		# no race condition here because it's single thread
+
+	waitNextMessage(stream)
+		add wait count
+		set promise to promises[streamId]
+		start receiver if not started
+		wait future
+
+	startReceiver()
+		repeat while wait count > 0
+			receive one message
+			resolve promises[streamId]
+			reduce wait count
+		set receiver started flag to false
+		# no race condition here, same as above
+
+
+
+
 

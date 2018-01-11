@@ -3,7 +3,7 @@
 
 namespace cql {
 	/** Create a new session instance */
-	std::unique_ptr<CqlSession> CqlSessionFactoryImpl::getSession() {
+	CqlObject<CqlSession> CqlSessionFactoryImpl::getSession() {
 		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
 	}
 

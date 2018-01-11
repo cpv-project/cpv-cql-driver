@@ -1,4 +1,5 @@
 #include <net/dns.hh>
+#include <core/reactor.hh>
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlNetworkException.hpp>
 #include "./Connectors/CqlConnectorFactory.hpp"
@@ -37,18 +38,22 @@ namespace cql {
 		}).handle_exception([self] (std::exception_ptr ex) {
 			throw CqlNetworkException(CQL_CODEINFO, "connect to",
 				self->nodeConfiguration_->getAddress().first, "failed:", ex);
-		});
+		}).then([self] {
+			// send OPTION
 
-		
-		/* auto self = shared_from_this();
-		return seastar::futurize_apply([self] {
-			return self->connector_->connect(self->address_);
-		}).then([self] (seastar::connected_socket&& fd) {
-			self->socket_ = std::move(fd);
+		}).then([self] {
+			// receive SUPPORTED
+
+		}).then([self] {
+			// send ready
+
+		}).then([self] {
+			// perform authentication
+
+		}).then([self] {
+			// ready now
 			self->isReady_ = true;
-		}).handle_exception([self] (std::exception_ptr ex) {
-			throw CqlNetworkException(CQL_CODEINFO, "connect to", self->address_, "failed:", ex);
-		}); */
+		});
 	}
 
 	/** Constructor */

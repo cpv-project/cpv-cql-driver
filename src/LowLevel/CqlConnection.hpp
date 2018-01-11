@@ -1,44 +1,46 @@
 #pragma once
-#include <memory>
-#include <net/api.hh>
-#include <core/reactor.hh>
+#include <CqlDriver/Common/Utility/CqlObject.hpp>
 #include <CqlDriver/Common/CqlSessionConfiguration.hpp>
 #include <CqlDriver/Common/CqlNodeConfiguration.hpp>
 #include "./Connectors/CqlConnectorBase.hpp"
 #include "./Authenticators/CqlAuthenticatorBase.hpp"
+#include "./RequestMessages/CqlRequestMessageBase.hpp"
+#include "./ResponseMessages/CqlResponseMessageBase.hpp"
 
 namespace cql {
-	/**
-	 * Map to single tcp connection to the database
-	 * Example:
-	 * TODO
-	 */
+	/** A single tcp connection to the database */
 	class CqlConnection :
 		public seastar::enable_shared_from_this<CqlConnection> {
 	public:
 		/** Representing an in use stream */
-		/* class Stream {
+		class Stream {
 		public:
-			std::uint16_t getStreamId() const { return streamId_; }
-			Stream(std::uint16_t streamId, seastar::weak_ptr<CqlConnection> connection) :
-				streamId_(streamId), connection_(connection) { }
+			struct State { bool isInUse; };
+			std::uint16_t getStreamId() const;
+			bool isValid() const;
+			Stream(std::uint16_t streamId, const seastar::lw_shared_ptr<State>& state);
 			~Stream();
 			Stream(const Stream&) = delete;
 			Stream& operator=(const Stream&) = delete;
+			Stream(Stream&& stream);
+			Stream& operator=(Stream&& stream);
 
 		private:
 			std::uint16_t streamId_;
-			seastar::weak_ptr<CqlConnection> connection_;
-		}; */
+			seastar::lw_shared_ptr<State> state_;
+		};
 
 		/** Initialize connection and wait until it's ready to send ordinary messages */
 		seastar::future<> ready();
 
-		// openStream
+		/** TODO */
+		Stream openStream();
 
-		// sendMessage
+		/** TODO */
+		seastar::future<> sendMessage(CqlObject<CqlRequestMessageBase>&& message, const Stream& stream);
 
-		// waitNextMessage
+		/** TODO */
+		seastar::future<CqlObject<CqlResponseMessageBase>> waitNextMessage(const Stream& stream);
 
 		/** Constructor */
 		CqlConnection(
@@ -53,9 +55,11 @@ namespace cql {
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
 
 	private:
-		// startSendLoop (should not do it)
+		/** TODO */
+		void startSender();
 
-		// startReceiveLoop (should not do it)
+		/** TODO */
+		void startReceiver();
 
 	private:
 		seastar::shared_ptr<CqlSessionConfiguration> sessionConfiguration_;

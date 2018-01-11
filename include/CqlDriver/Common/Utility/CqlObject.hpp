@@ -4,27 +4,45 @@
 
 namespace cql {
 	/**
-	 * Reuseable object, back to free list automatically when destruct
+	 * Reuseable object, back to free list automatically on destruction.
 	 * T should provide two functions:
 	 * - freeResources: called in deallocate
 	 * - reset: called in allocate, with forwarded parameters
+	 * Move CqlObject<Derived> to CqlObject<Base> is valid (polymorphism is supported).
 	 */
 	template <class T>
 	class CqlObject {
 	public:
 		/** Constructor */
 		CqlObject(std::unique_ptr<T>&& ptr) :
-			ptr_(std::move(ptr)) { }
+			ptr_(std::move(ptr)),
+			deleter_([](std::unique_ptr<T>&& ptr) {
+				auto& freeList = getFreeList();
+				if (freeList.size() < getCapacity()) {
+					ptr->freeResources();
+					freeList.emplace_back(std::move(ptr));
+				} else {
+					ptr.reset(); // call the derived destructor
+				}
+			}) { }
 
-		/** Constructor */
-		CqlObject(CqlObject&&) = default;
+		/** Move constructor */
+		CqlObject(CqlObject&& object) :
+			ptr_(std::move(object.ptr_)),
+			deleter_(object.deleter_) { }
+
+		/** Move constructor */
+		template <class U>
+		CqlObject(CqlObject<U>&& object) :
+			ptr_(std::move(object.ptr_)),
+			deleter_(reinterpret_cast<decltype(deleter_)>(object.deleter_)) {
+			static_assert(sizeof(ptr_) == sizeof(object.ptr_), "ensure unique_ptr<> have same layout");
+		}
 
 		/** Destructor */
 		~CqlObject() {
-			auto& freeList = getFreeList();
-			if (ptr_ != nullptr && freeList.size() < getCapacity()) {
-				ptr_->freeResources();
-				freeList.emplace_back(std::move(ptr_));
+			if (ptr_ != nullptr) {
+				deleter_(std::move(ptr_));
 			}
 		}
 
@@ -56,7 +74,9 @@ namespace cql {
 		}
 
 	private:
+		template <class> friend class CqlObject;
 		std::unique_ptr<T> ptr_;
+		void(*deleter_)(std::unique_ptr<T>&&);
 	};
 
 	/** Allocate object */

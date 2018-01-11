@@ -22,6 +22,7 @@ namespace cql {
 	 * - decode body (decodeBody)
 	 */
 	class CqlMessageBase {
+	public:
 		/** Get the direction of message, either request or response */
 		CqlMessageDirection getDirection() const;
 
@@ -42,6 +43,9 @@ namespace cql {
 
 		/** Constructor */
 		CqlMessageBase(CqlObject<CqlMessageHeader>&& header);
+
+	protected:
+		CqlObject<CqlMessageHeader> header_;
 	};
 }
 

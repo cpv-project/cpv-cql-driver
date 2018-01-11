@@ -6,7 +6,7 @@ namespace cql {
 	class CqlSessionFactoryImpl : public CqlSessionFactory {
 	public:
 		/** Create a new session instance */
-		std::unique_ptr<CqlSession> getSession() override;
+		CqlObject<CqlSession> getSession() override;
 
 		/** Constructor */
 		CqlSessionFactoryImpl(

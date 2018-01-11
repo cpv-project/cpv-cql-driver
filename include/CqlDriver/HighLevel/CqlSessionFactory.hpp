@@ -1,5 +1,6 @@
 #pragma once
 #include <core/shared_ptr.hh>
+#include "../Common/Utility/CqlObject.hpp"
 #include "../Common/CqlSessionConfiguration.hpp"
 #include "../Common/CqlNodeCollection.hpp"
 #include "CqlSession.hpp"
@@ -9,7 +10,7 @@ namespace cql {
 	class CqlSessionFactory {
 	public:
 		/** Create a new session instance */
-		virtual std::unique_ptr<CqlSession> getSession() = 0;
+		virtual CqlObject<CqlSession> getSession() = 0;
 
 		/** Virtual destructor */
 		virtual ~CqlSessionFactory() = default;
