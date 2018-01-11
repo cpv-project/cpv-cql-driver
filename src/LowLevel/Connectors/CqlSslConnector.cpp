@@ -3,6 +3,7 @@
 namespace cql {
 	/* Setup the connection */
 	seastar::future<seastar::connected_socket> CqlSslConnector::connect(
+		const CqlNodeConfiguration&,
 		const seastar::socket_address& address) const {
 		if (initialized_.available() && !initialized_.failed()) {
 			// fast path

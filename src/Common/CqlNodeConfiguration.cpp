@@ -43,7 +43,7 @@ namespace cql {
 	/** Set to use password authentication for this node */
 	CqlNodeConfiguration& CqlNodeConfiguration::setPasswordAuthentication(
 		seastar::sstring&& username, seastar::sstring&& password) {
-		authenticatorClass_ = AuthenticatorClasses::PasswordAuthenticator;
+		authenticatorClass_ = CqlAuthenticatorClasses::PasswordAuthenticator;
 		authenticatorData_.resize(0);
 		authenticatorData_.append(username.c_str(), username.size());
 		authenticatorData_.append("\x00", 1);
@@ -104,7 +104,7 @@ namespace cql {
 		address_(),
 		useSsl_(false),
 		useCompression_(false),
-		authenticatorClass_(AuthenticatorClasses::AllowAllAuthenticator),
+		authenticatorClass_(CqlAuthenticatorClasses::AllowAllAuthenticator),
 		authenticatorData_(),
 		ipAddress_(),
 		ipAddressIsResolved_(false),

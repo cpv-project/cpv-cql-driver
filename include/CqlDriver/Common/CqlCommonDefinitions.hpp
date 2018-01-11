@@ -64,7 +64,7 @@ namespace cql {
 	std::ostream& operator<<(std::ostream& stream, CqlColumnType type);
 
 	/** The full class name of the IAuthenticator in use */
-	namespace AuthenticatorClasses {
+	namespace CqlAuthenticatorClasses {
 		static const char* AllowAllAuthenticator = "AllowAllAuthenticator";
 		static const char* PasswordAuthenticator = "PasswordAuthenticator";
 	}

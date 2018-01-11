@@ -4,6 +4,7 @@
 namespace cql {
 	/* Setup the connection */
 	seastar::future<seastar::connected_socket> CqlTcpConnector::connect(
+		const CqlNodeConfiguration&,
 		const seastar::socket_address& address) const {
 		return seastar::engine().net().connect(address);
 	}

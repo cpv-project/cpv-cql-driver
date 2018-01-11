@@ -16,9 +16,9 @@ target_link_libraries(${PROJECT_NAME} gtest_main ${LIBCQLDRIVER_PATH})
 # add predefined macros
 add_definitions(-DDB_SIMPLE_IP="127.0.0.1")
 add_definitions(-DDB_SIMPLE_PORT=9043)
-add_definitions(-DDB_SSL_1_IP="127.0.0.1")
+add_definitions(-DDB_SSL_1_IP="localhost")
 add_definitions(-DDB_SSL_1_PORT=9044)
-add_definitions(-DDB_SSL_2_IP="127.0.0.1")
+add_definitions(-DDB_SSL_2_IP="localhost")
 add_definitions(-DDB_SSL_2_PORT=9045)
 
 # get flags from cqldriver pkgconfig

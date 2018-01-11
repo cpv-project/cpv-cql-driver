@@ -13,6 +13,7 @@ namespace cql {
 	public:
 		/* Setup the connection */
 		seastar::future<seastar::connected_socket> connect(
+			const CqlNodeConfiguration& nodeConfiguration,
 			const seastar::socket_address& address) const override;
 
 		/** Constructor */

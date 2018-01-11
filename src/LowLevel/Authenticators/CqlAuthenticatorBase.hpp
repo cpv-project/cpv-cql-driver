@@ -9,6 +9,9 @@ namespace cql {
 	public:
 		/** Perform the authentication */
 		virtual seastar::future<> authenticate(CqlConnection&) const = 0;
+
+		/** Virtual destructor */
+		virtual ~CqlAuthenticatorBase() = default;
 	};
 }
 
