@@ -77,6 +77,12 @@ namespace cql {
 		connector_(connector),
 		authenticator_(authenticator),
 		socket_(),
-		isReady_(false) { }
+		isReady_(false),
+		connectionInfo_(),
+		streamStates_(nodeConfiguration_->getMaxStream()),
+		sendPromiseQueue_(nodeConfiguration_->getMaxStream()),
+		sendPromiseMap_(nodeConfiguration_->getMaxStream()),
+		receivePromiseCount_(0),
+		receivePromiseMap_(nodeConfiguration_->getMaxStream()) { }
 }
 

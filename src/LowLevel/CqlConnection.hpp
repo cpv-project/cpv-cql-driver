@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <utility>
+#include <core/queue.hh>
 #include <CqlDriver/Common/Utility/CqlObject.hpp>
 #include <CqlDriver/Common/CqlSessionConfiguration.hpp>
 #include <CqlDriver/Common/CqlNodeConfiguration.hpp>
@@ -6,6 +9,7 @@
 #include "./Authenticators/CqlAuthenticatorBase.hpp"
 #include "./RequestMessages/CqlRequestMessageBase.hpp"
 #include "./ResponseMessages/CqlResponseMessageBase.hpp"
+#include "CqlConnectionInfo.hpp"
 
 namespace cql {
 	/** A single tcp connection to the database */
@@ -69,6 +73,13 @@ namespace cql {
 
 		seastar::connected_socket socket_;
 		bool isReady_;
+		CqlConnectionInfo connectionInfo_;
+		std::vector<seastar::lw_shared_ptr<Stream::State>> streamStates_;
+
+		seastar::queue<seastar::promise<>> sendPromiseQueue_;
+		std::vector<std::pair<bool, seastar::promise<>>> sendPromiseMap_;
+		std::size_t receivePromiseCount_;
+		std::vector<std::pair<bool, seastar::promise<CqlObject<CqlResponseMessageBase>>>> receivePromiseMap_;
 	};
 }
 

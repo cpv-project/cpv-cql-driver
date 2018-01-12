@@ -27,13 +27,13 @@ namespace cql {
 			}) { }
 
 		/** Move constructor */
-		CqlObject(CqlObject&& object) :
+		CqlObject(CqlObject&& object) noexcept :
 			ptr_(std::move(object.ptr_)),
 			deleter_(object.deleter_) { }
 
 		/** Move constructor */
 		template <class U>
-		CqlObject(CqlObject<U>&& object) :
+		CqlObject(CqlObject<U>&& object) noexcept :
 			ptr_(std::move(object.ptr_)),
 			deleter_(reinterpret_cast<decltype(deleter_)>(object.deleter_)) {
 			static_assert(sizeof(ptr_) == sizeof(object.ptr_), "ensure unique_ptr<> have same layout");

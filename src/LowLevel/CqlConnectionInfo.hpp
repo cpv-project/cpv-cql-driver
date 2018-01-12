@@ -9,13 +9,13 @@ namespace cql {
 	class CqlConnectionInfo {
 	public:
 		/** The binary protocol version this connection using */
-		std::size_t getVersion() const;
+		std::size_t getVersion() const { return version_; }
 
 		/** The header size of this binary protocol version */
-		std::size_t getHeaderSize() const;
+		std::size_t getHeaderSize() const { return headerSize_; }
 
 		/** The maximum message body size for security check (avoid oom attack) */
-		std::size_t getMaximumMessageBodySize() const;
+		std::size_t getMaximumMessageBodySize() const { return maximumMessageBodySize_; }
 
 		/** Choose a version for this connection */
 		void useVersion(std::size_t version);
