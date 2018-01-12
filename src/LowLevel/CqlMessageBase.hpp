@@ -23,29 +23,17 @@ namespace cql {
 	 */
 	class CqlMessageBase {
 	public:
-		/** Get the direction of message, either request or response */
-		CqlMessageDirection getDirection() const;
-
-		/** Get the type of message */
-		CqlMessageType getType() const;
-
 		/** Get the message header */
 		const CqlMessageHeader& getHeader() const&;
 
-		/** Encode message body to binary data */
-		virtual void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const = 0;
-
-		/** Decode message body from binary data */
-		virtual void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) = 0;
-
 		/** Virtual destructor */
-		virtual ~CqlMessageBase();
+		virtual ~CqlMessageBase() = default;
 
 		/** Constructor */
-		CqlMessageBase(CqlObject<CqlMessageHeader>&& header);
+		CqlMessageBase(CqlMessageHeader&& header); 
 
 	protected:
-		CqlObject<CqlMessageHeader> header_;
+		CqlMessageHeader header_;
 	};
 }
 
