@@ -1,3 +1,4 @@
+#include <limits>
 #include <net/dns.hh>
 #include <core/reactor.hh>
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
@@ -5,6 +6,8 @@
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
 #include "./Connectors/CqlConnectorFactory.hpp"
 #include "./Authenticators/CqlAuthenticatorFactory.hpp"
+#include "./RequestMessages/CqlRequestMessageFactory.hpp"
+#include "./ResponseMessages/CqlResponseMessageFactory.hpp"
 #include "CqlConnection.hpp"
 
 namespace cql {
@@ -146,12 +149,17 @@ namespace cql {
 		streamStates_(nodeConfiguration_->getMaxStream()),
 		streamZero_(0, nullptr),
 		lastOpenedStream_(0),
-		sendPromiseQueue_(nodeConfiguration_->getMaxStream()),
 		sendPromiseMap_(nodeConfiguration_->getMaxStream()),
+		sendMessageQueue_(nodeConfiguration_->getMaxStream()),
 		senderIsStarted_(false),
-		receivePromiseCount_(0),
 		receivePromiseMap_(nodeConfiguration_->getMaxStream()),
+		receiveMessageQueueMap_(),
+		receivePromiseCount_(0),
 		receiverIsStarted_(false) {
+		// initialize receive message queues
+		for (std::size_t i = 0, j = nodeConfiguration_->getMaxStream(); i < j; ++i) {
+			receiveMessageQueueMap_.emplace_back(std::numeric_limits<std::size_t>::max());
+		}
 		// open stream zero, which is for internal communication
 		auto state = seastar::make_lw_shared<Stream::State>();
 		streamStates_.at(0) = state;

@@ -8,6 +8,9 @@ namespace cql {
 	 * (if authentication is required, the server indicates readiness by sending a AUTH_RESPONSE message)
 	 */
 	class CqlReadyMessage : public CqlResponseMessageBase {
+	public:
+		/** Decode message body from binary data */
+		void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) override;
 	};
 }
 

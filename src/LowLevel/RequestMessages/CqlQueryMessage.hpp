@@ -8,6 +8,8 @@ namespace cql {
 	 */
 	class CqlQueryMessage : public CqlRequestMessageBase {
 	public:
+		/** Encode message body to binary data */
+		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 	};
 }
 

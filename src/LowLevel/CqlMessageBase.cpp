@@ -6,8 +6,20 @@ namespace cql {
 		return header_;
 	}
 
+	/** Get the message header */
+	CqlMessageHeader& CqlMessageBase::getHeader() & {
+		return header_;
+	}
+
+	/** For CqlObject support */
+	void CqlMessageBase::freeResources() { }
+
+	/** For CqlObject support */
+	void CqlMessageBase::reset(CqlMessageHeader&& header) {
+		header_ = std::move(header);
+	}
+
 	/** Constructor */
-	CqlMessageBase::CqlMessageBase(CqlMessageHeader&& header) :
-		header_(std::move(header)) { }
+	CqlMessageBase::CqlMessageBase() : header_() { }
 }
 

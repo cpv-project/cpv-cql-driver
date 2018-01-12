@@ -7,6 +7,9 @@ namespace cql {
 	 * A client will only receive events for the types it has REGISTERed to.
 	 */
 	class CqlEventMessage : public CqlResponseMessageBase {
+	public:
+		/** Decode message body from binary data */
+		void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) override;
 	};
 }
 

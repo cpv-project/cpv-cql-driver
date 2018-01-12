@@ -9,7 +9,7 @@ namespace cql {
 		static auto staticNames = [] {
 			std::array<const char*, static_cast<std::size_t>(CqlMessageType::Max_)> names;
 			names[static_cast<std::size_t>(CqlMessageType::Error)] = "Error";
-			names[static_cast<std::size_t>(CqlMessageType::StartUp)] = "StartUp";
+			names[static_cast<std::size_t>(CqlMessageType::Startup)] = "Startup";
 			names[static_cast<std::size_t>(CqlMessageType::Ready)] = "Ready";
 			names[static_cast<std::size_t>(CqlMessageType::Authenticate)] = "Authenticate";
 			names[static_cast<std::size_t>(CqlMessageType::Options)] = "Options";

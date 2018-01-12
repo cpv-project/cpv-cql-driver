@@ -26,11 +26,26 @@ namespace cql {
 		/** Get the message header */
 		const CqlMessageHeader& getHeader() const&;
 
-		/** Virtual destructor */
-		virtual ~CqlMessageBase() = default;
+		/** Get the message header */
+		CqlMessageHeader& getHeader() &;
+
+		/** For CqlObject support */
+		void freeResources();
+
+		/** For CqlObject support */
+		void reset(CqlMessageHeader&& header);
 
 		/** Constructor */
-		CqlMessageBase(CqlMessageHeader&& header); 
+		CqlMessageBase(); 
+
+		/** Disable copy and move */
+		CqlMessageBase(const CqlMessageBase&) = delete;
+		CqlMessageBase(CqlMessageBase&&) = delete;
+		CqlMessageBase& operator=(const CqlMessageBase&) = delete;
+		CqlMessageBase& operator=(CqlMessageBase&&) = delete;
+
+		/** Virtual destructor */
+		virtual ~CqlMessageBase() = default;
 
 	protected:
 		CqlMessageHeader header_;

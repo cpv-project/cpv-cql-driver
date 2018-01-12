@@ -5,10 +5,10 @@ TEST(TestCqlMessageHeader, getset) {
 	cql::CqlMessageHeader header;
 	header.setFlags(cql::CqlMessageHeaderFlags::Compression);
 	header.setStreamId(123);
-	header.setOpCode(cql::CqlMessageType::StartUp, cql::CqlMessageDirection::Request);
+	header.setOpCode(cql::CqlMessageType::Startup, cql::CqlMessageDirection::Request);
 	ASSERT_EQ(header.getFlags(), cql::CqlMessageHeaderFlags::Compression);
 	ASSERT_EQ(header.getStreamId(), 123);
-	ASSERT_EQ(header.getOpCode(), cql::CqlMessageType::StartUp);
+	ASSERT_EQ(header.getOpCode(), cql::CqlMessageType::Startup);
 	ASSERT_EQ(header.getDirection(), cql::CqlMessageDirection::Request);
 	ASSERT_EQ(header.getBodyLength(), 0);
 }
@@ -18,7 +18,7 @@ TEST(TestCqlMessageHeader, encode) {
 	cql::CqlConnectionInfo info;
 	header.setFlags(cql::CqlMessageHeaderFlags::Compression);
 	header.setStreamId(123);
-	header.setOpCode(cql::CqlMessageType::StartUp, cql::CqlMessageDirection::Request);
+	header.setOpCode(cql::CqlMessageType::Startup, cql::CqlMessageDirection::Request);
 	seastar::sstring data;
 	header.encodeHeaderPre(info, data);
 	data.append("asdfg", 5);

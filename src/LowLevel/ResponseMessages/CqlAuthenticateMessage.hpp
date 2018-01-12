@@ -8,6 +8,9 @@ namespace cql {
 	 * and must be answered by a AUTH_RESPONSE message from the client.
 	 */
 	class CqlAuthenticateMessage : public CqlResponseMessageBase {
+	public:
+		/** Decode message body from binary data */
+		void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) override;
 	};
 }
 

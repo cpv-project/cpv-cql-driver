@@ -7,6 +7,9 @@ namespace cql {
 	 * Clients are expected to answer the server challenge with an AUTH_RESPONSE message.
 	 */
 	class CqlAuthChallengeMessage : public CqlResponseMessageBase {
+	public:
+		/** Decode message body from binary data */
+		void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) override;
 	};
 }
 

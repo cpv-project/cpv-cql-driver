@@ -63,7 +63,8 @@ auto session = factory.getSession();
 
 CqlConnection
 	sendMessage(message)
-		push message and promise to queue
+		push message to queue
+		set promise to promises[streamId]
 		start sender if not started
 		wait future
 
@@ -71,25 +72,25 @@ CqlConnection
 		repeat while queue not empty
 			take message from queue
 			send message
-			resolve promise
+			resolve promises[streamId]
 		set sender started flag to false
 		# no race condition here because it's single thread
 
 	waitNextMessage(stream)
-		add wait count
-		set promise to promises[streamId]
-		start receiver if not started
-		wait future
+		take message from queue
+		if not success
+			add wait count
+			set promise to promises[streamId]
+			start receiver if not started
+			wait future
+			take message from queue
 
 	startReceiver()
 		repeat while wait count > 0
-			receive one message
-			resolve promises[streamId]
-			reduce wait count
+			receive one message and push to queue
+			if promises[streamId]
+				resolve promises[streamId]
+				reduce wait count
 		set receiver started flag to false
 		# no race condition here, same as above
-
-
-
-
 

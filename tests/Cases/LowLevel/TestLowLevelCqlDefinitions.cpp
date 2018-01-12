@@ -4,7 +4,7 @@
 
 TEST(TestCqlLowLevelDefinitions, messageTypeToString) {
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Error), "Error");
-	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::StartUp), "StartUp");
+	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Startup), "Startup");
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Ready), "Ready");
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Authenticate), "Authenticate");
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageType::Options), "Options");

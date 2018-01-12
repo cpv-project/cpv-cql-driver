@@ -22,7 +22,7 @@ namespace cql {
 	 */
 	enum class CqlMessageType {
 		Error = 0,
-		StartUp = 1,
+		Startup = 1,
 		Ready = 2,
 		Authenticate = 3,
 		Options = 5,

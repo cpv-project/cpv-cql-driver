@@ -99,12 +99,13 @@ namespace cql {
 		Stream streamZero_;
 		std::size_t lastOpenedStream_;
 
-		seastar::queue<seastar::promise<>> sendPromiseQueue_;
 		std::vector<std::pair<bool, seastar::promise<>>> sendPromiseMap_;
+		seastar::queue<CqlObject<CqlRequestMessageBase>> sendMessageQueue_;
 		bool senderIsStarted_;
 
+		std::vector<std::pair<bool, seastar::promise<>>> receivePromiseMap_;
+		std::vector<seastar::queue<CqlObject<CqlResponseMessageBase>>> receiveMessageQueueMap_;
 		std::size_t receivePromiseCount_;
-		std::vector<std::pair<bool, seastar::promise<CqlObject<CqlResponseMessageBase>>>> receivePromiseMap_;
 		bool receiverIsStarted_;
 	};
 }
