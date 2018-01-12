@@ -11,6 +11,7 @@ TEST(TestCqlNodeConfiguration, all) {
 		ASSERT_EQ(configuration.getAddress().second, 0);
 		ASSERT_FALSE(configuration.getUseSsl());
 		ASSERT_FALSE(configuration.getUseCompression());
+		ASSERT_EQ(configuration.getMaxStream(), 20);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::CqlAuthenticatorClasses::AllowAllAuthenticator);
 		ASSERT_TRUE(configuration.getAuthenticatorData().empty());
 		seastar::socket_address address;
@@ -21,11 +22,13 @@ TEST(TestCqlNodeConfiguration, all) {
 			.setAddress("127.0.0.1", 9000)
 			.setUseSsl(true)
 			.setUseCompression(true)
+			.setMaxStream(21)
 			.setPasswordAuthentication("abc", "asdfg");
 		ASSERT_EQ(configuration.getAddress().first, "127.0.0.1");
 		ASSERT_EQ(configuration.getAddress().second, 9000);
 		ASSERT_TRUE(configuration.getUseSsl());
 		ASSERT_TRUE(configuration.getUseCompression());
+		ASSERT_EQ(configuration.getMaxStream(), 21);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::CqlAuthenticatorClasses::PasswordAuthenticator);
 		ASSERT_EQ(configuration.getAuthenticatorData(), seastar::sstring("abc""\x00""asdfg", 9));
 		seastar::socket_address address;

@@ -1,5 +1,6 @@
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlFormatException.hpp>
 #include <CqlDriver/Common/CqlCommonDefinitions.hpp>
 #include <CqlDriver/Common/CqlNodeConfiguration.hpp>
 #include <stdexcept>
@@ -40,6 +41,16 @@ namespace cql {
 		return *this;
 	}
 
+	/** Set how many streams can hold in single connection */
+	CqlNodeConfiguration& CqlNodeConfiguration::setMaxStream(std::size_t value) {
+		if (!(value >= 1 && value <= 255)) {
+			throw CqlFormatException(CQL_CODEINFO,
+				"invalid max stream value, it should >= 1 and <= 255");
+		}
+		maxStream_ = value;
+		return *this;
+	}
+
 	/** Set to use password authentication for this node */
 	CqlNodeConfiguration& CqlNodeConfiguration::setPasswordAuthentication(
 		seastar::sstring&& username, seastar::sstring&& password) {
@@ -64,6 +75,11 @@ namespace cql {
 	/** Get should use frame compression if available */
 	bool CqlNodeConfiguration::getUseCompression() const {
 		return useCompression_;
+	}
+
+	/** Get how many streams can hold in single connection */
+	std::size_t CqlNodeConfiguration::getMaxStream() const {
+		return maxStream_;
 	}
 
 	/** Get the full authentication class name */
@@ -104,6 +120,7 @@ namespace cql {
 		address_(),
 		useSsl_(false),
 		useCompression_(false),
+		maxStream_(20),
 		authenticatorClass_(CqlAuthenticatorClasses::AllowAllAuthenticator),
 		authenticatorData_(),
 		ipAddress_(),
