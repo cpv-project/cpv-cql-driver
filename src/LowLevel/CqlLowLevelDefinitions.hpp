@@ -12,7 +12,8 @@ namespace cql {
 	 */
 	enum class CqlMessageDirection {
 		Request = 0,
-		Response = 0x80
+		Response = 0x80,
+		Mask_ = 0x80
 	};
 
 	/**

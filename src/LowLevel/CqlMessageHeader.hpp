@@ -14,12 +14,6 @@ namespace cql {
 	 */
 	class CqlMessageHeader {
 	public:
-		using VersionType = CqlProtocolByte;
-		using FlagsType = CqlProtocolByte;
-		using StreamIdType = CqlProtocolShort;
-		using OpCodeType = CqlProtocolByte;
-		using BodyLengthType = CqlProtocolInt;
-
 		/** Encode message header to binary data */
 		void encodeHeaderPre(const CqlConnectionInfo& info, seastar::sstring& data) const;
 
@@ -29,20 +23,34 @@ namespace cql {
 		/** Decode message header from binary data */
 		void decodeHeader(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data);
 
+		/**
+		 * Get the flags of message
+		 * Also see the CqlMessageHeaderFlags in CqlLowLevelDefinitions.hpp
+		 */
+		CqlMessageHeaderFlags getFlags() const;
+
 		/** Get the stream id of message */
-		StreamIdType getStreamId() const;
+		std::size_t getStreamId() const;
 
 		/**
 		 * Get the opcode of message
-		 * Also see the CqlMessageType in CqlDefinitions.hpp
+		 * Also see the CqlMessageType in CqlLowLevelDefinitions.hpp
 		 */
-		OpCodeType getOpCode() const;
+		CqlMessageType getOpCode() const;
+
+		/** Get the direction of message, it depends on opcode */
+		CqlMessageDirection getDirection() const;
 
 		/**
 		 * Get the length of message body (aka frame payload)
 		 * Only available for response message, for request message it always return 0.
 		 */
-		BodyLengthType getBodyLength() const;
+		std::size_t getBodyLength() const;
+
+		/**
+		 * Set the flags of message
+		 */
+		void setFlags(CqlMessageHeaderFlags flags);
 
 		/**
 		 * Set the stream id of message
@@ -57,21 +65,23 @@ namespace cql {
 		 * - the -1 mentioned before is actually 0xffff,
 		 * - and the maximum stream id the client can send is 0x7fff(32767).
 		 */
-		void setStreamId(const StreamIdType& streamId);
+		void setStreamId(std::size_t streamId);
 
 		/**
-		 * Set the opcode of message
+		 * Set the opcode and direction of message
 		 * Also see the CqlMessageType in CqlDefinitions.hpp
 		 */
-		void setOpCode(const OpCodeType& opCode);
+		void setOpCode(CqlMessageType opCode, CqlMessageDirection direction);
 
 		/** Constructor */
 		CqlMessageHeader();
 
 	private:
-		StreamIdType streamId_;
-		OpCodeType opCode_;
-		BodyLengthType bodyLength_;
+		CqlProtocolByte flags_;
+		CqlProtocolShort streamId_;
+		CqlProtocolByte opCode_;
+		CqlMessageDirection direction_;
+		CqlProtocolInt bodyLength_;
 	};
 }
 
