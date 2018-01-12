@@ -43,9 +43,9 @@ namespace cql {
 
 	/** Set how many streams can hold in single connection */
 	CqlNodeConfiguration& CqlNodeConfiguration::setMaxStream(std::size_t value) {
-		if (!(value >= 1 && value <= 255)) {
+		if (!(value >= 2 && value <= 255)) {
 			throw CqlFormatException(CQL_CODEINFO,
-				"invalid max stream value, it should >= 1 and <= 255");
+				"invalid max stream value, it should >= 2 and <= 255");
 		}
 		maxStream_ = value;
 		return *this;

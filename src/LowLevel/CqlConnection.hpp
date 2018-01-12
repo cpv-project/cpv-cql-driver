@@ -12,22 +12,26 @@
 #include "CqlConnectionInfo.hpp"
 
 namespace cql {
-	/** A single tcp connection to the database */
+	/**
+	 * A single tcp connection to the database
+	 * To send and receive message, a "Stream" object is required,
+	 * Only one message can be sent or received at a time for the same stream.
+	 */
 	class CqlConnection :
 		public seastar::enable_shared_from_this<CqlConnection> {
 	public:
 		/** Representing an in use stream */
 		class Stream {
 		public:
-			struct State { bool isInUse; };
-			std::uint16_t getStreamId() const;
-			bool isValid() const;
+			struct State { bool isInUse; State() : isInUse(false) { } };
+			std::uint16_t getStreamId() const { return streamId_; }
+			bool isValid() const { return state_.get() != nullptr; }
 			Stream(std::uint16_t streamId, const seastar::lw_shared_ptr<State>& state);
-			~Stream();
 			Stream(const Stream&) = delete;
 			Stream& operator=(const Stream&) = delete;
 			Stream(Stream&& stream);
 			Stream& operator=(Stream&& stream);
+			~Stream();
 
 		private:
 			std::uint16_t streamId_;
@@ -37,13 +41,23 @@ namespace cql {
 		/** Initialize connection and wait until it's ready to send ordinary messages */
 		seastar::future<> ready();
 
-		/** TODO */
+		/**
+		 * Open a new stream.
+		 * If the maximum numbers of streams have reached a invalid Stream object will be returned.
+		 * Please don't forget to check stream.isValid().
+		 */
 		Stream openStream();
 
-		/** TODO */
+		/**
+		 * Send a message to the given stream and wait for success.
+		 * Only one message can be sent at a time for the same stream.
+		 */
 		seastar::future<> sendMessage(CqlObject<CqlRequestMessageBase>&& message, const Stream& stream);
 
-		/** TODO */
+		/**
+		 * Wait for the next message from the given stream.
+		 * Only one message can be received at a time for the same stream.
+		 */
 		seastar::future<CqlObject<CqlResponseMessageBase>> waitNextMessage(const Stream& stream);
 
 		/** Constructor */
@@ -59,10 +73,16 @@ namespace cql {
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
 
 	private:
-		/** TODO */
+		/**
+		 * Start background message sender.
+		 * Only one sender can run at the same time, and it will exit after jobs are finished.
+		 */
 		void startSender();
 
-		/** TODO */
+		/**
+		 * Start background message receiver.
+		 * Only one receiver and run at the same time, and it will exit after jobs are finished.
+		 */
 		void startReceiver();
 
 	private:
@@ -74,7 +94,10 @@ namespace cql {
 		seastar::connected_socket socket_;
 		bool isReady_;
 		CqlConnectionInfo connectionInfo_;
+
 		std::vector<seastar::lw_shared_ptr<Stream::State>> streamStates_;
+		Stream streamZero_;
+		std::size_t lastOpenedStream_;
 
 		seastar::queue<seastar::promise<>> sendPromiseQueue_;
 		std::vector<std::pair<bool, seastar::promise<>>> sendPromiseMap_;

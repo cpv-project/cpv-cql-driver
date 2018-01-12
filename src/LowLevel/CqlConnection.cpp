@@ -2,12 +2,47 @@
 #include <core/reactor.hh>
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlNetworkException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
 #include "./Connectors/CqlConnectorFactory.hpp"
 #include "./Authenticators/CqlAuthenticatorFactory.hpp"
 #include "CqlConnection.hpp"
 
 namespace cql {
-	/** Wait for connection ready */
+	/** Constructor */
+	CqlConnection::Stream::Stream(std::uint16_t streamId, const seastar::lw_shared_ptr<State>& state) :
+		streamId_(streamId),
+		state_(state) {
+		if (state_.get() != nullptr) {
+			if (state_->isInUse) {
+				throw CqlLogicException(CQL_CODEINFO, "construct stream with a already in use state");
+			}
+			state_->isInUse = true;
+		}
+	}
+
+	/** Move constructor */
+	CqlConnection::Stream::Stream(CqlConnection::Stream&& stream) :
+		streamId_(stream.streamId_),
+		state_(std::move(stream.state_)) {
+		stream.state_ = nullptr;
+	}
+
+	/** Move assignment */
+	CqlConnection::Stream& CqlConnection::Stream::operator=(CqlConnection::Stream&& stream) {
+		if (&stream != this) {
+			new (this) CqlConnection::Stream(std::move(stream));
+		}
+		return *this;
+	}
+
+	/** Destructor */
+	CqlConnection::Stream::~Stream() {
+		if (state_.get() != nullptr) {
+			state_->isInUse = false;
+		}
+	}
+	
+	/** Initialize connection and wait until it's ready to send ordinary messages */
 	seastar::future<> CqlConnection::ready() {
 		if (isReady_) {
 			return seastar::make_ready_future<>();
@@ -80,9 +115,16 @@ namespace cql {
 		isReady_(false),
 		connectionInfo_(),
 		streamStates_(nodeConfiguration_->getMaxStream()),
+		streamZero_(0, nullptr),
+		lastOpenedStream_(0),
 		sendPromiseQueue_(nodeConfiguration_->getMaxStream()),
 		sendPromiseMap_(nodeConfiguration_->getMaxStream()),
 		receivePromiseCount_(0),
-		receivePromiseMap_(nodeConfiguration_->getMaxStream()) { }
+		receivePromiseMap_(nodeConfiguration_->getMaxStream()) {
+		// open stream zero, which is for internal communication
+		auto state = seastar::make_lw_shared<Stream::State>();
+		streamStates_.at(0) = state;
+		streamZero_ = Stream(0, state);
+	}
 }
 
