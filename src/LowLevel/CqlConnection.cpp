@@ -91,6 +91,35 @@ namespace cql {
 		});
 	}
 
+	/** Open a new stream */
+	CqlConnection::Stream CqlConnection::openStream() {
+		// OPTIMIZE: it's a O(n) search, can we do better here?
+		for (std::size_t i = 1, j = streamStates_.size(); i < j; ++i) {
+			std::size_t nextStreamId = (lastOpenedStream_ + i) % j;
+			auto& state = streamStates_[nextStreamId];
+			if (state.get() == nullptr) {
+				state = seastar::make_lw_shared<CqlConnection::Stream::State>();
+			}
+			if (!state->isInUse) {
+				lastOpenedStream_ = nextStreamId;
+				return CqlConnection::Stream(nextStreamId, state);
+			}
+		}
+		return CqlConnection::Stream(0, nullptr);
+	}
+
+	/** Send a message to the given stream and wait for success */
+	seastar::future<> CqlConnection::sendMessage(
+		CqlObject<CqlRequestMessageBase>&& message, const CqlConnection::Stream& stream) {
+		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+	}
+
+	/** Wait for the next message from the given stream */
+	seastar::future<CqlObject<CqlResponseMessageBase>> CqlConnection::waitNextMessage(
+		const CqlConnection::Stream& stream) {
+		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+	}
+
 	/** Constructor */
 	CqlConnection::CqlConnection(
 		const seastar::shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
@@ -119,12 +148,27 @@ namespace cql {
 		lastOpenedStream_(0),
 		sendPromiseQueue_(nodeConfiguration_->getMaxStream()),
 		sendPromiseMap_(nodeConfiguration_->getMaxStream()),
+		senderIsStarted_(false),
 		receivePromiseCount_(0),
-		receivePromiseMap_(nodeConfiguration_->getMaxStream()) {
+		receivePromiseMap_(nodeConfiguration_->getMaxStream()),
+		receiverIsStarted_(false) {
 		// open stream zero, which is for internal communication
 		auto state = seastar::make_lw_shared<Stream::State>();
 		streamStates_.at(0) = state;
 		streamZero_ = Stream(0, state);
+	}
+
+	/** Start background message sender */
+	void CqlConnection::startSender() {
+		// sender will only run when needed
+		// if we make sender to run forever, it will be very hard to control connection's livetime
+		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+	}
+
+	/** Start background message receiver */
+	void CqlConnection::startReceiver() {
+		// receiver will only run when needed, same as above
+		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
 	}
 }
 

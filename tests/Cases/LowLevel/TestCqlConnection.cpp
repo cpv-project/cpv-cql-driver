@@ -34,3 +34,25 @@ TEST_FUTURE(TestConnection, waitForReadyFailed) {
 	});
 }
 
+TEST(TestConnection, openStream) {
+	std::size_t testMaxStream = 5;
+	auto connection = seastar::make_shared<cql::CqlConnection>(
+		seastar::make_shared<cql::CqlSessionConfiguration>(),
+		seastar::make_shared<cql::CqlNodeConfiguration>(
+			cql::CqlNodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
+				.setMaxStream(testMaxStream)));
+	for (std::size_t i = 0; i < 3; ++i) {
+		// test 3 round
+		std::vector<cql::CqlConnection::Stream> streams;
+		for (std::size_t j = 1; j < testMaxStream; ++j) {
+			// stream 0 is reserved
+			auto stream = connection->openStream();
+			ASSERT_TRUE(stream.isValid());
+			streams.emplace_back(std::move(stream));
+		}
+		auto invalidStream = connection->openStream();
+		ASSERT_FALSE(invalidStream.isValid());
+	}
+}
+

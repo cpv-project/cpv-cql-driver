@@ -101,8 +101,11 @@ namespace cql {
 
 		seastar::queue<seastar::promise<>> sendPromiseQueue_;
 		std::vector<std::pair<bool, seastar::promise<>>> sendPromiseMap_;
+		bool senderIsStarted_;
+
 		std::size_t receivePromiseCount_;
 		std::vector<std::pair<bool, seastar::promise<CqlObject<CqlResponseMessageBase>>>> receivePromiseMap_;
+		bool receiverIsStarted_;
 	};
 }
 
