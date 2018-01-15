@@ -29,12 +29,6 @@ namespace cql {
 		/** Get the message header */
 		CqlMessageHeader& getHeader() &;
 
-		/** For CqlObject support */
-		void freeResources();
-
-		/** For CqlObject support */
-		void reset(CqlMessageHeader&& header);
-
 		/** Constructor */
 		CqlMessageBase(); 
 
@@ -46,6 +40,13 @@ namespace cql {
 
 		/** Virtual destructor */
 		virtual ~CqlMessageBase() = default;
+
+	protected:
+		/** For CqlObject support */
+		void freeResources();
+
+		/** For CqlObject support */
+		void reset(CqlMessageHeader&& header);
 
 	protected:
 		CqlMessageHeader header_;

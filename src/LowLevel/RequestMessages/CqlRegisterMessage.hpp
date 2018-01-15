@@ -8,6 +8,9 @@ namespace cql {
 	 */
 	class CqlRegisterMessage : public CqlRequestMessageBase {
 	public:
+		using CqlRequestMessageBase::freeResources;
+		using CqlRequestMessageBase::reset;
+
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 	};
