@@ -33,3 +33,17 @@ TEST(TestCqlLowLevelDefinitions, messageHeaderFlagsToString) {
 	ASSERT_EQ(cql::joinString("", cql::CqlMessageHeaderFlags::UseBeta), "UseBeta");
 }
 
+TEST(TestCqlLowLevelDefinitions, queryParametersFlagsToString) {
+	ASSERT_EQ(cql::joinString("", cql::CqlQueryParametersFlags::None), "");
+	ASSERT_EQ(
+		cql::joinString("",
+			cql::CqlQueryParametersFlags::WithValues |
+			cql::CqlQueryParametersFlags::SkipMetadata),
+		"WithValues|SkipMetadata");
+	ASSERT_EQ(
+		cql::joinString("",
+			cql::CqlQueryParametersFlags::WithPageSize |
+			cql::CqlQueryParametersFlags::WithKeyspace),
+		"WithPageSize|WithKeyspace");
+}
+

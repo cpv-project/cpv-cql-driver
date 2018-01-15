@@ -67,5 +67,41 @@ namespace cql {
 		}
 		return stream;
 	}
+
+	/** Or operation */
+	CqlQueryParametersFlags operator|(CqlQueryParametersFlags a, CqlQueryParametersFlags b) {
+		return CqlQueryParametersFlags(static_cast<std::size_t>(a) | static_cast<std::size_t>(b));
+	}
+
+	/** And operation */
+	CqlQueryParametersFlags operator&(CqlQueryParametersFlags a, CqlQueryParametersFlags b) {
+		return CqlQueryParametersFlags(static_cast<std::size_t>(a) & static_cast<std::size_t>(b));
+	}
+
+	/** Write the text description of query parameters flags to stream */
+	std::ostream& operator<<(std::ostream& stream, CqlQueryParametersFlags flags) {
+		static std::vector<std::pair<CqlQueryParametersFlags, const char*>> staticNames({
+			{ CqlQueryParametersFlags::WithValues, "WithValues" },
+			{ CqlQueryParametersFlags::SkipMetadata, "SkipMetadata" },
+			{ CqlQueryParametersFlags::WithPageSize, "WithPageSize" },
+			{ CqlQueryParametersFlags::WithPagingState, "WithPagingState" },
+			{ CqlQueryParametersFlags::WithSerialConsistency, "WithSerialConsistency" },
+			{ CqlQueryParametersFlags::WithDefaultTimestamp, "WithDefaultTimestamp" },
+			{ CqlQueryParametersFlags::WithNamesForValue, "WithNamesForValue" },
+			{ CqlQueryParametersFlags::WithKeyspace, "WithKeyspace" },
+		});
+		bool isFirst = true;
+		for (const auto& name : staticNames) {
+			if ((flags & name.first) == name.first) {
+				if (isFirst) {
+					isFirst = false;
+				} else {
+					stream << "|";
+				}
+				stream << name.second;
+			}
+		}
+		return stream;
+	}
 }
 

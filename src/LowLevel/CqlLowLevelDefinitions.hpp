@@ -19,6 +19,7 @@ namespace cql {
 	/**
 	 * Message type, each type is either request type or response type
 	 * The value of this enum is the `opcode` in frame header.
+	 * Check native_protocol_v4.spec section 2.4.
 	 */
 	enum class CqlMessageType {
 		Error = 0,
@@ -46,6 +47,7 @@ namespace cql {
 	/**
 	 * Flags in message header
 	 * The value of this enum is the `flags` in frame header.
+	 * Check native_protocol_v4.spec section 2.2.
 	 */
 	enum class CqlMessageHeaderFlags {
 		None = 0,
@@ -64,5 +66,31 @@ namespace cql {
 
 	/** Write the text description of header flags to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags);
+
+	/**
+	 * Flags in query parameters.
+	 * The value of this enum is the `flags` in query parameters.
+	 * Check native_protocol_v4.spec section 4.1.4.
+	 */
+	enum CqlQueryParametersFlags {
+		None = 0,
+		WithValues = 1,
+		SkipMetadata = 2,
+		WithPageSize = 4,
+		WithPagingState = 8,
+		WithSerialConsistency = 16,
+		WithDefaultTimestamp = 32,
+		WithNamesForValue = 64,
+		WithKeyspace = 128
+	};
+
+	/** Or operation */
+	CqlQueryParametersFlags operator|(CqlQueryParametersFlags a, CqlQueryParametersFlags b);
+
+	/** And operation */
+	CqlQueryParametersFlags operator&(CqlQueryParametersFlags a, CqlQueryParametersFlags b);
+
+	/** Write the text description of query parameters flags to stream */
+	std::ostream& operator<<(std::ostream& stream, CqlQueryParametersFlags flags);
 }
 
