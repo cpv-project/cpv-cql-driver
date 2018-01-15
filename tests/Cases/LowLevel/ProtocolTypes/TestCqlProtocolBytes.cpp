@@ -3,15 +3,32 @@
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestCqlProtocolBytes, getset) {
-	cql::CqlProtocolBytes value("abc");
-	ASSERT_EQ(value.get(), "abc");
-	value.get().append("aaaaa", 5);
-	ASSERT_EQ(value.get(), "abcaaaaa");
-	ASSERT_FALSE(value.isNull());
+	{
+		cql::CqlProtocolBytes value("abc");
+		ASSERT_EQ(value.get(), "abc");
+		value.get().append("aaaaa", 5);
+		ASSERT_EQ(value.get(), "abcaaaaa");
+		ASSERT_FALSE(value.isNull());
 
-	value = cql::CqlProtocolBytes();
-	ASSERT_EQ(value.get(), "");
-	ASSERT_TRUE(value.isNull());
+		value = cql::CqlProtocolBytes();
+		ASSERT_EQ(value.get(), "");
+		ASSERT_TRUE(value.isNull());
+	}
+	{
+		cql::CqlProtocolBytes value("abc");
+		value.set(cql::CqlProtocolBytesState::Null);
+		ASSERT_EQ(value.get(), "");
+		ASSERT_TRUE(value.isNull());
+
+		value.set("asdfg", 5);
+		ASSERT_EQ(value.get(), "asdfg");
+		ASSERT_FALSE(value.isNull());
+
+		value.set(cql::CqlProtocolBytesState::Null);
+		value.append("asd", 3);
+		ASSERT_EQ(value.get(), "asd");
+		ASSERT_FALSE(value.isNull());
+	}
 }
 
 TEST(TestCqlProtocolBytes, encode) {

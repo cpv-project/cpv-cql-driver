@@ -6,7 +6,7 @@ TEST(TestCqlAuthResponseMessage, encode) {
 	cql::CqlConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::CqlRequestMessageFactory::makeRequestMessage<cql::CqlAuthResponseMessage>();
-		message->setToken(cql::CqlProtocolBytes("abc"));
+		message->getToken().set("abc", 3);
 		seastar::sstring data;
 		message->getHeader().encodeHeaderPre(info, data);
 		message->encodeBody(info, data);

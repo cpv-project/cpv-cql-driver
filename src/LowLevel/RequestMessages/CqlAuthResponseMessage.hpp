@@ -21,7 +21,6 @@ namespace cql {
 		/** The detail of what this token contains depends on the actual authenticator used */
 		const CqlProtocolBytes& getToken() const& { return token_; }
 		CqlProtocolBytes& getToken() & { return token_; }
-		void setToken(CqlProtocolBytes&& token) { token_ = std::move(token); }
 
 		/** Constructor */
 		CqlAuthResponseMessage();

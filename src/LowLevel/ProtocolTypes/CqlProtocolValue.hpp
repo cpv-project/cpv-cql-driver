@@ -18,6 +18,8 @@ namespace cql {
 		CqlProtocolValueState::Normal> {
 	public:
 		using CqlProtocolSizedStringBase::get;
+		using CqlProtocolSizedStringBase::set;
+		using CqlProtocolSizedStringBase::append;
 		using CqlProtocolSizedStringBase::state;
 		using CqlProtocolSizedStringBase::encode;
 		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;

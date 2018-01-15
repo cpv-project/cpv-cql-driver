@@ -4,7 +4,7 @@ namespace cql {
 	/** For CqlObject */
 	void CqlAuthResponseMessage::reset(CqlMessageHeader&& header) {
 		CqlRequestMessageBase::reset(std::move(header));
-		token_.get().resize(0);
+		token_.set(CqlProtocolBytesState::Null);
 	}
 
 	/** Encode message body to binary data */
