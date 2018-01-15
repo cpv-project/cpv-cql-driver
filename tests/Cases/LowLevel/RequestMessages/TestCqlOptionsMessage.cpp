@@ -9,6 +9,6 @@ TEST(TestCqlOptionsMessage, encode) {
 	message->getHeader().encodeHeaderPre(info, data);
 	message->encodeBody(info, data);
 	message->getHeader().encodeHeaderPost(info, data);
-	ASSERT_EQ(data, seastar::sstring("\x04\x00\x00\x00\x05\x00\x00\x00\x00", 9));
+	ASSERT_EQ(data, makeTestString("\x04\x00\x00\x00\x05\x00\x00\x00\x00"));
 }
 
