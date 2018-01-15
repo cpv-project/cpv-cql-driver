@@ -25,24 +25,24 @@ TEST(TestCqlProtocolStringMap, encode) {
 	});
 	seastar::sstring data;
 	value.encode(data);
-	seastar::sstring encodedA(
+	auto encodedA = makeTestString(
 		"\x00\x02"
 		"\x00\x05""apple""\x00\x03""dog"
-		"\x00\x06""orange""\x00\x03""cat" , 27);
-	seastar::sstring encodedB(
+		"\x00\x06""orange""\x00\x03""cat");
+	auto encodedB = makeTestString(
 		"\x00\x02"
 		"\x00\x06""orange""\x00\x03""cat"
-		"\x00\x05""apple""\x00\x03""dog", 27);
+		"\x00\x05""apple""\x00\x03""dog");
 	ASSERT_TRUE(data == encodedA || data == encodedB);
 }
 
 TEST(TestCqlProtocolStringMap, decode) {
 	cql::CqlProtocolStringMap value;
 	{
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x02"
 			"\x00\x05""apple""\x00\x03""dog"
-			"\x00\x06""orange""\x00\x03""cat" , 27);
+			"\x00\x06""orange""\x00\x03""cat");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -52,9 +52,9 @@ TEST(TestCqlProtocolStringMap, decode) {
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("orange")).get(), "cat");
 	}
 	{
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x01"
-			"\x00\x05""apple""\x00\x03""dog", 14);
+			"\x00\x05""apple""\x00\x03""dog");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -63,7 +63,7 @@ TEST(TestCqlProtocolStringMap, decode) {
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("apple")).get(), "dog");
 	}
 	{
-		seastar::sstring data("\x00\x00", 2);
+		auto data = makeTestString("\x00\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -75,26 +75,26 @@ TEST(TestCqlProtocolStringMap, decode) {
 TEST(TestCqlProtocolStringMap, decodeError) {
 	{
 		cql::CqlProtocolStringMap value;
-		seastar::sstring data("\x01", 1);
+		auto data = makeTestString("\x01");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolStringMap value;
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x02"
-			"\x00\x05""apple""\x00\x03""dog", 14);
+			"\x00\x05""apple""\x00\x03""dog");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolStringMap value;
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x02"
 			"\x00\x05""apple""\x00\x03""dog"
-			"\x00\x06""orange""\x00\x03""c" , 25);
+			"\x00\x06""orange""\x00\x03""c");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

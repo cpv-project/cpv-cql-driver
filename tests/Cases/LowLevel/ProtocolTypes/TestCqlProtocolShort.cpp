@@ -16,12 +16,12 @@ TEST(TestCqlProtocolShort, encode) {
 	cql::CqlProtocolShort value(0x1234);
 	seastar::sstring data;
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\x12\x34"));
+	ASSERT_EQ(data, makeTestString("\x12\x34"));
 }
 
 TEST(TestCqlProtocolShort, decode) {
 	cql::CqlProtocolShort value(0);
-	seastar::sstring data("\x12\x34");
+	auto data = makeTestString("\x12\x34");
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	value.decode(ptr, end);
@@ -31,7 +31,7 @@ TEST(TestCqlProtocolShort, decode) {
 
 TEST(TestCqlProtocolShort, decodeError) {
 	cql::CqlProtocolShort value(0);
-	seastar::sstring data("\x12");
+	auto data = makeTestString("\x12");
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

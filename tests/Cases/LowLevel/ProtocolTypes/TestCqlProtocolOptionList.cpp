@@ -25,13 +25,13 @@ TEST(TestCqlProtocolColumnOptionList, encode) {
 	});
 	seastar::sstring data;
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\x00\x02\x00\x01\x00\x09", 6));
+	ASSERT_EQ(data, makeTestString("\x00\x02\x00\x01\x00\x09"));
 }
 
 TEST(TestCqlProtocolColumnOptionList, decode) {
 	cql::CqlProtocolColumnOptionList value;
 	{
-		seastar::sstring data("\x00\x02\x00\x01\x00\x09", 6);
+		auto data = makeTestString("\x00\x02\x00\x01\x00\x09");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -41,7 +41,7 @@ TEST(TestCqlProtocolColumnOptionList, decode) {
 		ASSERT_EQ(value.get().at(1).get(), cql::CqlColumnType::Int);
 	}
 	{
-		seastar::sstring data("\x00\x01\x00\x01", 4);
+		auto data = makeTestString("\x00\x01\x00\x01");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -50,7 +50,7 @@ TEST(TestCqlProtocolColumnOptionList, decode) {
 		ASSERT_EQ(value.get().at(0).get(), cql::CqlColumnType::Ascii);
 	}
 	{
-		seastar::sstring data("\x00\x00", 2);
+		auto data = makeTestString("\x00\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -62,21 +62,21 @@ TEST(TestCqlProtocolColumnOptionList, decode) {
 TEST(TestCqlProtocolColumnOptionList, decodeError) {
 	{
 		cql::CqlProtocolColumnOptionList value;
-		seastar::sstring data("\x01", 1);
+		auto data = makeTestString("\x01");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolColumnOptionList value;
-		seastar::sstring data("\x00\x02\x00\x01", 4);
+		auto data = makeTestString("\x00\x02\x00\x01");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolColumnOptionList value;
-		seastar::sstring data("\x00\x01\x00\x20", 4);
+		auto data = makeTestString("\x00\x01\x00\x20");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

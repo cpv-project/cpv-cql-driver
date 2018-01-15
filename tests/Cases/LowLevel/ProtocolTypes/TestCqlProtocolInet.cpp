@@ -20,21 +20,21 @@ TEST(TestCqlProtocolInet, encode) {
 		cql::CqlProtocolInet value({ seastar::net::inet_address("127.0.0.1"), 0x89aa });
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x04\x7f\x00\x00\x01\x00\x00\x89\xaa", 9));
+		ASSERT_EQ(data, makeTestString("\x04\x7f\x00\x00\x01\x00\x00\x89\xaa"));
 	}
 	{
 		cql::CqlProtocolInet value({ seastar::net::inet_address("0:0:FF:D:C:B:A:1"), 0xaa89 });
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring(
-			"\x10\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01\x00\x00\xaa\x89", 21));
+		ASSERT_EQ(data, makeTestString(
+			"\x10\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01\x00\x00\xaa\x89"));
 	}
 }
 
 TEST(TestCqlProtocolInet, decode) {
 	cql::CqlProtocolInet value;
 	{
-		seastar::sstring data("\x04\x7f\x00\x00\x01\x00\x00\x89\xaa", 9);
+		auto data = makeTestString("\x04\x7f\x00\x00\x01\x00\x00\x89\xaa");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -43,8 +43,8 @@ TEST(TestCqlProtocolInet, decode) {
 			cql::CqlProtocolInet::ValueType(seastar::net::inet_address("127.0.0.1"), 0x89aa));
 	}
 	{
-		seastar::sstring data(
-			"\x10\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01\x00\x00\xaa\x89", 21);
+		auto data = makeTestString(
+			"\x10\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01\x00\x00\xaa\x89");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -57,21 +57,21 @@ TEST(TestCqlProtocolInet, decode) {
 TEST(TestCqlProtocolInet, decodeError) {
 	{
 		cql::CqlProtocolInet value;
-		seastar::sstring data("\x04\x7f\x00\x00\x01\x00\x00\x89", 8);
+		auto data = makeTestString("\x04\x7f\x00\x00\x01\x00\x00\x89");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolInet value;
-		seastar::sstring data("\x04\x7f\x00", 3);
+		auto data = makeTestString("\x04\x7f\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolInet value;
-		seastar::sstring data("\x00", 1);
+		auto data = makeTestString("\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

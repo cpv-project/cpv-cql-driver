@@ -99,7 +99,7 @@ TEST(TestCqlProtocolColumnOption, encode) {
 		cql::CqlProtocolColumnOption value(cql::CqlColumnType::Ascii);
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x00\x01", 2));
+		ASSERT_EQ(data, makeTestString("\x00\x01"));
 	}
 	{
 		// Custom
@@ -108,7 +108,7 @@ TEST(TestCqlProtocolColumnOption, encode) {
 				cql::CqlProtocolString("abc")));
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x00\x00\x00\x03""abc", 7));
+		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x03""abc"));
 	}
 	{
 		// List<Set<Int>>
@@ -119,7 +119,7 @@ TEST(TestCqlProtocolColumnOption, encode) {
 						cql::CqlProtocolColumnOption(cql::CqlColumnType::Int)))));
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x00\x20\x00\x22\x00\x09", 6));
+		ASSERT_EQ(data, makeTestString("\x00\x20\x00\x22\x00\x09"));
 	}
 	{
 		// Map<Int, VarChar>
@@ -129,7 +129,7 @@ TEST(TestCqlProtocolColumnOption, encode) {
 				cql::CqlProtocolColumnOption(cql::CqlColumnType::VarChar)));
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x00\x21\x00\x09\x00\x0d", 6));
+		ASSERT_EQ(data, makeTestString("\x00\x21\x00\x09\x00\x0d"));
 	}
 	{
 		// Set<Time>
@@ -138,7 +138,7 @@ TEST(TestCqlProtocolColumnOption, encode) {
 				cql::CqlProtocolColumnOption(cql::CqlColumnType::Time)));
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x00\x22\x00\x12", 4));
+		ASSERT_EQ(data, makeTestString("\x00\x22\x00\x12"));
 	}
 	{
 		// Udt
@@ -158,13 +158,13 @@ TEST(TestCqlProtocolColumnOption, encode) {
 				}));
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring(
+		ASSERT_EQ(data, makeTestString(
 			"\x00\x30"
 			"\x00\x02""ks"
 			"\x00\x03""unx"
 			"\x00\x02"
 			"\x00\x03""abc""\x00\x09"
-			"\x00\x05""asdfg""\x00\x0d", 29));
+			"\x00\x05""asdfg""\x00\x0d"));
 	}
 	{
 		// Tuple
@@ -176,7 +176,7 @@ TEST(TestCqlProtocolColumnOption, encode) {
 			}));
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x00\x31\x00\x02\x00\x01\x00\x09", 8));
+		ASSERT_EQ(data, makeTestString("\x00\x31\x00\x02\x00\x01\x00\x09"));
 	}
 }
 
@@ -184,7 +184,7 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	cql::CqlProtocolColumnOption value;
 	{
 		// Ascii
-		seastar::sstring data("\x00\x01", 2);
+		auto data = makeTestString("\x00\x01");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -193,7 +193,7 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	}
 	{
 		// Custom
-		seastar::sstring data("\x00\x00\x00\x03""abc", 7);
+		auto data = makeTestString("\x00\x00\x00\x03""abc");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -203,7 +203,7 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	}
 	{
 		// List<Set<Int>>
-		seastar::sstring data("\x00\x20\x00\x22\x00\x09", 6);
+		auto data = makeTestString("\x00\x20\x00\x22\x00\x09");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -215,7 +215,7 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	}
 	{
 		// Map<Int, VarChar>
-		seastar::sstring data("\x00\x21\x00\x09\x00\x0d", 6);
+		auto data = makeTestString("\x00\x21\x00\x09\x00\x0d");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -227,7 +227,7 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	}
 	{
 		// Set<Time>
-		seastar::sstring data("\x00\x22\x00\x12", 4);
+		auto data = makeTestString("\x00\x22\x00\x12");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -238,13 +238,13 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	}
 	{
 		// Udt
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x30"
 			"\x00\x02""ks"
 			"\x00\x03""unx"
 			"\x00\x02"
 			"\x00\x03""abc""\x00\x09"
-			"\x00\x05""asdfg""\x00\x0d", 29);
+			"\x00\x05""asdfg""\x00\x0d");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -261,7 +261,7 @@ TEST(TestCqlProtocolColumnOption, decode) {
 	}
 	{
 		// Tuple
-		seastar::sstring data("\x00\x31\x00\x02\x00\x01\x00\x09", 8);
+		auto data = makeTestString("\x00\x31\x00\x02\x00\x01\x00\x09");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -303,14 +303,14 @@ TEST(TestCqlProtocolColumnOption, getPayloadError) {
 TEST(TestCqlProtocolColumnOption, decodeError) {
 	{
 		cql::CqlProtocolColumnOption value;
-		seastar::sstring data("\x00", 1);
+		auto data = makeTestString("\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolColumnOption value;
-		seastar::sstring data("\x00\x00\x00\x03""ab", 6);
+		auto data = makeTestString("\x00\x00\x00\x03""ab");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

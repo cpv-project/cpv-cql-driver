@@ -28,28 +28,28 @@ TEST(TestCqlProtocolValue, encode) {
 	cql::CqlProtocolValue value("abc");
 	seastar::sstring data;
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\x00\x00\x00\x03""abc", 7));
+	ASSERT_EQ(data, makeTestString("\x00\x00\x00\x03""abc"));
 
 	value = cql::CqlProtocolValue("");
 	data.resize(0);
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\x00\x00\x00\x00", 4));
+	ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00"));
 
 	value = cql::CqlProtocolValue(cql::CqlProtocolValueState::NotSet);
 	data.resize(0);
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\xff\xff\xff\xfe"));
+	ASSERT_EQ(data, makeTestString("\xff\xff\xff\xfe"));
 
 	value = cql::CqlProtocolValue(cql::CqlProtocolValueState::Null);
 	data.resize(0);
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\xff\xff\xff\xff"));
+	ASSERT_EQ(data, makeTestString("\xff\xff\xff\xff"));
 }
 
 TEST(TestCqlProtocolValue, decode) {
 	cql::CqlProtocolValue value("");
 	{
-		seastar::sstring data("\x00\x00\x00\x03""abc", 7);
+		auto data = makeTestString("\x00\x00\x00\x03""abc");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -58,7 +58,7 @@ TEST(TestCqlProtocolValue, decode) {
 		ASSERT_EQ(value.state(), cql::CqlProtocolValueState::Normal);
 	}
 	{
-		seastar::sstring data("\x00\x00\x00\x02""ab", 6);
+		auto data = makeTestString("\x00\x00\x00\x02""ab");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -67,7 +67,7 @@ TEST(TestCqlProtocolValue, decode) {
 		ASSERT_EQ(value.state(), cql::CqlProtocolValueState::Normal);
 	}
 	{
-		seastar::sstring data("\xff\xff\xff\xfe");
+		auto data = makeTestString("\xff\xff\xff\xfe");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -76,7 +76,7 @@ TEST(TestCqlProtocolValue, decode) {
 		ASSERT_EQ(value.state(), cql::CqlProtocolValueState::NotSet);
 	}
 	{
-		seastar::sstring data("\xff\xff\xff\xff");
+		auto data = makeTestString("\xff\xff\xff\xff");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -85,7 +85,7 @@ TEST(TestCqlProtocolValue, decode) {
 		ASSERT_EQ(value.state(), cql::CqlProtocolValueState::Null);
 	}
 	{
-		seastar::sstring data("\x00\x00\x00\x00", 4);
+		auto data = makeTestString("\x00\x00\x00\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -98,21 +98,21 @@ TEST(TestCqlProtocolValue, decode) {
 TEST(TestCqlProtocolValue, decodeError) {
 	{
 		cql::CqlProtocolValue value("");
-		seastar::sstring data("\x00", 1);
+		auto data = makeTestString("\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolValue value("");
-		seastar::sstring data("\x00\x00\x00\x02""a", 5);
+		auto data = makeTestString("\x00\x00\x00\x02""a");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolValue value("");
-		seastar::sstring data("\xff\xff\xff\xfd", 4);
+		auto data = makeTestString("\xff\xff\xff\xfd");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

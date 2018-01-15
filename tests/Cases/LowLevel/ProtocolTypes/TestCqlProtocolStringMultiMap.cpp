@@ -52,24 +52,24 @@ TEST(TestCqlProtocolStringMultiMap, encode) {
 	});
 	seastar::sstring data;
 	value.encode(data);
-	seastar::sstring encodedA(
+	auto encodedA = makeTestString(
 		"\x00\x02"
 		"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB"
-		"\x00\x06""orange""\x00\x01""\x00\x03""cat" , 38);
-	seastar::sstring encodedB(
+		"\x00\x06""orange""\x00\x01""\x00\x03""cat");
+	auto encodedB = makeTestString(
 		"\x00\x02"
 		"\x00\x06""orange""\x00\x01""\x00\x03""cat"
-		"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB", 38);
+		"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB");
 	ASSERT_TRUE(data == encodedA || data == encodedB);
 }
 
 TEST(TestCqlProtocolStringMultiMap, decode) {
 	cql::CqlProtocolStringMultiMap value;
 	{
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x02"
 			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB"
-			"\x00\x06""orange""\x00\x01""\x00\x03""cat" , 38);
+			"\x00\x06""orange""\x00\x01""\x00\x03""cat");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -82,9 +82,9 @@ TEST(TestCqlProtocolStringMultiMap, decode) {
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("orange")).get().at(0).get(), "cat");
 	}
 	{
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x01"
-			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB", 23);
+			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -95,7 +95,7 @@ TEST(TestCqlProtocolStringMultiMap, decode) {
 		ASSERT_EQ(value.get().at(cql::CqlProtocolString("apple")).get().at(1).get(), "dogB");
 	}
 	{
-		seastar::sstring data("\x00\x00", 2);
+		auto data = makeTestString("\x00\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -107,26 +107,26 @@ TEST(TestCqlProtocolStringMultiMap, decode) {
 TEST(TestCqlProtocolStringMultiMap, decodeError) {
 	{
 		cql::CqlProtocolStringMultiMap value;
-		seastar::sstring data("\x01", 1);
+		auto data = makeTestString("\x01");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolStringMultiMap value;
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x02"
-			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB", 23);
+			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));
 	}
 	{
 		cql::CqlProtocolStringMultiMap value;
-		seastar::sstring data(
+		auto data = makeTestString(
 			"\x00\x02"
 			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB"
-			"\x00\x06""orange""\x00\x01""\x00\x03" , 35);
+			"\x00\x06""orange""\x00\x01""\x00\x03");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

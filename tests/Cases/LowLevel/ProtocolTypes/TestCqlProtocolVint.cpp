@@ -17,32 +17,32 @@ TEST(TestCqlProtocolVint, encode) {
 		cql::CqlProtocolVint value(0x7fff0000aaaaeeee);
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\xff\xff\xfe\x00\x01\x55\x55\xdd\xdc", 9));
+		ASSERT_EQ(data, makeTestString("\xff\xff\xfe\x00\x01\x55\x55\xdd\xdc"));
 	}
 	{
 		cql::CqlProtocolVint value(3);
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x06", 1));
+		ASSERT_EQ(data, makeTestString("\x06"));
 	}
 	{
 		cql::CqlProtocolVint value(-3);
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\x05", 1));
+		ASSERT_EQ(data, makeTestString("\x05"));
 	}
 	{
 		cql::CqlProtocolVint value(-0x7f238a);
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring("\xe0\xfe\x47\x13", 4));
+		ASSERT_EQ(data, makeTestString("\xe0\xfe\x47\x13"));
 	}
 }
 
 TEST(TestCqlProtocolVint, decode) {
 	cql::CqlProtocolVint value(0);
 	{
-		seastar::sstring data("\xff\xff\xfe\x00\x01\x55\x55\xdd\xdc", 9);
+		auto data = makeTestString("\xff\xff\xfe\x00\x01\x55\x55\xdd\xdc");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -50,7 +50,7 @@ TEST(TestCqlProtocolVint, decode) {
 		ASSERT_EQ(value.get(), 0x7fff0000aaaaeeee);
 	}
 	{
-		seastar::sstring data("\x06", 1);
+		auto data = makeTestString("\x06");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -58,7 +58,7 @@ TEST(TestCqlProtocolVint, decode) {
 		ASSERT_EQ(value.get(), 3);
 	}
 	{
-		seastar::sstring data("\x05", 1);
+		auto data = makeTestString("\x05");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -66,7 +66,7 @@ TEST(TestCqlProtocolVint, decode) {
 		ASSERT_EQ(value.get(), -3);
 	}
 	{
-		seastar::sstring data("\xe0\xfe\x47\x13", 4);
+		auto data = makeTestString("\xe0\xfe\x47\x13");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -85,7 +85,7 @@ TEST(TestCqlProtocolVint, decodeError) {
 	}
 	{
 		cql::CqlProtocolVint value(0);
-		seastar::sstring data("\xe0\xfe\x47", 3);
+		auto data = makeTestString("\xe0\xfe\x47");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

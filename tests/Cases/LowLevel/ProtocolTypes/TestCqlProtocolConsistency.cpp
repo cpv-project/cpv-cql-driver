@@ -16,12 +16,12 @@ TEST(TestCqlProtocolConsistency, encode) {
 	cql::CqlProtocolConsistency value(cql::CqlConsistencyLevel::Three);
 	seastar::sstring data;
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\x00\x03", 2));
+	ASSERT_EQ(data, makeTestString("\x00\x03"));
 }
 
 TEST(TestCqlProtocolConsistency, decode) {
 	cql::CqlProtocolConsistency value;
-	seastar::sstring data("\x00\x03", 2);
+	auto data = makeTestString("\x00\x03");
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	value.decode(ptr, end);
@@ -31,7 +31,7 @@ TEST(TestCqlProtocolConsistency, decode) {
 
 TEST(TestCqlProtocolConsistency, decodeError) {
 	cql::CqlProtocolConsistency value;
-	seastar::sstring data("\x00", 1);
+	auto data = makeTestString("\x00");
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	ASSERT_THROWS(cql::CqlDecodeException, value.decode(ptr, end));

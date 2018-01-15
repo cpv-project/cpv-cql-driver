@@ -30,23 +30,23 @@ TEST(TestCqlProtocolUuid, encode) {
 		cql::CqlProtocolUuid value("00112233-4455-6677-8899-aabbccddeeff");
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring(
-			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff", 16));
+		ASSERT_EQ(data, makeTestString(
+			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"));
 	}
 	{
 		cql::CqlProtocolUuid value("12345678-ABCD-EFAA-8765-4321FFABCDEF");
 		seastar::sstring data;
 		value.encode(data);
-		ASSERT_EQ(data, seastar::sstring(
-			"\x12\x34\x56\x78\xab\xcd\xef\xaa\x87\x65\x43\x21\xff\xab\xcd\xef", 16));
+		ASSERT_EQ(data, makeTestString(
+			"\x12\x34\x56\x78\xab\xcd\xef\xaa\x87\x65\x43\x21\xff\xab\xcd\xef"));
 	}
 }
 
 TEST(TestCqlProtocolUuid, decode) {
 	{
 		cql::CqlProtocolUuid value(0, 0);
-		seastar::sstring data(
-			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff", 16);
+		auto data = makeTestString(
+			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -55,8 +55,8 @@ TEST(TestCqlProtocolUuid, decode) {
 	}
 	{
 		cql::CqlProtocolUuid value(0, 0);
-		seastar::sstring data(
-			"\x12\x34\x56\x78\xab\xcd\xef\xaa\x87\x65\x43\x21\xff\xab\xcd\xef", 16);
+		auto data = makeTestString(
+			"\x12\x34\x56\x78\xab\xcd\xef\xaa\x87\x65\x43\x21\xff\xab\xcd\xef");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
