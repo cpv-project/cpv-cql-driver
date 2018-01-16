@@ -36,14 +36,7 @@ namespace cql {
 	}
 
 	void CqlProtocolQueryParameters::setValues(const std::vector<CqlProtocolValue>& values) {
-		// copy contents string by string to avoid allocation
-		values_.resize(values.size());
-		for (std::size_t i = 0; i < values_.size(); ++i) {
-			auto& src = values[i].get();
-			auto& dst = values_[i].get();
-			dst.resize(0);
-			dst.append(src.data(), src.size());
-		}
+		values_ = values;
 		flags_.set(enumValue(
 			(getFlags() | CqlQueryParametersFlags::WithValues) &
 			(~CqlQueryParametersFlags::WithNamesForValue)));
@@ -58,21 +51,8 @@ namespace cql {
 
 	void CqlProtocolQueryParameters::setNameAndValues(
 		const std::vector<CqlProtocolString>& names, const std::vector<CqlProtocolValue>& values) {
-		// copy contents string by string to avoid allocation
-		names_.resize(names.size());
-		for (std::size_t i = 0; i < names_.size(); ++i) {
-			auto& src = names[i].get();
-			auto& dst = names_[i].get();
-			dst.resize(0);
-			dst.append(src.data(), src.size());
-		}
-		values_.resize(values.size());
-		for (std::size_t i = 0; i < values_.size(); ++i) {
-			auto& src = values[i].get();
-			auto& dst = values_[i].get();
-			dst.resize(0);
-			dst.append(src.data(), src.size());
-		}
+		names_ = names;
+		values_ = values;
 		flags_.set(enumValue(
 			getFlags() | CqlQueryParametersFlags::WithValues |
 			CqlQueryParametersFlags::WithNamesForValue));
@@ -104,13 +84,12 @@ namespace cql {
 	}
 
 	void CqlProtocolQueryParameters::setPagingState(const seastar::sstring& pagingState) {
-		auto& dst = pagingState_.get();
-		dst.resize(0);
-		dst.append(pagingState.data(), pagingState.size());
+		pagingState_.set(pagingState.data(), pagingState.size());
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPagingState));
 	}
 
 	void CqlProtocolQueryParameters::setPagingState(seastar::sstring&& pagingState) {
+		pagingState_.set(CqlProtocolBytesState::Normal);
 		pagingState_.get() = std::move(pagingState);
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPagingState));
 	}
@@ -138,13 +117,12 @@ namespace cql {
 	}
 
 	void CqlProtocolQueryParameters::setKeySpace(const seastar::sstring& keySpace) {
-		auto& dst = keySpace_.get();
-		dst.resize(0);
-		dst.append(keySpace.data(), keySpace.size());
+		keySpace_.set(keySpace.data(), keySpace.size());
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithKeySpace));
 	}
 
 	void CqlProtocolQueryParameters::setKeySpace(seastar::sstring&& keySpace) {
+		keySpace_.set(CqlProtocolStringState::Normal);
 		keySpace_.get() = std::move(keySpace);
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithKeySpace));
 	}
