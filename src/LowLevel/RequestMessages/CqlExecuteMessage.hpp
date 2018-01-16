@@ -1,4 +1,6 @@
 #pragma once
+#include "../ProtocolTypes/CqlProtocolShortBytes.hpp"
+#include "../ProtocolTypes/CqlProtocolQueryParameters.hpp"
 #include "CqlRequestMessageBase.hpp"
 
 namespace cql {
@@ -9,10 +11,26 @@ namespace cql {
 	class CqlExecuteMessage : public CqlRequestMessageBase {
 	public:
 		using CqlRequestMessageBase::freeResources;
-		using CqlRequestMessageBase::reset;
+
+		/** For CqlObject */
+		void reset(CqlMessageHeader&& header);
 
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
+
+		const CqlProtocolShortBytes& getPrepareQueryId() const& { return prepareQueryId_; }
+		CqlProtocolShortBytes& getPrepareQueryId() & { return prepareQueryId_; }
+
+		const CqlProtocolShortBytes& getResultMetadataId() const& { return resultMetadataId_; }
+		CqlProtocolShortBytes& getResultMetadataId() & { return resultMetadataId_; }
+
+		const CqlProtocolQueryParameters& getQueryParameters() const& { return queryParameters_; }
+		CqlProtocolQueryParameters& getQueryParameters() & { return queryParameters_; }
+
+	private:
+		CqlProtocolShortBytes prepareQueryId_;
+		CqlProtocolShortBytes resultMetadataId_;
+		CqlProtocolQueryParameters queryParameters_;
 	};
 }
 

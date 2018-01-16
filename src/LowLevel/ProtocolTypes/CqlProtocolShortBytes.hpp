@@ -16,6 +16,8 @@ namespace cql {
 		CqlProtocolShortBytesState::Normal> {
 	public:
 		using CqlProtocolSizedStringBase::get;
+		using CqlProtocolSizedStringBase::set;
+		using CqlProtocolSizedStringBase::append;
 		using CqlProtocolSizedStringBase::encode;
 		using CqlProtocolSizedStringBase::decode;
 		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
