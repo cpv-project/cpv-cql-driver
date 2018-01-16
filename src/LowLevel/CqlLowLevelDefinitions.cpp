@@ -4,63 +4,55 @@
 #include <utility>
 
 namespace cql {
-	/** Write the text description of message type to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlMessageType type) {
-		static auto staticNames = [] {
-			std::array<const char*, static_cast<std::size_t>(CqlMessageType::Max_)> names;
-			names[static_cast<std::size_t>(CqlMessageType::Error)] = "Error";
-			names[static_cast<std::size_t>(CqlMessageType::Startup)] = "Startup";
-			names[static_cast<std::size_t>(CqlMessageType::Ready)] = "Ready";
-			names[static_cast<std::size_t>(CqlMessageType::Authenticate)] = "Authenticate";
-			names[static_cast<std::size_t>(CqlMessageType::Options)] = "Options";
-			names[static_cast<std::size_t>(CqlMessageType::Supported)] = "Supported";
-			names[static_cast<std::size_t>(CqlMessageType::Query)] = "Query";
-			names[static_cast<std::size_t>(CqlMessageType::Result)] = "Result";
-			names[static_cast<std::size_t>(CqlMessageType::Prepare)] = "Prepare";
-			names[static_cast<std::size_t>(CqlMessageType::Execute)] = "Execute";
-			names[static_cast<std::size_t>(CqlMessageType::Register)] = "Register";
-			names[static_cast<std::size_t>(CqlMessageType::Event)] = "Event";
-			names[static_cast<std::size_t>(CqlMessageType::Batch)] = "Batch";
-			names[static_cast<std::size_t>(CqlMessageType::AuthChallenge)] = "AuthChallenge";
-			names[static_cast<std::size_t>(CqlMessageType::AuthResponse)] = "AuthResponse";
-			names[static_cast<std::size_t>(CqlMessageType::AuthSuccess)] = "AuthSuccess";
-			return names;
-		}();
-		auto index = static_cast<std::size_t>(type);
-		if (index >= staticNames.size() || staticNames[index] == nullptr) {
-			stream << "Unknow";
-		} else {
-			stream << staticNames[index];
-		}
-		return stream;
+	const std::vector<std::pair<CqlMessageDirection, const char*>>&
+		EnumDescriptions<CqlMessageDirection>::get() {
+		static std::vector<std::pair<CqlMessageDirection, const char*>> staticNames({
+			{ CqlMessageDirection::Request, "Request" },
+			{ CqlMessageDirection::Response, "Response" }
+		});
+		return staticNames;
 	}
 
-	/** Write the text description of header flags to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags) {
+	const std::vector<std::pair<CqlMessageType, const char*>>&
+		EnumDescriptions<CqlMessageType>::get() {
+		static std::vector<std::pair<CqlMessageType, const char*>> staticNames({
+			{ CqlMessageType::Error, "Error" },
+			{ CqlMessageType::Startup, "Startup" },
+			{ CqlMessageType::Ready, "Ready" },
+			{ CqlMessageType::Authenticate, "Authenticate" },
+			{ CqlMessageType::Options, "Options" },
+			{ CqlMessageType::Supported, "Supported" },
+			{ CqlMessageType::Query, "Query" },
+			{ CqlMessageType::Result, "Result" },
+			{ CqlMessageType::Prepare, "Prepare" },
+			{ CqlMessageType::Execute, "Execute" },
+			{ CqlMessageType::Register, "Register" },
+			{ CqlMessageType::Event, "Event" },
+			{ CqlMessageType::Batch, "Batch" },
+			{ CqlMessageType::AuthChallenge, "AuthChallenge" },
+			{ CqlMessageType::AuthResponse, "AuthResponse" },
+			{ CqlMessageType::AuthSuccess, "AuthSuccess" },
+		});
+		return staticNames;
+	}
+
+	const std::vector<std::pair<CqlMessageHeaderFlags, const char*>>&
+		EnumDescriptions<CqlMessageHeaderFlags>::get() {
 		static std::vector<std::pair<CqlMessageHeaderFlags, const char*>> staticNames({
+			{ CqlMessageHeaderFlags::None, "None" },
 			{ CqlMessageHeaderFlags::Compression, "Compression" },
 			{ CqlMessageHeaderFlags::Tracing, "Tracing" },
 			{ CqlMessageHeaderFlags::CustomPayload, "CustomPayload" },
 			{ CqlMessageHeaderFlags::Warning, "Warning" },
 			{ CqlMessageHeaderFlags::UseBeta, "UseBeta" }
 		});
-		bool isFirst = true;
-		for (const auto& name : staticNames) {
-			if ((flags & name.first) == name.first) {
-				if (isFirst) {
-					isFirst = false;
-				} else {
-					stream << "|";
-				}
-				stream << name.second;
-			}
-		}
-		return stream;
+		return staticNames;
 	}
 
-	/** Write the text description of query parameters flags to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlQueryParametersFlags flags) {
+	const std::vector<std::pair<CqlQueryParametersFlags, const char*>>&
+		EnumDescriptions<CqlQueryParametersFlags>::get() {
 		static std::vector<std::pair<CqlQueryParametersFlags, const char*>> staticNames({
+			{ CqlQueryParametersFlags::None, "None" },
 			{ CqlQueryParametersFlags::WithValues, "WithValues" },
 			{ CqlQueryParametersFlags::SkipMetadata, "SkipMetadata" },
 			{ CqlQueryParametersFlags::WithPageSize, "WithPageSize" },
@@ -70,18 +62,16 @@ namespace cql {
 			{ CqlQueryParametersFlags::WithNamesForValue, "WithNamesForValue" },
 			{ CqlQueryParametersFlags::WithKeySpace, "WithKeySpace" },
 		});
-		bool isFirst = true;
-		for (const auto& name : staticNames) {
-			if ((flags & name.first) == name.first) {
-				if (isFirst) {
-					isFirst = false;
-				} else {
-					stream << "|";
-				}
-				stream << name.second;
-			}
-		}
-		return stream;
+		return staticNames;
+	}
+
+	const std::vector<std::pair<CqlPrepareParametersFlags, const char*>>&
+		EnumDescriptions<CqlPrepareParametersFlags>::get() {
+		static std::vector<std::pair<CqlPrepareParametersFlags, const char*>> staticNames({
+			{ CqlPrepareParametersFlags::None, "None" },
+			{ CqlPrepareParametersFlags::WithKeySpace, "WithKeySpace" },
+		});
+		return staticNames;
 	}
 }
 

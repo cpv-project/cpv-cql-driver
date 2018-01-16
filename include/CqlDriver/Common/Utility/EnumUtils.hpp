@@ -1,4 +1,7 @@
 #pragma once
+#include <iostream>
+#include <vector>
+#include <utility>
 #include <type_traits>
 
 namespace cql {
@@ -45,6 +48,32 @@ namespace cql {
 	std::underlying_type_t<T> enumValue(T a) {
 		using t = std::underlying_type_t<T>;
 		return static_cast<t>(a);
+	}
+
+	/** Specialize this class to provide enum descriptions */
+	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	struct EnumDescriptions {
+		static const std::vector<std::pair<T, const char*>>& get() = delete;
+	};
+
+	/** Write text description of enum to stream */
+	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	std::ostream& operator<<(std::ostream& stream, T value) {
+		bool isFirst = true;
+		auto& descriptions = EnumDescriptions<T>::get();
+		for (const auto& pair : descriptions) {
+			if (enumValue(pair.first) == 0 ?
+				(value == pair.first) :
+				((value & pair.first) == pair.first)) {
+				if (isFirst) {
+					isFirst = false;
+				} else {
+					stream << "|";
+				}
+				stream << pair.second;
+			}
+		}
+		return stream;
 	}
 }
 

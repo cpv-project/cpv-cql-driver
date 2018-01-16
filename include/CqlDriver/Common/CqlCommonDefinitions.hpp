@@ -23,8 +23,10 @@ namespace cql {
 		Max_ = 0xb
 	};
 
-	/** Write the text description of consistency level to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlConsistencyLevel level);
+	template <>
+	struct EnumDescriptions<CqlConsistencyLevel> {
+		static const std::vector<std::pair<CqlConsistencyLevel, const char*>>& get();
+	};
 
 	/**
 	 * Column types
@@ -61,8 +63,10 @@ namespace cql {
 		Max_ = 0x0032
 	};
 
-	/** Write the text description of column type to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlColumnType type);
+	template <>
+	struct EnumDescriptions<CqlColumnType> {
+		static const std::vector<std::pair<CqlColumnType, const char*>>& get();
+	};
 
 	/** The full class name of the IAuthenticator in use */
 	namespace CqlAuthenticatorClasses {

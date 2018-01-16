@@ -1,4 +1,5 @@
 #include <CqlDriver/Common/Utility/EnumUtils.hpp>
+#include <CqlDriver/Common/Utility/StringUtils.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 namespace cql {
@@ -7,6 +8,19 @@ namespace cql {
 		A = 1,
 		B = 2,
 		C = 4
+	};
+
+	template <>
+	struct EnumDescriptions<MyTestEnum> {
+		static const std::vector<std::pair<MyTestEnum, const char*>>& get() {
+			static std::vector<std::pair<MyTestEnum, const char*>> staticNames({
+				{ MyTestEnum::None, "None" },
+				{ MyTestEnum::A, "A" },
+				{ MyTestEnum::B, "B" },
+				{ MyTestEnum::C, "C" }
+			});
+			return staticNames;
+		}
 	};
 }
 
@@ -34,6 +48,10 @@ TEST(TestEnumUtils, operators) {
 	{
 		auto value = cql::MyTestEnum::A | cql::MyTestEnum::B;
 		ASSERT_EQ(enumValue(value), 3);
+	}
+	{
+		ASSERT_EQ(cql::joinString("", cql::MyTestEnum::None), "None");
+		ASSERT_EQ(cql::joinString("", cql::MyTestEnum::A | cql::MyTestEnum::B), "A|B");
 	}
 }
 

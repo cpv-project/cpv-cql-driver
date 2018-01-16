@@ -4,11 +4,11 @@
 
 namespace cql {
 	// For more information, check the cql protocol definition on:
-	// https://github.com/apache/cassandra/blob/trunk/doc/native_protocol_v5.spec
+	// https://github.com/apache/cassandra/blob/trunk/doc/native_protocol_v4.spec
 
 	/**
 	 * Message direction, either request or response
-	 * The value of this enum can use to calculate the `version` in frame header,
+	 * The value of this enum can use to calculate the <version> in frame header,
 	 * for example: header.version = static_cast<std::size_t>(direction) | DefaultCqlVerion;
 	 */
 	enum class CqlMessageDirection {
@@ -17,9 +17,14 @@ namespace cql {
 		Mask_ = 0x80
 	};
 
+	template <>
+	struct EnumDescriptions<CqlMessageDirection> {
+		static const std::vector<std::pair<CqlMessageDirection, const char*>>& get();
+	};
+
 	/**
 	 * Message type, each type is either request type or response type
-	 * The value of this enum is the `opcode` in frame header.
+	 * The value of this enum is the <opcode> in frame header.
 	 * Check native_protocol_v4.spec section 2.4.
 	 */
 	enum class CqlMessageType {
@@ -42,12 +47,14 @@ namespace cql {
 		Max_ = 0x11 // only for array definition
 	};
 
-	/** Write the text description of message type to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlMessageType type);
+	template <>
+	struct EnumDescriptions<CqlMessageType> {
+		static const std::vector<std::pair<CqlMessageType, const char*>>& get();
+	};
 
 	/**
 	 * Flags in message header
-	 * The value of this enum is the `flags` in frame header.
+	 * The value of this enum is the <flags> in frame header.
 	 * Check native_protocol_v4.spec section 2.2.
 	 */
 	enum class CqlMessageHeaderFlags {
@@ -59,15 +66,17 @@ namespace cql {
 		UseBeta = 16
 	};
 
-	/** Write the text description of header flags to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags);
+	template <>
+	struct EnumDescriptions<CqlMessageHeaderFlags> {
+		static const std::vector<std::pair<CqlMessageHeaderFlags, const char*>>& get();
+	};
 
 	/**
 	 * Flags in query parameters.
-	 * The value of this enum is the `flags` in query parameters.
+	 * The value of this enum is the <flags> in query parameters.
 	 * Check native_protocol_v4.spec section 4.1.4.
 	 */
-	enum CqlQueryParametersFlags {
+	enum class CqlQueryParametersFlags {
 		None = 0,
 		WithValues = 1,
 		SkipMetadata = 2,
@@ -79,7 +88,24 @@ namespace cql {
 		WithKeySpace = 128
 	};
 
-	/** Write the text description of query parameters flags to stream */
-	std::ostream& operator<<(std::ostream& stream, CqlQueryParametersFlags flags);
+	template <>
+	struct EnumDescriptions<CqlQueryParametersFlags> {
+		static const std::vector<std::pair<CqlQueryParametersFlags, const char*>>& get();
+	};
+
+	/**
+	 * Flags in prepare parameters.
+	 * The value of this enum is the <flags> in prepare parameters.
+	 * Check native_protocol_v4.spec section 4.1.5.
+	 */
+	enum class CqlPrepareParametersFlags {
+		None = 0,
+		WithKeySpace = 1
+	};
+
+	template <>
+	struct EnumDescriptions<CqlPrepareParametersFlags> {
+		static const std::vector<std::pair<CqlPrepareParametersFlags, const char*>>& get();
+	};
 }
 
