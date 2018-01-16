@@ -73,5 +73,16 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<CqlBatchParametersFlags, const char*>>&
+		EnumDescriptions<CqlBatchParametersFlags>::get() {
+		static std::vector<std::pair<CqlBatchParametersFlags, const char*>> staticNames({
+			{ CqlBatchParametersFlags::None, "None" },
+			{ CqlBatchParametersFlags::WithSerialConsistency, "WithSerialConsistency" },
+			{ CqlBatchParametersFlags::WithDefaultTimestamp, "WithDefaultTimestamp" },
+			{ CqlBatchParametersFlags::WithKeySpace, "WithKeySpace" },
+		});
+		return staticNames;
+	}
 }
 

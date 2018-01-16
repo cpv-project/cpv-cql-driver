@@ -107,5 +107,22 @@ namespace cql {
 	struct EnumDescriptions<CqlPrepareParametersFlags> {
 		static const std::vector<std::pair<CqlPrepareParametersFlags, const char*>>& get();
 	};
+
+	/**
+	 * Flags in batch parameters.
+	 * The value of this enum is the <flags> in batch parameters.
+	 * Check native_protocol_v4.spec section 4.1.7.
+	 */
+	enum class CqlBatchParametersFlags {
+		None = 0,
+		WithSerialConsistency = 16,
+		WithDefaultTimestamp = 32,
+		WithKeySpace = 128
+	};
+
+	template <>
+	struct EnumDescriptions<CqlBatchParametersFlags> {
+		static const std::vector<std::pair<CqlBatchParametersFlags, const char*>>& get();
+	};
 }
 
