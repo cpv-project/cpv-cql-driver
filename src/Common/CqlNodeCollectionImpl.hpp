@@ -15,7 +15,7 @@ namespace cql {
 		void reportSuccess(const seastar::shared_ptr<CqlNodeConfiguration>& node) override;
 
 		/** Constructor */
-		CqlNodeCollectionImpl(const std::vector<CqlNodeConfiguration>& initialNodes);
+		explicit CqlNodeCollectionImpl(const std::vector<CqlNodeConfiguration>& initialNodes);
 	};
 }
 

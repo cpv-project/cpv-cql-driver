@@ -33,7 +33,7 @@ namespace cql {
 		}
 
 		CqlProtocolInet() : address_(), port_(0) { }
-		CqlProtocolInet(const ValueType& value) :
+		explicit CqlProtocolInet(const ValueType& value) :
 			address_(value.first), port_(value.second) { }
 
 	private:

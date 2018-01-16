@@ -74,7 +74,7 @@ namespace cql {
 
 	void CqlProtocolQueryParameters::setPageSize(std::size_t pageSize) {
 		pageSize_.set(static_cast<decltype(pageSize_.get())>(pageSize));
-		if (pageSize < 0 || pageSize_.get() != pageSize) {
+		if (pageSize_.get() < 0 || pageSize_.get() != pageSize) {
 			throw CqlLogicException(CQL_CODEINFO, "page size overflow");
 		}
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPageSize));
