@@ -23,6 +23,7 @@ namespace cql {
 	public:
 		CqlColumnType get() const { return type_; }
 		void set(CqlColumnType type);
+		void reset();
 
 		CqlProtocolColumnOptionCustomPayload getCustomPayload() const;
 		void setCustomPayload(const CqlProtocolColumnOptionCustomPayload& payload);

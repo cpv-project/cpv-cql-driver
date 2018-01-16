@@ -13,6 +13,7 @@ namespace cql {
 	public:
 		IntType get() const { return value_; }
 		void set(IntType value) { value_ = value; }
+		void reset() { value_ = 0; }
 
 		void encode(seastar::sstring& data) const {
 			auto value = seastar::cpu_to_be(value_);

@@ -3,6 +3,11 @@
 #include "CqlProtocolShort.hpp"
 
 namespace cql {
+	void CqlProtocolQueryParameters::reset() {
+		consistency_.reset();
+		flags_.set(enumValue(CqlQueryParametersFlags::None));
+	}
+
 	CqlConsistencyLevel CqlProtocolQueryParameters::getConsistency() const {
 		return consistency_.get();
 	}
@@ -13,10 +18,6 @@ namespace cql {
 
 	CqlQueryParametersFlags CqlProtocolQueryParameters::getFlags() const {
 		return static_cast<CqlQueryParametersFlags>(flags_.get());
-	}
-
-	void CqlProtocolQueryParameters::resetFlags() {
-		flags_.set(enumValue(CqlQueryParametersFlags::None));
 	}
 
 	void CqlProtocolQueryParameters::setSkipMetadata(bool value) {

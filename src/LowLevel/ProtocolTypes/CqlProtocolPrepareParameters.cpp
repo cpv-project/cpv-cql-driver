@@ -1,12 +1,12 @@
 #include "CqlProtocolPrepareParameters.hpp"
 
 namespace cql {
-	CqlPrepareParametersFlags CqlProtocolPrepareParameters::getFlags() const {
-		return static_cast<CqlPrepareParametersFlags>(flags_.get());
+	void CqlProtocolPrepareParameters::reset() {
+		flags_.set(enumValue(CqlPrepareParametersFlags::None));
 	}
 
-	void CqlProtocolPrepareParameters::resetFlags() {
-		flags_.set(enumValue(CqlPrepareParametersFlags::None));
+	CqlPrepareParametersFlags CqlProtocolPrepareParameters::getFlags() const {
+		return static_cast<CqlPrepareParametersFlags>(flags_.get());
 	}
 
 	const seastar::sstring& CqlProtocolPrepareParameters::getKeySpace() const& {

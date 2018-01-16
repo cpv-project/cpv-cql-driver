@@ -18,6 +18,7 @@ namespace cql {
 
 		const VectorType& get() const& { return value_; }
 		VectorType& get() & { return value_; }
+		void reset() { value_.clear(); }
 
 		void encode(seastar::sstring& data) const {
 			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {

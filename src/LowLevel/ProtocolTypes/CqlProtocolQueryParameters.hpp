@@ -17,13 +17,15 @@ namespace cql {
 	 */
 	class CqlProtocolQueryParameters {
 	public:
+		/** Reset to initial state */
+		void reset();
+
 		/** The [consistency] level for the operation */
 		CqlConsistencyLevel getConsistency() const;
 		void setConsistency(CqlConsistencyLevel consistency);
 
 		/** Call setters below will alter flags to indicate which component is included */
 		CqlQueryParametersFlags getFlags() const;
-		void resetFlags();
 
 		/** If set, the result set returned as a response to the query will have the NO_METADATA flag */
 		void setSkipMetadata(bool value);

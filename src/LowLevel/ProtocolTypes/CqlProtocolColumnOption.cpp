@@ -10,6 +10,10 @@ namespace cql {
 		payload_.resize(0); // should set type first then payload
 	}
 
+	void CqlProtocolColumnOption::reset() {
+		set(CqlColumnType::Custom);
+	}
+
 	CqlProtocolColumnOptionCustomPayload CqlProtocolColumnOption::getCustomPayload() const {
 		if (type_ != CqlColumnType::Custom) {
 			throw CqlLogicException(CQL_CODEINFO, "type not matched");

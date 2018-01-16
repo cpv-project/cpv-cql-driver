@@ -17,6 +17,11 @@ namespace cql {
 			port_ = CqlProtocolInt(value.second);
 		}
 
+		void reset() {
+			address_.reset();
+			port_.reset();
+		}
+
 		void encode(seastar::sstring& data) const {
 			address_.encode(data);
 			port_.encode(data);

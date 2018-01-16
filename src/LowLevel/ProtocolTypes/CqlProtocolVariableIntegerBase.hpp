@@ -20,6 +20,7 @@ namespace cql {
 	public:
 		std::uint64_t get() const { return value_; }
 		void set(std::uint64_t value) { value_ = value; }
+		void reset() { value_ = 0; }
 
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);

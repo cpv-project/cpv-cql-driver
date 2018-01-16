@@ -11,6 +11,7 @@ namespace cql {
 		private CqlProtocolMapBase<std::uint16_t, CqlProtocolString, CqlProtocolStringList> {
 	public:
 		using CqlProtocolMapBase::get;
+		using CqlProtocolMapBase::reset;
 		using CqlProtocolMapBase::encode;
 		using CqlProtocolMapBase::decode;
 		using CqlProtocolMapBase::CqlProtocolMapBase;

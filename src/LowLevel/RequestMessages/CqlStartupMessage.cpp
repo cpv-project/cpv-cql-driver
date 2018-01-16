@@ -10,7 +10,7 @@ namespace cql {
 	/** For CqlObject */
 	void CqlStartupMessage::reset(CqlMessageHeader&& header) {
 		CqlRequestMessageBase::reset(std::move(header));
-		options_.get().clear();
+		options_.reset();
 		options_.get().emplace(CqlVersionKey, CqlVersionValue);
 	}
 

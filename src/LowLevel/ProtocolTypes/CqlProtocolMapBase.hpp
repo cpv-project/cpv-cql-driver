@@ -36,6 +36,7 @@ namespace cql {
 
 		const MapType& get() const& { return value_; }
 		MapType& get() & { return value_; }
+		void reset() { value_.clear(); }
 
 		void encode(seastar::sstring& data) const {
 			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {

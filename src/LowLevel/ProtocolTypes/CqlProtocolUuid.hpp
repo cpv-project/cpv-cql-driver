@@ -13,6 +13,7 @@ namespace cql {
 	public:
 		std::pair<std::uint64_t, std::uint64_t> get() const;
 		void set(std::pair<std::uint64_t, std::uint64_t> value);
+		void reset();
 
 		seastar::sstring str() const;
 		void set(const seastar::sstring& str);

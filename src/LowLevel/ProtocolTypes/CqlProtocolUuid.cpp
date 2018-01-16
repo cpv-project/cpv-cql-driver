@@ -15,6 +15,11 @@ namespace cql {
 		lowBits_ = value.second;
 	}
 
+	void CqlProtocolUuid::reset() {
+		highBits_ = 0;
+		lowBits_ = 0;
+	}
+
 	seastar::sstring CqlProtocolUuid::str() const {
 		// example: 00112233-4455-6677-8899-aabbccddeeff
 		seastar::sstring result;

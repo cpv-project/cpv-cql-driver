@@ -12,6 +12,7 @@ namespace cql {
 	public:
 		seastar::net::inet_address get() const { return value_; }
 		void set(const seastar::net::inet_address& value) & { value_ = value; }
+		void reset() { value_ = {}; }
 
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);

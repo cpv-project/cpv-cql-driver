@@ -16,6 +16,7 @@ namespace cql {
 	public:
 		using CqlProtocolSizedStringBase::get;
 		using CqlProtocolSizedStringBase::set;
+		using CqlProtocolSizedStringBase::reset;
 		using CqlProtocolSizedStringBase::append;
 		using CqlProtocolSizedStringBase::encode;
 		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;

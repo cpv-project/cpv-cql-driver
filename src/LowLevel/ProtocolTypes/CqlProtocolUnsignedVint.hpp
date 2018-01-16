@@ -10,6 +10,7 @@ namespace cql {
 	public:
 		using CqlProtocolVariableIntegerBase::get;
 		using CqlProtocolVariableIntegerBase::set;
+		using CqlProtocolVariableIntegerBase::reset;
 		using CqlProtocolVariableIntegerBase::encode;
 		using CqlProtocolVariableIntegerBase::decode;
 		using CqlProtocolVariableIntegerBase::CqlProtocolVariableIntegerBase;

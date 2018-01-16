@@ -4,8 +4,8 @@ namespace cql {
 	/** For CqlObject */
 	void CqlPrepareMessage::reset(CqlMessageHeader&& header) {
 		CqlRequestMessageBase::reset(std::move(header));
-		query_.set(CqlProtocolLongStringState::Normal);
-		prepareParameters_.resetFlags();
+		query_.reset();
+		prepareParameters_.reset();
 	}
 
 	/** Encode message body to binary data */

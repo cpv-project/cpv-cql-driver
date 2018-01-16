@@ -16,18 +16,26 @@ namespace cql {
 		const seastar::sstring& get() const& { return value_; }
 		seastar::sstring& get() & { return value_; }
 		StateType state() const { return state_; }
+
 		void set(StateType state) {
 			state_ = state;
 			value_.resize(0);
 		}
+
 		void set(const char* str, std::size_t size) {
 			state_ = NormalState;
 			value_.resize(0);
 			value_.append(str, size);
 		}
+
 		void append(const char* str, std::size_t size) {
 			state_ = NormalState;
 			value_.append(str, size);
+		}
+
+		void reset() {
+			state_ = DefaultState;
+			value_.resize(0);
 		}
 
 		void encode(seastar::sstring& data) const {

@@ -9,6 +9,7 @@ namespace cql {
 	 */
 	class CqlProtocolVint : private CqlProtocolVariableIntegerBase {
 	public:
+		using CqlProtocolVariableIntegerBase::reset;
 		using CqlProtocolVariableIntegerBase::encode;
 		using CqlProtocolVariableIntegerBase::decode;
 

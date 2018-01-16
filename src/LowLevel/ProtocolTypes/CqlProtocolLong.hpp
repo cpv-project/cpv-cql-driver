@@ -7,6 +7,7 @@ namespace cql {
 	public:
 		using CqlProtocolIntegerBase::get;
 		using CqlProtocolIntegerBase::set;
+		using CqlProtocolIntegerBase::reset;
 		using CqlProtocolIntegerBase::encode;
 		using CqlProtocolIntegerBase::decode;
 		using CqlProtocolIntegerBase::CqlProtocolIntegerBase;

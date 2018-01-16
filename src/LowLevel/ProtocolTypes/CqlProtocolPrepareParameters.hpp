@@ -11,9 +11,11 @@ namespace cql {
 	 */
 	class CqlProtocolPrepareParameters {
 	public:
+		/** Reset to initial state */
+		void reset();
+
 		/** Call setters below will alter flags to indicate which component is included */
 		CqlPrepareParametersFlags getFlags() const;
-		void resetFlags();
 
 		/** The query should be executed in, supercedes the keyspace that the connection is bound to */
 		const seastar::sstring& getKeySpace() const&;

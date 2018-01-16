@@ -9,6 +9,7 @@ namespace cql {
 	 */
 	class CqlProtocolConsistency : private CqlProtocolIntegerBase<std::uint16_t> {
 	public:
+		using CqlProtocolIntegerBase::reset;
 		using CqlProtocolIntegerBase::encode;
 		using CqlProtocolIntegerBase::decode;
 
