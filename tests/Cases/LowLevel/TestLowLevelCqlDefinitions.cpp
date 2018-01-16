@@ -43,7 +43,7 @@ TEST(TestCqlLowLevelDefinitions, queryParametersFlagsToString) {
 	ASSERT_EQ(
 		cql::joinString("",
 			cql::CqlQueryParametersFlags::WithPageSize |
-			cql::CqlQueryParametersFlags::WithKeyspace),
-		"WithPageSize|WithKeyspace");
+			cql::CqlQueryParametersFlags::WithKeySpace),
+		"WithPageSize|WithKeySpace");
 }
 

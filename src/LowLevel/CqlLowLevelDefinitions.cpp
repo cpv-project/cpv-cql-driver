@@ -35,16 +35,6 @@ namespace cql {
 		return stream;
 	}
 
-	/** Or operation */
-	CqlMessageHeaderFlags operator|(CqlMessageHeaderFlags a, CqlMessageHeaderFlags b) {
-		return CqlMessageHeaderFlags(static_cast<std::size_t>(a) | static_cast<std::size_t>(b));
-	}
-
-	/** And operation */
-	CqlMessageHeaderFlags operator&(CqlMessageHeaderFlags a, CqlMessageHeaderFlags b) {
-		return CqlMessageHeaderFlags(static_cast<std::size_t>(a) & static_cast<std::size_t>(b));
-	}
-
 	/** Write the text description of header flags to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags) {
 		static std::vector<std::pair<CqlMessageHeaderFlags, const char*>> staticNames({
@@ -68,16 +58,6 @@ namespace cql {
 		return stream;
 	}
 
-	/** Or operation */
-	CqlQueryParametersFlags operator|(CqlQueryParametersFlags a, CqlQueryParametersFlags b) {
-		return CqlQueryParametersFlags(static_cast<std::size_t>(a) | static_cast<std::size_t>(b));
-	}
-
-	/** And operation */
-	CqlQueryParametersFlags operator&(CqlQueryParametersFlags a, CqlQueryParametersFlags b) {
-		return CqlQueryParametersFlags(static_cast<std::size_t>(a) & static_cast<std::size_t>(b));
-	}
-
 	/** Write the text description of query parameters flags to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlQueryParametersFlags flags) {
 		static std::vector<std::pair<CqlQueryParametersFlags, const char*>> staticNames({
@@ -88,7 +68,7 @@ namespace cql {
 			{ CqlQueryParametersFlags::WithSerialConsistency, "WithSerialConsistency" },
 			{ CqlQueryParametersFlags::WithDefaultTimestamp, "WithDefaultTimestamp" },
 			{ CqlQueryParametersFlags::WithNamesForValue, "WithNamesForValue" },
-			{ CqlQueryParametersFlags::WithKeyspace, "WithKeyspace" },
+			{ CqlQueryParametersFlags::WithKeySpace, "WithKeySpace" },
 		});
 		bool isFirst = true;
 		for (const auto& name : staticNames) {

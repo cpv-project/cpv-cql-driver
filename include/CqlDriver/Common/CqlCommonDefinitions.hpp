@@ -1,5 +1,6 @@
 #pragma once
 #include <ostream>
+#include "./Utility/EnumUtils.hpp"
 
 namespace cql {
 	/**

@@ -1,4 +1,5 @@
 #pragma once
+#include <CqlDriver/Common/Utility/EnumUtils.hpp>
 #include <ostream>
 
 namespace cql {
@@ -58,12 +59,6 @@ namespace cql {
 		UseBeta = 16
 	};
 
-	/** Or operation */
-	CqlMessageHeaderFlags operator|(CqlMessageHeaderFlags a, CqlMessageHeaderFlags b);
-
-	/** And operation */
-	CqlMessageHeaderFlags operator&(CqlMessageHeaderFlags a, CqlMessageHeaderFlags b);
-
 	/** Write the text description of header flags to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlMessageHeaderFlags flags);
 
@@ -81,14 +76,8 @@ namespace cql {
 		WithSerialConsistency = 16,
 		WithDefaultTimestamp = 32,
 		WithNamesForValue = 64,
-		WithKeyspace = 128
+		WithKeySpace = 128
 	};
-
-	/** Or operation */
-	CqlQueryParametersFlags operator|(CqlQueryParametersFlags a, CqlQueryParametersFlags b);
-
-	/** And operation */
-	CqlQueryParametersFlags operator&(CqlQueryParametersFlags a, CqlQueryParametersFlags b);
 
 	/** Write the text description of query parameters flags to stream */
 	std::ostream& operator<<(std::ostream& stream, CqlQueryParametersFlags flags);
