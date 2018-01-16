@@ -1,4 +1,6 @@
 #pragma once
+#include "../ProtocolTypes/CqlProtocolLongString.hpp"
+#include "../ProtocolTypes/CqlProtocolPrepareParameters.hpp"
 #include "CqlRequestMessageBase.hpp"
 
 namespace cql {
@@ -9,10 +11,22 @@ namespace cql {
 	class CqlPrepareMessage : public CqlRequestMessageBase {
 	public:
 		using CqlRequestMessageBase::freeResources;
-		using CqlRequestMessageBase::reset;
+
+		/** For CqlObject */
+		void reset(CqlMessageHeader&& header);
 
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
+
+		const CqlProtocolLongString& getQuery() const& { return query_; }
+		CqlProtocolLongString& getQuery() & { return query_; }
+
+		const CqlProtocolPrepareParameters& getPrepareParameters() const& { return prepareParameters_; }
+		CqlProtocolPrepareParameters& getPrepareParameters() & { return prepareParameters_; }
+
+	private:
+		CqlProtocolLongString query_;
+		CqlProtocolPrepareParameters prepareParameters_;
 	};
 }
 
