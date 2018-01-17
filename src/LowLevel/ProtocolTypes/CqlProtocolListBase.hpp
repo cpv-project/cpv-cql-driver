@@ -5,6 +5,7 @@
 #include <core/sstring.hh>
 #include <core/byteorder.hh>
 #include <CqlDriver/Common/Exceptions/CqlEncodeException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 
 namespace cql {
 	/**
