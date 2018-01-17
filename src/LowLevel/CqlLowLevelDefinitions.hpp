@@ -106,5 +106,20 @@ namespace cql {
 	struct EnumDescriptions<CqlBatchParametersFlags> {
 		static const std::vector<std::pair<CqlBatchParametersFlags, const char*>>& get();
 	};
+
+	/**
+	 * Indicating whether the following query is a prepared one or not
+	 * The value of this enum is the <kind> in batch query.
+	 * Check native_protocol_v4.spec section 4.1.7.
+	 */
+	enum class CqlBatchQueryKind {
+		Query = 0,
+		PreparedQueryId = 1
+	};
+
+	template <>
+	struct EnumDescriptions<CqlBatchQueryKind> {
+		static const std::vector<std::pair<CqlBatchQueryKind, const char*>>& get();
+	};
 }
 

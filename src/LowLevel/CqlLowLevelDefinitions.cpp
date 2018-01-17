@@ -72,5 +72,14 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<CqlBatchQueryKind, const char*>>&
+		EnumDescriptions<CqlBatchQueryKind>::get() {
+		static std::vector<std::pair<CqlBatchQueryKind, const char*>> staticNames({
+			{ CqlBatchQueryKind::Query, "Query" },
+			{ CqlBatchQueryKind::PreparedQueryId, "PreparedQueryId" },
+		});
+		return staticNames;
+	}
 }
 

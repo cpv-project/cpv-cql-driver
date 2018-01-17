@@ -7,7 +7,7 @@ TEST(TestCqlExecuteMessage, encode) {
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::CqlRequestMessageFactory::makeRequestMessage<cql::CqlExecuteMessage>();
 		seastar::sstring data;
-		message->getPrepareQueryId().set("asd", 3);
+		message->getPreparedQueryId().set("asd", 3);
 		message->getResultMetadataId().set("a", 1);
 		message->getQueryParameters().setConsistency(cql::CqlConsistencyLevel::One);
 		message->getHeader().encodeHeaderPre(info, data);

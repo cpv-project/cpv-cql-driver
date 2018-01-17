@@ -4,14 +4,14 @@ namespace cql {
 	/** For CqlObject */
 	void CqlExecuteMessage::reset(CqlMessageHeader&& header) {
 		CqlRequestMessageBase::reset(std::move(header));
-		prepareQueryId_.reset();
+		preparedQueryId_.reset();
 		resultMetadataId_.reset();
 		queryParameters_.reset();
 	}
 
 	/** Encode message body to binary data */
 	void CqlExecuteMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
-		prepareQueryId_.encode(data);
+		preparedQueryId_.encode(data);
 		resultMetadataId_.encode(data);
 		queryParameters_.encode(data);
 	}
