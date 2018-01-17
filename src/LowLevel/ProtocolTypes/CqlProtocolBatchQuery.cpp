@@ -7,7 +7,7 @@ namespace cql {
 		kind_.reset();
 		query_.reset();
 		preparedQueryId_.reset();
-		values_.clear();
+		values_.reset();
 	}
 
 	CqlBatchQueryKind CqlProtocolBatchQuery::getKind() const {
@@ -45,15 +45,15 @@ namespace cql {
 	}
 
 	const std::vector<CqlProtocolValue>& CqlProtocolBatchQuery::getValues() const& {
-		return values_;
+		return values_.get();
 	}
 
 	void CqlProtocolBatchQuery::setValues(const std::vector<CqlProtocolValue>& values) {
-		values_ = values;
+		values_.get() = values;
 	}
 
 	void CqlProtocolBatchQuery::setValues(std::vector<CqlProtocolValue>&& values) {
-		values_ = std::move(values);
+		values_.get() = std::move(values);
 	}
 
 	void CqlProtocolBatchQuery::encode(seastar::sstring& data) const {
@@ -63,14 +63,7 @@ namespace cql {
 		} else {
 			preparedQueryId_.encode(data);
 		}
-		CqlProtocolShort valuesCount(values_.size());
-		if (valuesCount.get() != values_.size()) {
-			throw CqlLogicException(CQL_CODEINFO, "too many values cause overflow");
-		}
-		valuesCount.encode(data);
-		for (const auto& value : values_) {
-			value.encode(data);
-		}
+		values_.encode(data);
 	}
 
 	void CqlProtocolBatchQuery::decode(const char*& ptr, const char* end) {
@@ -80,12 +73,7 @@ namespace cql {
 		} else {
 			preparedQueryId_.decode(ptr, end);
 		}
-		CqlProtocolShort valuesCount;
-		valuesCount.decode(ptr, end);
-		values_.resize(valuesCount.get());
-		for (auto& value : values_) {
-			value.decode(ptr, end);
-		}
+		values_.decode(ptr, end);
 	}
 
 	CqlProtocolBatchQuery::CqlProtocolBatchQuery() :

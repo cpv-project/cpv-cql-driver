@@ -3,7 +3,7 @@
 #include "CqlProtocolByte.hpp"
 #include "CqlProtocolLongString.hpp"
 #include "CqlProtocolShortBytes.hpp"
-#include "CqlProtocolValue.hpp"
+#include "CqlProtocolValueList.hpp"
 
 namespace cql {
 	/**
@@ -46,7 +46,7 @@ namespace cql {
 		CqlProtocolByte kind_;
 		CqlProtocolLongString query_;
 		CqlProtocolShortBytes preparedQueryId_;
-		std::vector<CqlProtocolValue> values_;
+		CqlProtocolValueList values_;
 	};
 }
 

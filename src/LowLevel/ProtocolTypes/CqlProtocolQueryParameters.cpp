@@ -1,4 +1,5 @@
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include "CqlProtocolQueryParameters.hpp"
 #include "CqlProtocolShort.hpp"
 
@@ -29,22 +30,22 @@ namespace cql {
 	}
 
 	const std::vector<CqlProtocolString>& CqlProtocolQueryParameters::getNames() const& {
-		return names_;
+		throw CqlNotImplementedException(CQL_CODEINFO, "waiting for delete");
 	}
 
 	const std::vector<CqlProtocolValue>& CqlProtocolQueryParameters::getValues() const& {
-		return values_;
+		return values_.get();
 	}
 
 	void CqlProtocolQueryParameters::setValues(const std::vector<CqlProtocolValue>& values) {
-		values_ = values;
+		values_.get() = values;
 		flags_.set(enumValue(
 			(getFlags() | CqlQueryParametersFlags::WithValues) &
 			(~CqlQueryParametersFlags::WithNamesForValue)));
 	}
 
 	void CqlProtocolQueryParameters::setValues(std::vector<CqlProtocolValue>&& values) {
-		values_ = std::move(values);
+		values_.get() = std::move(values);
 		flags_.set(enumValue(
 			(getFlags() | CqlQueryParametersFlags::WithValues) &
 			(~CqlQueryParametersFlags::WithNamesForValue)));
@@ -52,8 +53,14 @@ namespace cql {
 
 	void CqlProtocolQueryParameters::setNameAndValues(
 		const std::vector<CqlProtocolString>& names, const std::vector<CqlProtocolValue>& values) {
-		names_ = names;
-		values_ = values;
+		if (names.size() != values.size()) {
+			throw CqlLogicException(CQL_CODEINFO, "names size not equal to values size");
+		}
+		auto& map = nameAndValues_.get();
+		map.clear();
+		for (std::size_t i = 0; i < names.size(); ++i) {
+			map.emplace(names[i], values[i]);
+		}
 		flags_.set(enumValue(
 			getFlags() | CqlQueryParametersFlags::WithValues |
 			CqlQueryParametersFlags::WithNamesForValue));
@@ -61,8 +68,16 @@ namespace cql {
 
 	void CqlProtocolQueryParameters::setNameAndValues(
 		std::vector<CqlProtocolString>&& names, std::vector<CqlProtocolValue>&& values) {
-		names_ = std::move(names);
-		values_ = std::move(values);
+		if (names.size() != values.size()) {
+			throw CqlLogicException(CQL_CODEINFO, "names size not equal to values size");
+		}
+		auto& map = nameAndValues_.get();
+		map.clear();
+		for (std::size_t i = 0; i < names.size(); ++i) {
+			map.emplace(std::move(names[i]), std::move(values[i]));
+		}
+		names.clear();
+		values.clear();
 		flags_.set(enumValue(
 			getFlags() | CqlQueryParametersFlags::WithValues |
 			CqlQueryParametersFlags::WithNamesForValue));
@@ -118,23 +133,10 @@ namespace cql {
 		consistency_.encode(data);
 		flags_.encode(data);
 		if (enumTrue(flags & CqlQueryParametersFlags::WithValues)) {
-			CqlProtocolShort valuesCount(values_.size());
-			if (valuesCount.get() != values_.size()) {
-				throw CqlLogicException(CQL_CODEINFO, "too many values cause overflow");
-			}
-			valuesCount.encode(data);
 			if (enumTrue(flags & CqlQueryParametersFlags::WithNamesForValue)) {
-				if (names_.size() != values_.size()) {
-					throw CqlLogicException(CQL_CODEINFO, "names size not equal to values size");
-				}
-				for (std::size_t i = 0; i < values_.size(); ++i) {
-					names_[i].encode(data);
-					values_[i].encode(data);
-				}
+				nameAndValues_.encode(data);
 			} else {
-				for (const auto& value : values_) {
-					value.encode(data);
-				}
+				values_.encode(data);
 			}
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithPageSize)) {
@@ -156,21 +158,10 @@ namespace cql {
 		flags_.decode(ptr, end);
 		auto flags = getFlags();
 		if (enumTrue(flags & CqlQueryParametersFlags::WithValues)) {
-			CqlProtocolShort valuesCount(values_.size());
-			valuesCount.decode(ptr, end);
 			if (enumTrue(flags & CqlQueryParametersFlags::WithNamesForValue)) {
-				names_.resize(valuesCount.get());
-				values_.resize(valuesCount.get());
-				for (std::size_t i = 0; i < values_.size(); ++i) {
-					names_[i].decode(ptr, end);
-					values_[i].decode(ptr, end);
-				}
+				nameAndValues_.decode(ptr, end);
 			} else {
-				// didn't touch names_, for future reuse
-				values_.resize(valuesCount.get());
-				for (auto& value : values_) {
-					value.decode(ptr, end);
-				}
+				values_.decode(ptr, end);
 			}
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithPageSize)) {
@@ -190,8 +181,8 @@ namespace cql {
 	CqlProtocolQueryParameters::CqlProtocolQueryParameters() :
 		consistency_(),
 		flags_(),
-		names_(),
 		values_(),
+		nameAndValues_(),
 		pageSize_(),
 		pagingState_(),
 		serialConsistency_(),

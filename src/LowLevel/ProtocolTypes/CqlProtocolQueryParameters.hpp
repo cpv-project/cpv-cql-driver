@@ -6,7 +6,8 @@
 #include "CqlProtocolInt.hpp"
 #include "CqlProtocolLong.hpp"
 #include "CqlProtocolString.hpp"
-#include "CqlProtocolValue.hpp"
+#include "CqlProtocolValueList.hpp"
+#include "CqlProtocolValueMap.hpp"
 #include "CqlProtocolBytes.hpp"
 
 namespace cql {
@@ -73,8 +74,8 @@ namespace cql {
 	private:
 		CqlProtocolConsistency consistency_;
 		CqlProtocolByte flags_;
-		std::vector<CqlProtocolString> names_;
-		std::vector<CqlProtocolValue> values_;
+		CqlProtocolValueList values_;
+		CqlProtocolValueMap nameAndValues_;
 		CqlProtocolInt pageSize_;
 		CqlProtocolBytes pagingState_;
 		CqlProtocolConsistency serialConsistency_;
