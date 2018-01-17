@@ -13,5 +13,9 @@ namespace cql {
 		// where <query> is a [long string] representing the CQL query.
 		query_.encode(data);
 	}
+
+	/** Constructor */
+	CqlPrepareMessage::CqlPrepareMessage() :
+		query_() { }
 }
 

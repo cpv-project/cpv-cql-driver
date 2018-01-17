@@ -16,5 +16,10 @@ namespace cql {
 		query_.encode(data);
 		queryParameters_.encode(data);
 	}
+
+	/** Constructor */
+	CqlQueryMessage::CqlQueryMessage() :
+		query_(),
+		queryParameters_() { }
 }
 

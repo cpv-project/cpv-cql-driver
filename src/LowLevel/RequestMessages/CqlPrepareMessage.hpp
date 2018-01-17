@@ -17,8 +17,12 @@ namespace cql {
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 
+		/** The CQL query string */
 		const CqlProtocolLongString& getQuery() const& { return query_; }
 		CqlProtocolLongString& getQuery() & { return query_; }
+
+		/** Constructor */
+		CqlPrepareMessage();
 
 	private:
 		CqlProtocolLongString query_;

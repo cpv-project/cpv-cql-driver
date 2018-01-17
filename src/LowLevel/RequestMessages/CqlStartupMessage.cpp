@@ -32,6 +32,7 @@ namespace cql {
 	}
 
 	/** Constructor */
-	CqlStartupMessage::CqlStartupMessage() : options_() { }
+	CqlStartupMessage::CqlStartupMessage() :
+		options_() { }
 }
 
