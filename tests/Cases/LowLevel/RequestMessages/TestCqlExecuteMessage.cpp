@@ -14,10 +14,10 @@ TEST(TestCqlExecuteMessage, encode) {
 		message->encodeBody(info, data);
 		message->getHeader().encodeHeaderPost(info, data);
 		ASSERT_EQ(data, makeTestString(
-			"\x04\x00\x00\x00\x0a\x00\x00\x00\x0e"
+			"\x04\x00\x00\x00\x0a\x00\x00\x00\x0b"
 			"\x00\x03""asd"
 			"\x00\x01""a"
-			"\x00\x01\x00\x00\x00\x00"));
+			"\x00\x01\x00"));
 	}
 }
 

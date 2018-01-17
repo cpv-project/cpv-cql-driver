@@ -62,8 +62,7 @@ namespace cql {
 		Compression = 1,
 		Tracing = 2,
 		CustomPayload = 4,
-		Warning = 8,
-		UseBeta = 16
+		Warning = 8
 	};
 
 	template <>
@@ -84,28 +83,12 @@ namespace cql {
 		WithPagingState = 8,
 		WithSerialConsistency = 16,
 		WithDefaultTimestamp = 32,
-		WithNamesForValue = 64,
-		WithKeySpace = 128
+		WithNamesForValue = 64
 	};
 
 	template <>
 	struct EnumDescriptions<CqlQueryParametersFlags> {
 		static const std::vector<std::pair<CqlQueryParametersFlags, const char*>>& get();
-	};
-
-	/**
-	 * Flags in prepare parameters.
-	 * The value of this enum is the <flags> in prepare parameters.
-	 * Check native_protocol_v4.spec section 4.1.5.
-	 */
-	enum class CqlPrepareParametersFlags {
-		None = 0,
-		WithKeySpace = 1
-	};
-
-	template <>
-	struct EnumDescriptions<CqlPrepareParametersFlags> {
-		static const std::vector<std::pair<CqlPrepareParametersFlags, const char*>>& get();
 	};
 
 	/**
@@ -116,8 +99,7 @@ namespace cql {
 	enum class CqlBatchParametersFlags {
 		None = 0,
 		WithSerialConsistency = 16,
-		WithDefaultTimestamp = 32,
-		WithKeySpace = 128
+		WithDefaultTimestamp = 32
 	};
 
 	template <>

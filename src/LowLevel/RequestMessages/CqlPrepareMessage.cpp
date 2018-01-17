@@ -5,16 +5,13 @@ namespace cql {
 	void CqlPrepareMessage::reset(CqlMessageHeader&& header) {
 		CqlRequestMessageBase::reset(std::move(header));
 		query_.reset();
-		prepareParameters_.reset();
 	}
 
 	/** Encode message body to binary data */
 	void CqlPrepareMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
-		// The body of the message must be: <query><flags>[<keyspace>]
+		// The body of the message must be: <query>
 		// where <query> is a [long string] representing the CQL query.
-		// The remain parts are in CqlProtocolPrepareParameters.
 		query_.encode(data);
-		prepareParameters_.encode(data);
 	}
 }
 

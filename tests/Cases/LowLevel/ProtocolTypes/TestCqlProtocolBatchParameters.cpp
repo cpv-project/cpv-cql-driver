@@ -13,15 +13,12 @@ TEST(TestCqlProtocolBatchParameters, getset) {
 		value.setConsistency(cql::CqlConsistencyLevel::Two);
 		value.setSerialConsistency(cql::CqlConsistencyLevel::LocalSerial);
 		value.setDefaultTimestamp(123);
-		value.setKeySpace("asd");
 		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::Two);
 		ASSERT_EQ(value.getFlags(),
 			cql::CqlBatchParametersFlags::WithSerialConsistency |
-			cql::CqlBatchParametersFlags::WithDefaultTimestamp |
-			cql::CqlBatchParametersFlags::WithKeySpace);
+			cql::CqlBatchParametersFlags::WithDefaultTimestamp);
 		ASSERT_EQ(value.getSerialConsistency(), cql::CqlConsistencyLevel::LocalSerial);
 		ASSERT_EQ(value.getDefaultTimestamp(), 123);
-		ASSERT_EQ(value.getKeySpace(), "asd");
 	}
 }
 
@@ -33,22 +30,20 @@ TEST(TestCqlProtocolBatchParameters, encode) {
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x01"
-			"\x00\x00\x00\x00"));
+			"\x00"));
 	}
 	{
 		cql::CqlProtocolBatchParameters value;
 		value.setConsistency(cql::CqlConsistencyLevel::Two);
 		value.setSerialConsistency(cql::CqlConsistencyLevel::LocalSerial);
 		value.setDefaultTimestamp(123);
-		value.setKeySpace("asd");
 		seastar::sstring data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x02"
-			"\x00\x00\x00\xb0"
+			"\x30"
 			"\x00\x09"
-			"\x00\x00\x00\x00\x00\x00\x00\x7b"
-			"\x00\x03""asd"));
+			"\x00\x00\x00\x00\x00\x00\x00\x7b"));
 	}
 }
 
@@ -57,7 +52,7 @@ TEST(TestCqlProtocolBatchParameters, decode) {
 	{
 		auto data = makeTestString(
 			"\x00\x01"
-			"\x00\x00\x00\x00");
+			"\x00");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -68,10 +63,9 @@ TEST(TestCqlProtocolBatchParameters, decode) {
 	{
 		auto data = makeTestString(
 			"\x00\x02"
-			"\x00\x00\x00\xb0"
+			"\x30"
 			"\x00\x09"
-			"\x00\x00\x00\x00\x00\x00\x00\x7b"
-			"\x00\x03""asd");
+			"\x00\x00\x00\x00\x00\x00\x00\x7b");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
@@ -79,11 +73,9 @@ TEST(TestCqlProtocolBatchParameters, decode) {
 		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::Two);
 		ASSERT_EQ(value.getFlags(),
 			cql::CqlBatchParametersFlags::WithSerialConsistency |
-			cql::CqlBatchParametersFlags::WithDefaultTimestamp |
-			cql::CqlBatchParametersFlags::WithKeySpace);
+			cql::CqlBatchParametersFlags::WithDefaultTimestamp);
 		ASSERT_EQ(value.getSerialConsistency(), cql::CqlConsistencyLevel::LocalSerial);
 		ASSERT_EQ(value.getDefaultTimestamp(), 123);
-		ASSERT_EQ(value.getKeySpace(), "asd");
 	}
 }
 

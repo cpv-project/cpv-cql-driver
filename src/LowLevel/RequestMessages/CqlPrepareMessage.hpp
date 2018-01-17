@@ -1,6 +1,5 @@
 #pragma once
 #include "../ProtocolTypes/CqlProtocolLongString.hpp"
-#include "../ProtocolTypes/CqlProtocolPrepareParameters.hpp"
 #include "CqlRequestMessageBase.hpp"
 
 namespace cql {
@@ -21,12 +20,8 @@ namespace cql {
 		const CqlProtocolLongString& getQuery() const& { return query_; }
 		CqlProtocolLongString& getQuery() & { return query_; }
 
-		const CqlProtocolPrepareParameters& getPrepareParameters() const& { return prepareParameters_; }
-		CqlProtocolPrepareParameters& getPrepareParameters() & { return prepareParameters_; }
-
 	private:
 		CqlProtocolLongString query_;
-		CqlProtocolPrepareParameters prepareParameters_;
 	};
 }
 

@@ -2,13 +2,14 @@
 #include <CqlDriver/Common/CqlCommonDefinitions.hpp>
 #include "../CqlLowLevelDefinitions.hpp"
 #include "CqlProtocolConsistency.hpp"
+#include "CqlProtocolByte.hpp"
 #include "CqlProtocolInt.hpp"
 #include "CqlProtocolLong.hpp"
 #include "CqlProtocolString.hpp"
 
 namespace cql {
 	/**
-	 * <consistency><flags>[<serial_consistency>][<timestamp>][<keyspace>]
+	 * <consistency><flags>[<serial_consistency>][<timestamp>]
 	 * [] mean optional, depends on <flags>.
 	 * Check native_protocol_v4.spec section 4.1.7.
 	 */
@@ -38,11 +39,6 @@ namespace cql {
 		std::uint64_t getDefaultTimestamp() const;
 		void setDefaultTimestamp(std::uint64_t timestamp);
 
-		/** The query should be executed in, supercedes the keyspace that the connection is bound to */
-		const seastar::sstring& getKeySpace() const&;
-		void setKeySpace(const seastar::sstring& keySpace);
-		void setKeySpace(seastar::sstring&& keySpace);
-
 		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
@@ -52,10 +48,9 @@ namespace cql {
 
 	private:
 		CqlProtocolConsistency consistency_;
-		CqlProtocolInt flags_;
+		CqlProtocolByte flags_;
 		CqlProtocolConsistency serialConsistency_;
 		CqlProtocolLong defaultTimestamp_;
-		CqlProtocolString keySpace_;
 	};
 }
 

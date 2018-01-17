@@ -113,21 +113,6 @@ namespace cql {
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithDefaultTimestamp));
 	}
 
-	const seastar::sstring& CqlProtocolQueryParameters::getKeySpace() const& {
-		return keySpace_.get();
-	}
-
-	void CqlProtocolQueryParameters::setKeySpace(const seastar::sstring& keySpace) {
-		keySpace_.set(keySpace.data(), keySpace.size());
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithKeySpace));
-	}
-
-	void CqlProtocolQueryParameters::setKeySpace(seastar::sstring&& keySpace) {
-		keySpace_.set(CqlProtocolStringState::Normal);
-		keySpace_.get() = std::move(keySpace);
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithKeySpace));
-	}
-
 	void CqlProtocolQueryParameters::encode(seastar::sstring& data) const {
 		auto flags = getFlags();
 		consistency_.encode(data);
@@ -163,9 +148,6 @@ namespace cql {
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithDefaultTimestamp)) {
 			defaultTimestamp_.encode(data);
-		}
-		if (enumTrue(flags & CqlQueryParametersFlags::WithKeySpace)) {
-			keySpace_.encode(data);
 		}
 	}
 
@@ -203,9 +185,6 @@ namespace cql {
 		if (enumTrue(flags & CqlQueryParametersFlags::WithDefaultTimestamp)) {
 			defaultTimestamp_.decode(ptr, end);
 		}
-		if (enumTrue(flags & CqlQueryParametersFlags::WithKeySpace)) {
-			keySpace_.decode(ptr, end);
-		}
 	}
 
 	CqlProtocolQueryParameters::CqlProtocolQueryParameters() :
@@ -216,7 +195,6 @@ namespace cql {
 		pageSize_(),
 		pagingState_(),
 		serialConsistency_(),
-		defaultTimestamp_(),
-		keySpace_() { }
+		defaultTimestamp_() { }
 }
 

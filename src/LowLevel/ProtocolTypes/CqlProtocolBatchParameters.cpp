@@ -38,21 +38,6 @@ namespace cql {
 		flags_.set(enumValue(getFlags() | CqlBatchParametersFlags::WithDefaultTimestamp));
 	}
 
-	const seastar::sstring& CqlProtocolBatchParameters::getKeySpace() const& {
-		return keySpace_.get();
-	}
-
-	void CqlProtocolBatchParameters::setKeySpace(const seastar::sstring& keySpace) {
-		keySpace_.set(keySpace.data(), keySpace.size());
-		flags_.set(enumValue(getFlags() | CqlBatchParametersFlags::WithKeySpace));
-	}
-
-	void CqlProtocolBatchParameters::setKeySpace(seastar::sstring&& keySpace) {
-		keySpace_.set(CqlProtocolStringState::Normal);
-		keySpace_.get() = std::move(keySpace);
-		flags_.set(enumValue(getFlags() | CqlBatchParametersFlags::WithKeySpace));
-	}
-
 	void CqlProtocolBatchParameters::encode(seastar::sstring& data) const {
 		auto flags = getFlags();
 		consistency_.encode(data);
@@ -62,9 +47,6 @@ namespace cql {
 		}
 		if (enumTrue(flags & CqlBatchParametersFlags::WithDefaultTimestamp)) {
 			defaultTimestamp_.encode(data);
-		}
-		if (enumTrue(flags & CqlBatchParametersFlags::WithKeySpace)) {
-			keySpace_.encode(data);
 		}
 	}
 
@@ -78,16 +60,12 @@ namespace cql {
 		if (enumTrue(flags & CqlBatchParametersFlags::WithDefaultTimestamp)) {
 			defaultTimestamp_.decode(ptr, end);
 		}
-		if (enumTrue(flags & CqlBatchParametersFlags::WithKeySpace)) {
-			keySpace_.decode(ptr, end);
-		}
 	}
 
 	CqlProtocolBatchParameters::CqlProtocolBatchParameters() :
 		consistency_(),
 		flags_(),
 		serialConsistency_(),
-		defaultTimestamp_(),
-		keySpace_() { }
+		defaultTimestamp_() { }
 }
 

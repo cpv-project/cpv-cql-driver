@@ -43,8 +43,7 @@ namespace cql {
 			{ CqlMessageHeaderFlags::Compression, "Compression" },
 			{ CqlMessageHeaderFlags::Tracing, "Tracing" },
 			{ CqlMessageHeaderFlags::CustomPayload, "CustomPayload" },
-			{ CqlMessageHeaderFlags::Warning, "Warning" },
-			{ CqlMessageHeaderFlags::UseBeta, "UseBeta" }
+			{ CqlMessageHeaderFlags::Warning, "Warning" }
 		});
 		return staticNames;
 	}
@@ -59,17 +58,7 @@ namespace cql {
 			{ CqlQueryParametersFlags::WithPagingState, "WithPagingState" },
 			{ CqlQueryParametersFlags::WithSerialConsistency, "WithSerialConsistency" },
 			{ CqlQueryParametersFlags::WithDefaultTimestamp, "WithDefaultTimestamp" },
-			{ CqlQueryParametersFlags::WithNamesForValue, "WithNamesForValue" },
-			{ CqlQueryParametersFlags::WithKeySpace, "WithKeySpace" },
-		});
-		return staticNames;
-	}
-
-	const std::vector<std::pair<CqlPrepareParametersFlags, const char*>>&
-		EnumDescriptions<CqlPrepareParametersFlags>::get() {
-		static std::vector<std::pair<CqlPrepareParametersFlags, const char*>> staticNames({
-			{ CqlPrepareParametersFlags::None, "None" },
-			{ CqlPrepareParametersFlags::WithKeySpace, "WithKeySpace" },
+			{ CqlQueryParametersFlags::WithNamesForValue, "WithNamesForValue" }
 		});
 		return staticNames;
 	}
@@ -79,8 +68,7 @@ namespace cql {
 		static std::vector<std::pair<CqlBatchParametersFlags, const char*>> staticNames({
 			{ CqlBatchParametersFlags::None, "None" },
 			{ CqlBatchParametersFlags::WithSerialConsistency, "WithSerialConsistency" },
-			{ CqlBatchParametersFlags::WithDefaultTimestamp, "WithDefaultTimestamp" },
-			{ CqlBatchParametersFlags::WithKeySpace, "WithKeySpace" },
+			{ CqlBatchParametersFlags::WithDefaultTimestamp, "WithDefaultTimestamp" }
 		});
 		return staticNames;
 	}
