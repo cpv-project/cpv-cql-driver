@@ -52,5 +52,30 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<CqlErrorCode, const char*>>&
+		EnumDescriptions<CqlErrorCode>::get() {
+		static std::vector<std::pair<CqlErrorCode, const char*>> staticNames({
+			{ CqlErrorCode::ServerError, "ServerError" },
+			{ CqlErrorCode::ProtocolError, "ProtocolError" },
+			{ CqlErrorCode::AuthenticationError, "AuthenticationError" },
+			{ CqlErrorCode::Unavailable, "Unavailable" },
+			{ CqlErrorCode::Overloaded, "Overloaded" },
+			{ CqlErrorCode::IsBootstrapping, "IsBootstrapping" },
+			{ CqlErrorCode::TruncateError, "TruncateError" },
+			{ CqlErrorCode::WriteTimeout, "WriteTimeout" },
+			{ CqlErrorCode::ReadTimeout, "ReadTimeout" },
+			{ CqlErrorCode::ReadFailure, "ReadFailure" },
+			{ CqlErrorCode::FunctionFailure, "FunctionFailure" },
+			{ CqlErrorCode::WriteFailure, "WriteFailure" },
+			{ CqlErrorCode::SyntaxError, "SyntaxError" },
+			{ CqlErrorCode::UnAuthorized, "UnAuthorized" },
+			{ CqlErrorCode::InvalidQuery, "InvalidQuery" },
+			{ CqlErrorCode::ConfigError, "ConfigError" },
+			{ CqlErrorCode::AlreadyExists, "AlreadyExists" },
+			{ CqlErrorCode::UnPreparedQuery, "UnPreparedQuery" },
+		});
+		return staticNames;
+	}
 }
 

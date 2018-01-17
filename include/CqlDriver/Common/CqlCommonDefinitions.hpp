@@ -68,6 +68,36 @@ namespace cql {
 		static const std::vector<std::pair<CqlColumnType, const char*>>& get();
 	};
 
+	/**
+	 * Error codes,
+	 * Check native_protocol_v4.spec section 9.
+	 */
+	enum class CqlErrorCode {
+		ServerError = 0x0000,
+		ProtocolError = 0x000a,
+		AuthenticationError = 0x0100,
+		Unavailable = 0x1000,
+		Overloaded = 0x1001,
+		IsBootstrapping = 0x1002,
+		TruncateError = 0x1003,
+		WriteTimeout = 0x1100,
+		ReadTimeout = 0x1200,
+		ReadFailure = 0x1300,
+		FunctionFailure = 0x1400,
+		WriteFailure = 0x1500,
+		SyntaxError = 0x2000,
+		UnAuthorized = 0x2100,
+		InvalidQuery = 0x2200,
+		ConfigError = 0x2300,
+		AlreadyExists = 0x2400,
+		UnPreparedQuery = 0x2500
+	};
+
+	template <>
+	struct EnumDescriptions<CqlErrorCode> {
+		static const std::vector<std::pair<CqlErrorCode, const char*>>& get();
+	};
+
 	/** The full class name of the IAuthenticator in use */
 	namespace CqlAuthenticatorClasses {
 		static const char* AllowAllAuthenticator = "AllowAllAuthenticator";
