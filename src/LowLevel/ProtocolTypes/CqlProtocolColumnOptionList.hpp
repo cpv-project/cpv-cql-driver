@@ -11,6 +11,7 @@ namespace cql {
 	public:
 		using CqlProtocolListBase::SmallSizeBoundary;
 		using CqlProtocolListBase::get;
+		using CqlProtocolListBase::set;
 		using CqlProtocolListBase::reset;
 		using CqlProtocolListBase::encode;
 		using CqlProtocolListBase::decode;

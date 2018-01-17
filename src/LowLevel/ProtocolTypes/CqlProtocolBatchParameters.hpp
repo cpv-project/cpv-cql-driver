@@ -19,24 +19,24 @@ namespace cql {
 		void reset();
 
 		/** The [consistency] level for the operation */
-		CqlConsistencyLevel getConsistency() const;
-		void setConsistency(CqlConsistencyLevel consistency);
+		CqlConsistencyLevel getConsistency() const { return consistency_.get(); }
+		void setConsistency(CqlConsistencyLevel consistency) { consistency_.set(consistency); }
 
 		/** Call setters below will alter flags to indicate which component is included */
-		CqlBatchParametersFlags getFlags() const;
+		CqlBatchParametersFlags getFlags() const { return static_cast<CqlBatchParametersFlags>(flags_.get()); }
 
 		/**
 		 * The [consistency] level for the serial phase of conditional updates,
 		 * can only be either SERIAL or LOCAL_SERIAL, the default is SERIAL.
 		 */
-		CqlConsistencyLevel getSerialConsistency() const;
+		CqlConsistencyLevel getSerialConsistency() const { return serialConsistency_.get(); }
 		void setSerialConsistency(CqlConsistencyLevel serialConsistency);
 
 		/**
 		 * This will replace the server side assigned timestamp as default timestamp,
 		 * note that a timestamp in the query itself will still override this timestamp.
 		 */
-		std::uint64_t getDefaultTimestamp() const;
+		std::uint64_t getDefaultTimestamp() const { return defaultTimestamp_.get(); }
 		void setDefaultTimestamp(std::uint64_t timestamp);
 
 		/** Encode and decode functions */

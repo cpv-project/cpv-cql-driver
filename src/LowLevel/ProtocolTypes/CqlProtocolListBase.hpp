@@ -16,10 +16,18 @@ namespace cql {
 		static const std::size_t SmallSizeBoundary = 255;
 		using VectorType = std::vector<ElementType>;
 
+		/** Get the values of list */
 		const VectorType& get() const& { return value_; }
 		VectorType& get() & { return value_; }
+
+		/** Set the values of list */
+		void set(const VectorType& value) { value_ = value; }
+		void set(VectorType&& value) { value_ = std::move(value); }
+
+		/** Reset to initial state */
 		void reset() { value_.clear(); }
 
+		/** Encode to binary data */
 		void encode(seastar::sstring& data) const {
 			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {
 				throw CqlEncodeException(CQL_CODEINFO, "length too long");
@@ -31,6 +39,7 @@ namespace cql {
 			}
 		}
 
+		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			LengthType size = 0;
 			if (ptr + sizeof(size) > end) {
@@ -59,8 +68,10 @@ namespace cql {
 			}
 		}
 
+		/** Constructors */
 		CqlProtocolListBase() : value_() { }
-		explicit CqlProtocolListBase(VectorType&& value) : value_(std::move(value)) { }
+		explicit CqlProtocolListBase(VectorType&& value) :
+			value_(std::move(value)) { }
 
 	protected:
 		VectorType value_;

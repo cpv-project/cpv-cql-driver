@@ -3,6 +3,7 @@
 #include <CqlDriver/Common/Exceptions/CqlEncodeException.hpp>
 
 namespace cql {
+	/** Encode to binary data */
 	void CqlProtocolInetAddr::encode(seastar::sstring& data) const {
 		std::uint8_t size = static_cast<std::uint8_t>(value_.size());
 		if (size == 0) {
@@ -12,6 +13,7 @@ namespace cql {
 		data.append(reinterpret_cast<const char*>(value_.data()), size);
 	}
 
+	/** Decode from binary data */
 	void CqlProtocolInetAddr::decode(const char*& ptr, const char* end) {
 		std::uint8_t size = 0;
 		if (ptr + sizeof(size) > end) {

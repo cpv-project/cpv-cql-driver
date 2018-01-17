@@ -18,13 +18,20 @@ namespace cql {
 	 */
 	class CqlProtocolVariableIntegerBase {
 	public:
+		/** Get the integer value */
 		std::uint64_t get() const { return value_; }
+
+		/** Set the integer value */
 		void set(std::uint64_t value) { value_ = value; }
+
+		/** Reset to initial state */
 		void reset() { value_ = 0; }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolVariableIntegerBase() : value_() { }
 		explicit CqlProtocolVariableIntegerBase(std::uint64_t value) :
 			value_(value) { }

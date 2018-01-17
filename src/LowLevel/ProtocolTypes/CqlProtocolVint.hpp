@@ -13,15 +13,18 @@ namespace cql {
 		using CqlProtocolVariableIntegerBase::encode;
 		using CqlProtocolVariableIntegerBase::decode;
 
+		/** Get the integer value */
 		std::int64_t get() const {
 			return static_cast<std::int64_t>((value_ >> 1) ^ -(value_ & 1));
 		}
 
+		/** Set the integer value */
 		void set(std::int64_t value) {
 			// avoid signed shifting
 			value_ = (value < 0 ? 0xffff'ffff'ffff'ffffU : 0) ^ (static_cast<std::uint64_t>(value) << 1);
 		}
 
+		/** Constructors */
 		CqlProtocolVint() {}
 		explicit CqlProtocolVint(std::int64_t value) { CqlProtocolVint::set(value); }
 	};

@@ -6,20 +6,24 @@
 #include <random>
 
 namespace cql {
+	/** Get the binary value of uuid */
 	std::pair<std::uint64_t, std::uint64_t> CqlProtocolUuid::get() const {
 		return std::make_pair(highBits_, lowBits_);
 	}
 
+	/** Set the binary value of uuid */
 	void CqlProtocolUuid::set(std::pair<std::uint64_t, std::uint64_t> value) {
 		highBits_ = value.first;
 		lowBits_ = value.second;
 	}
 
+	/** Reset to initial state */
 	void CqlProtocolUuid::reset() {
 		highBits_ = 0;
 		lowBits_ = 0;
 	}
 
+	/** Get the string representation of uuid */
 	seastar::sstring CqlProtocolUuid::str() const {
 		// example: 00112233-4455-6677-8899-aabbccddeeff
 		seastar::sstring result;
@@ -36,6 +40,7 @@ namespace cql {
 		return result;
 	}
 
+	/** Set the uuid by it's string representation */
 	void CqlProtocolUuid::set(const seastar::sstring& str) {
 		// example: 00112233-4455-6677-8899-aabbccddeeff
 		if (str.size() != 36) {
@@ -59,6 +64,7 @@ namespace cql {
 		lowBits_ = (static_cast<std::uint64_t>(d) << 48) | (static_cast<std::uint64_t>(e) << 32) | f;
 	}
 
+	/** Encode to binary data */
 	void CqlProtocolUuid::encode(seastar::sstring& data) const {
 		auto highBitsBe = seastar::cpu_to_be(highBits_);
 		auto lowBitsBe = seastar::cpu_to_be(lowBits_);
@@ -66,6 +72,7 @@ namespace cql {
 		data.append(reinterpret_cast<const char*>(&lowBitsBe), sizeof(lowBitsBe));
 	}
 
+	/** Decode from binary data */
 	void CqlProtocolUuid::decode(const char*& ptr, const char* end) {
 		static const constexpr std::size_t length = sizeof(highBits_) + sizeof(lowBits_);
 		if (ptr + length > end) {
@@ -78,12 +85,16 @@ namespace cql {
 		ptr += length;
 	}
 
+	/** Get the empty uuid */
 	const CqlProtocolUuid& CqlProtocolUuid::getEmpty() {
 		static CqlProtocolUuid staticEmpty(0, 0);
 		return staticEmpty;
 	}
 
+	/** Make a random uuid */
 	CqlProtocolUuid CqlProtocolUuid::makeRandom() {
+		// NOTICE: random_device may not work on windows,
+		// but this library also does not work on windows
 		static thread_local std::random_device urandom;
 		static thread_local std::uniform_int_distribution<std::uint8_t> dist(0, 255);
 		CqlProtocolUuid uuid(0, 0);
@@ -100,12 +111,11 @@ namespace cql {
 		return uuid;
 	}
 
+	/** Constructors */
 	CqlProtocolUuid::CqlProtocolUuid(const seastar::sstring& value) :
 		highBits_(), lowBits_() { set(value); }
-
 	CqlProtocolUuid::CqlProtocolUuid(std::pair<std::uint64_t, std::uint64_t> value) :
 		highBits_(value.first), lowBits_(value.second) { }
-
 	CqlProtocolUuid::CqlProtocolUuid(std::uint64_t highBits, std::uint64_t lowBits) :
 		highBits_(highBits), lowBits_(lowBits) { }
 }

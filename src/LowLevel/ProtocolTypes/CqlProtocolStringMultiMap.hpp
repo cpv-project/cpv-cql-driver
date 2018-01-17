@@ -10,7 +10,9 @@ namespace cql {
 	class CqlProtocolStringMultiMap :
 		private CqlProtocolMapBase<std::uint16_t, CqlProtocolString, CqlProtocolStringList> {
 	public:
+		using CqlProtocolMapBase::MapType;
 		using CqlProtocolMapBase::get;
+		using CqlProtocolMapBase::set;
 		using CqlProtocolMapBase::reset;
 		using CqlProtocolMapBase::encode;
 		using CqlProtocolMapBase::decode;

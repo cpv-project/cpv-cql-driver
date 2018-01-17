@@ -25,9 +25,9 @@ TEST(TestCqlProtocolQueryParameters, getset) {
 		cql::CqlProtocolQueryParameters value;
 		value.setConsistency(cql::CqlConsistencyLevel::Two);
 		value.setSkipMetadata(false);
-		value.setNameAndValues(
-			{ cql::CqlProtocolString("q"), cql::CqlProtocolString("w") },
-			{ cql::CqlProtocolValue("a"), cql::CqlProtocolValue("b") });
+		value.setNameAndValues({
+			{ cql::CqlProtocolString("q"), cql::CqlProtocolValue("a") },
+		});
 		value.setSerialConsistency(cql::CqlConsistencyLevel::LocalSerial);
 		value.setDefaultTimestamp(123);
 		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::Two);
@@ -36,12 +36,8 @@ TEST(TestCqlProtocolQueryParameters, getset) {
 			cql::CqlQueryParametersFlags::WithNamesForValue |
 			cql::CqlQueryParametersFlags::WithSerialConsistency |
 			cql::CqlQueryParametersFlags::WithDefaultTimestamp);
-		ASSERT_EQ(value.getNames().size(), 2);
-		ASSERT_EQ(value.getNames().at(0).get(), "q");
-		ASSERT_EQ(value.getNames().at(1).get(), "w");
-		ASSERT_EQ(value.getValues().size(), 2);
-		ASSERT_EQ(value.getValues().at(0).get(), "a");
-		ASSERT_EQ(value.getValues().at(1).get(), "b");
+		ASSERT_EQ(value.getNameAndValues().size(), 1);
+		ASSERT_EQ(value.getNameAndValues().at(cql::CqlProtocolString("q")).get(), "a");
 		ASSERT_EQ(value.getSerialConsistency(), cql::CqlConsistencyLevel::LocalSerial);
 		ASSERT_EQ(value.getDefaultTimestamp(), 123);
 	}
@@ -70,9 +66,9 @@ TEST(TestCqlProtocolQueryParameters, encode) {
 		cql::CqlProtocolQueryParameters value;
 		value.setConsistency(cql::CqlConsistencyLevel::Two);
 		value.setSkipMetadata(false);
-		value.setNameAndValues(
-			{ cql::CqlProtocolString("q"), cql::CqlProtocolString("w") },
-			{ cql::CqlProtocolValue("a"), cql::CqlProtocolValue("b") });
+		value.setNameAndValues({
+			{ cql::CqlProtocolString("q"), cql::CqlProtocolValue("a") },
+		});
 		value.setSerialConsistency(cql::CqlConsistencyLevel::LocalSerial);
 		value.setDefaultTimestamp(123);
 		seastar::sstring data;
@@ -80,11 +76,9 @@ TEST(TestCqlProtocolQueryParameters, encode) {
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x02"
 			"\x71"
-			"\x00\x02"
+			"\x00\x01"
 			"\x00\x01""q"
 			"\x00\x00\x00\x01""a"
-			"\x00\x01""w"
-			"\x00\x00\x00\x01""b"
 			"\x00\x09"
 			"\x00\x00\x00\x00\x00\x00\x00\x7b"));
 	}
@@ -121,11 +115,9 @@ TEST(TestCqlProtocolQueryParameters, decode) {
 		auto data = makeTestString(
 			"\x00\x02"
 			"\x71"
-			"\x00\x02"
+			"\x00\x01"
 			"\x00\x01""q"
 			"\x00\x00\x00\x01""a"
-			"\x00\x01""w"
-			"\x00\x00\x00\x01""b"
 			"\x00\x09"
 			"\x00\x00\x00\x00\x00\x00\x00\x7b");
 		auto ptr = data.c_str();
@@ -138,12 +130,8 @@ TEST(TestCqlProtocolQueryParameters, decode) {
 			cql::CqlQueryParametersFlags::WithNamesForValue |
 			cql::CqlQueryParametersFlags::WithSerialConsistency |
 			cql::CqlQueryParametersFlags::WithDefaultTimestamp);
-		ASSERT_EQ(value.getNames().size(), 2);
-		ASSERT_EQ(value.getNames().at(0).get(), "q");
-		ASSERT_EQ(value.getNames().at(1).get(), "w");
-		ASSERT_EQ(value.getValues().size(), 2);
-		ASSERT_EQ(value.getValues().at(0).get(), "a");
-		ASSERT_EQ(value.getValues().at(1).get(), "b");
+		ASSERT_EQ(value.getNameAndValues().size(), 1);
+		ASSERT_EQ(value.getNameAndValues().at(cql::CqlProtocolString("q")).get(), "a");
 		ASSERT_EQ(value.getSerialConsistency(), cql::CqlConsistencyLevel::LocalSerial);
 		ASSERT_EQ(value.getDefaultTimestamp(), 123);
 	}

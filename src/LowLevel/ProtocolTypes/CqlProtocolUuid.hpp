@@ -11,19 +11,32 @@ namespace cql {
 	 */
 	class CqlProtocolUuid {
 	public:
+		/** Get the binary value of uuid */
 		std::pair<std::uint64_t, std::uint64_t> get() const;
+
+		/** Set the binary value of uuid */
 		void set(std::pair<std::uint64_t, std::uint64_t> value);
+
+		/** Reset to initial state */
 		void reset();
 
+		/** Get the string representation of uuid */
 		seastar::sstring str() const;
+
+		/** Set the uuid by it's string representation */
 		void set(const seastar::sstring& str);
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Get the empty uuid */
 		static const CqlProtocolUuid& getEmpty();
+
+		/** Make a random uuid */
 		static CqlProtocolUuid makeRandom();
 
+		/** Constructors */
 		explicit CqlProtocolUuid(const seastar::sstring& value);
 		explicit CqlProtocolUuid(std::pair<std::uint64_t, std::uint64_t> value);
 		explicit CqlProtocolUuid(std::uint64_t highBits, std::uint64_t lowBits);

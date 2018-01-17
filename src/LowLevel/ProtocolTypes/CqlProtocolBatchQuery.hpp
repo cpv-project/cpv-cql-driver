@@ -31,9 +31,10 @@ namespace cql {
 		void setPreparedQueryId(seastar::sstring&& preparedQueryId);
 
 		/** Query parameter values */
-		const std::vector<CqlProtocolValue>& getValues() const&;
-		void setValues(const std::vector<CqlProtocolValue>& values);
-		void setValues(std::vector<CqlProtocolValue>&& values);
+		const std::vector<CqlProtocolValue>& getValues() const& { return values_.get(); }
+		std::vector<CqlProtocolValue>& getValues() & { return values_.get(); }
+		void setValues(const std::vector<CqlProtocolValue>& values) { values_.set(values); }
+		void setValues(std::vector<CqlProtocolValue>&& values) { values_.set(std::move(values)); }
 
 		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;

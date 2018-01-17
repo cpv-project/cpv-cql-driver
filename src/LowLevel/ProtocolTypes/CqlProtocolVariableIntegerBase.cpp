@@ -5,6 +5,7 @@
 
 namespace cql {
 	namespace {
+		/** The first byte use to indicate how many extra bytes followed */
 		static const std::array<std::uint8_t, 9> ExtraBytesHeaders({
 			0b00000000,
 			0b10000000,
@@ -18,6 +19,7 @@ namespace cql {
 		});
 	}
 
+	/** Encode to binary data */
 	void CqlProtocolVariableIntegerBase::encode(seastar::sstring& data) const {
 		std::uint64_t valueBe = seastar::cpu_to_be(value_);
 		const char* ptr = reinterpret_cast<const char*>(&valueBe);
@@ -44,6 +46,7 @@ namespace cql {
 		}
 	}
 
+	/** Decode from binary data */
 	void CqlProtocolVariableIntegerBase::decode(const char*& ptr, const char* end) {
 		if (ptr + sizeof(char) > end) {
 			throw CqlDecodeException(CQL_CODEINFO, "length not enough");

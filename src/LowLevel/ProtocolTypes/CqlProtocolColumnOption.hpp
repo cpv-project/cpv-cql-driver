@@ -21,31 +21,44 @@ namespace cql {
 	 */
 	class CqlProtocolColumnOption {
 	public:
+		/** Get the column type */
 		CqlColumnType get() const { return type_; }
+
+		/** Set the column type */
 		void set(CqlColumnType type);
+
+		/** Reset to initial state */
 		void reset();
 
+		/** Payload of custom column type */
 		CqlProtocolColumnOptionCustomPayload getCustomPayload() const;
 		void setCustomPayload(const CqlProtocolColumnOptionCustomPayload& payload);
 
+		/** Payload of list column type (element type) */
 		CqlProtocolColumnOptionListPayload getListPayload() const;
 		void setListPayload(const CqlProtocolColumnOptionListPayload& payload);
 
+		/** Payload of map column type (key and value type) */
 		CqlProtocolColumnOptionMapPayload getMapPayload() const;
 		void setMapPayload(const CqlProtocolColumnOptionMapPayload& payload);
 
+		/** Payload of set column type (element type) */
 		CqlProtocolColumnOptionSetPayload getSetPayload() const;
 		void setSetPayload(const CqlProtocolColumnOptionSetPayload& payload);
 
+		/** Payload of udt column type (name and type of fields) */
 		CqlProtocolColumnOptionUdtPayload getUdtPayload() const;
 		void setUdtPayload(const CqlProtocolColumnOptionUdtPayload& payload);
 
+		/** Payload of tuple column type (types) */
 		CqlProtocolColumnOptionTuplePayload getTuplePayload() const;
 		void setTuplePayload(const CqlProtocolColumnOptionTuplePayload& payload);
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOption() : type_(), payload_() { }
 		explicit CqlProtocolColumnOption(CqlColumnType type) :
 			type_(), payload_() { set(type); }
@@ -73,13 +86,16 @@ namespace cql {
 	 */
 	class CqlProtocolColumnOptionCustomPayload {
 	public:
+		/** The custom data */
 		const CqlProtocolString& get() const& { return value_; }
 		CqlProtocolString& get() & { return value_; }
 		void set(CqlProtocolString&& value) { value_ = std::move(value); }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOptionCustomPayload() : value_() { }
 		explicit CqlProtocolColumnOptionCustomPayload(CqlProtocolString&& value) :
 			value_(std::move(value)) { }
@@ -94,13 +110,16 @@ namespace cql {
 	 */
 	class CqlProtocolColumnOptionListPayload {
 	public:
+		/** The element type of list */
 		const CqlProtocolColumnOption& getElementType() const& { return elementType_; }
 		CqlProtocolColumnOption& getElementType() & { return elementType_; }
 		void setElementType(CqlProtocolColumnOption&& elementType) { elementType_ = std::move(elementType); }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOptionListPayload() : elementType_() { }
 		explicit CqlProtocolColumnOptionListPayload(CqlProtocolColumnOption&& elementType) :
 			elementType_(std::move(elementType)) { }
@@ -115,16 +134,21 @@ namespace cql {
 	 */
 	class CqlProtocolColumnOptionMapPayload {
 	public:
+		/** The key type of map */
 		const CqlProtocolColumnOption& getKeyType() const& { return keyType_; }
 		CqlProtocolColumnOption& getKeyType() & { return keyType_; }
 		void setKeyType(CqlProtocolColumnOption&& keyType) { keyType_ = std::move(keyType); }
+
+		/** The value type of map */
 		const CqlProtocolColumnOption& getValueType() const& { return valueType_; }
 		CqlProtocolColumnOption& getValueType() & { return valueType_; }
 		void setValueType(CqlProtocolColumnOption&& valueType) { valueType_ = std::move(valueType); }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOptionMapPayload() : keyType_(), valueType_() { }
 		CqlProtocolColumnOptionMapPayload(
 			CqlProtocolColumnOption&& keyType,
@@ -143,13 +167,16 @@ namespace cql {
 	 */
 	class CqlProtocolColumnOptionSetPayload {
 	public:
+		/** The element type of set */
 		const CqlProtocolColumnOption& getElementType() const& { return elementType_; }
 		CqlProtocolColumnOption& getElementType() & { return elementType_; }
 		void setElementType(CqlProtocolColumnOption&& elementType) { elementType_ = std::move(elementType); }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOptionSetPayload() : elementType_() { }
 		explicit CqlProtocolColumnOptionSetPayload(CqlProtocolColumnOption&& elementType) :
 			elementType_(std::move(elementType)) { }
@@ -159,7 +186,7 @@ namespace cql {
 	};
 
 	/**
-	 * Payload for column type "Udt"
+	 * Payload for column type "UDT" (user defined type)
 	 * The value is <ks><udt_name><n><name_1><type_1>...<name_n><type_n> where:
 	 * - <ks> is a [string] representing the keyspace name this UDT is part of
 	 * - <udt_name> is a [string] representing the UDT name
@@ -171,18 +198,26 @@ namespace cql {
 	class CqlProtocolColumnOptionUdtPayload {
 	public:
 		using FieldsType = std::vector<std::pair<CqlProtocolString, CqlProtocolColumnOption>>;
+
+		/** The key space */
 		const CqlProtocolString& getKeySpace() const& { return keySpace_; }
 		CqlProtocolString& getKeySpace() & { return keySpace_; }
 		void setKeySpace(CqlProtocolString&& keySpace) { keySpace_ = std::move(keySpace); }
+
+		/** The user defined type name */
 		const CqlProtocolString& getUdtName() const& { return udtName_; }
 		CqlProtocolString& getUdtName() & { return udtName_; }
 		void setUdtName(CqlProtocolString&& udtName) { udtName_ = std::move(udtName); }
+
+		/** The fields of user defined type */
 		const FieldsType& getFields() const& { return fields_; }
 		FieldsType& getFields() & { return fields_; }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOptionUdtPayload() : keySpace_(), udtName_(), fields_() { }
 		CqlProtocolColumnOptionUdtPayload(
 			CqlProtocolString&& keySpace,
@@ -206,12 +241,16 @@ namespace cql {
 	class CqlProtocolColumnOptionTuplePayload {
 	public:
 		using TypesType = std::vector<CqlProtocolColumnOption>;
+
+		/** The types of tuple */
 		const TypesType& getTypes() const& { return types_; }
 		TypesType& getTypes() & { return types_; }
 
+		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
+		/** Constructors */
 		CqlProtocolColumnOptionTuplePayload() : types_() { }
 		explicit CqlProtocolColumnOptionTuplePayload(TypesType&& types) :
 			types_(std::move(types)) { }

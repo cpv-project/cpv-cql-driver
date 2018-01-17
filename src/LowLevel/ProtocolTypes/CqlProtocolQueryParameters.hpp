@@ -19,34 +19,39 @@ namespace cql {
 	 */
 	class CqlProtocolQueryParameters {
 	public:
+		using NameAndValuesType = CqlProtocolValueMap::MapType;
+
 		/** Reset to initial state */
 		void reset();
 
 		/** The [consistency] level for the operation */
-		CqlConsistencyLevel getConsistency() const;
-		void setConsistency(CqlConsistencyLevel consistency);
+		CqlConsistencyLevel getConsistency() const { return consistency_.get(); }
+		void setConsistency(CqlConsistencyLevel consistency) { return consistency_.set(consistency); }
 
 		/** Call setters below will alter flags to indicate which component is included */
-		CqlQueryParametersFlags getFlags() const;
+		CqlQueryParametersFlags getFlags() const { return static_cast<CqlQueryParametersFlags>(flags_.get()); }
 
 		/** If set, the result set returned as a response to the query will have the NO_METADATA flag */
 		void setSkipMetadata(bool value);
 
-		/** Query parameter values, can be values only or names with values */
-		const std::vector<CqlProtocolString>& getNames() const&;
-		const std::vector<CqlProtocolValue>& getValues() const&;
+		/** Named query parameters */
+		const NameAndValuesType& getNameAndValues() const& { return nameAndValues_.get(); }
+		NameAndValuesType& getNameAndValues() & { return nameAndValues_.get(); }
+		void setNameAndValues(const NameAndValuesType& nameAndValues);
+		void setNameAndValues(NameAndValuesType&& nameAndValues);
+
+		/** Unnamed query parameters */
+		const std::vector<CqlProtocolValue>& getValues() const& { return values_.get(); }
+		std::vector<CqlProtocolValue>& getValues() & { return values_.get(); }
 		void setValues(const std::vector<CqlProtocolValue>& values);
 		void setValues(std::vector<CqlProtocolValue>&& values);
-		void setNameAndValues(
-			const std::vector<CqlProtocolString>& names, const std::vector<CqlProtocolValue>& values);
-		void setNameAndValues(std::vector<CqlProtocolString>&& names, std::vector<CqlProtocolValue>&& values);
 
 		/** An [int] controlling the desired page size of the result, check section 8 for more details */
-		std::size_t getPageSize() const;
+		std::size_t getPageSize() const { return static_cast<std::size_t>(pageSize_.get()); }
 		void setPageSize(std::size_t pageSize);
 
 		/** The query will be executed but starting from a given paging state, check section 8 */
-		const seastar::sstring& getPagingState() const&;
+		const seastar::sstring& getPagingState() const& { return pagingState_.get(); }
 		void setPagingState(const seastar::sstring& pagingState);
 		void setPagingState(seastar::sstring&& pagingState);
 
@@ -54,14 +59,14 @@ namespace cql {
 		 * The [consistency] level for the serial phase of conditional updates,
 		 * can only be either SERIAL or LOCAL_SERIAL, the default is SERIAL.
 		 */
-		CqlConsistencyLevel getSerialConsistency() const;
+		CqlConsistencyLevel getSerialConsistency() const { return serialConsistency_.get(); }
 		void setSerialConsistency(CqlConsistencyLevel serialConsistency);
 
 		/**
 		 * This will replace the server side assigned timestamp as default timestamp,
 		 * note that a timestamp in the query itself will still override this timestamp.
 		 */
-		std::uint64_t getDefaultTimestamp() const;
+		std::uint64_t getDefaultTimestamp() const { return defaultTimestamp_.get(); }
 		void setDefaultTimestamp(std::uint64_t timestamp);
 
 		/** Encode and decode functions */

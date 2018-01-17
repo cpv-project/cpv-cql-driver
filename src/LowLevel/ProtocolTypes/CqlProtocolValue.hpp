@@ -25,8 +25,13 @@ namespace cql {
 		using CqlProtocolSizedStringBase::encode;
 		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
 
+		/** Check whether the value is representing null */
 		bool isNull() const { return state_ == CqlProtocolValueState::Null; }
+
+		/** Check whether the value is representing "not set" */
 		bool isNotSet() const { return state_ == CqlProtocolValueState::NotSet; }
+
+		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			CqlProtocolSizedStringBase::decode(ptr, end);
 			if (state_ != CqlProtocolValueState::Normal &&

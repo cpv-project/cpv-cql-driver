@@ -34,10 +34,18 @@ namespace cql {
 	public:
 		using MapType = std::unordered_map<KeyType, ValueType, HashType, PredType>;
 
+		/** Get the keys and values of map */
 		const MapType& get() const& { return value_; }
 		MapType& get() & { return value_; }
+
+		/** Set the keys and values of map */
+		void set(const MapType& value) { value_ = value; }
+		void set(MapType&& value) { value_ = std::move(value); }
+
+		/** Reset to initial state */
 		void reset() { value_.clear(); }
 
+		/** Encode to binary data */
 		void encode(seastar::sstring& data) const {
 			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {
 				throw CqlEncodeException(CQL_CODEINFO, "length too long");
@@ -50,6 +58,7 @@ namespace cql {
 			}
 		}
 
+		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			LengthType size = 0;
 			if (ptr + sizeof(size) > end) {
@@ -68,8 +77,10 @@ namespace cql {
 			}
 		}
 
+		/** Constructors */
 		CqlProtocolMapBase() : value_() { }
-		explicit CqlProtocolMapBase(MapType&& value) : value_(std::move(value)) { }
+		explicit CqlProtocolMapBase(MapType&& value) :
+			value_(std::move(value)) { }
 
 	protected:
 		MapType value_;

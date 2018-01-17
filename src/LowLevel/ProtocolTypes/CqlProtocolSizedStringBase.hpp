@@ -13,31 +13,41 @@ namespace cql {
 	template <class LengthType, class StateType, StateType DefaultState, StateType NormalState>
 	class CqlProtocolSizedStringBase {
 	public:
+		/** Get the value of string, only available when state is NormalState */
 		const seastar::sstring& get() const& { return value_; }
+
+		/** Set the value of string */
 		seastar::sstring& get() & { return value_; }
+
+		/** Get the state */
 		StateType state() const { return state_; }
 
+		/** Set the state and clear the value of string */
 		void set(StateType state) {
 			state_ = state;
 			value_.resize(0);
 		}
 
+		/** Set the value of string and set the state to NormalState */
 		void set(const char* str, std::size_t size) {
 			state_ = NormalState;
 			value_.resize(0);
 			value_.append(str, size);
 		}
 
+		/** Append the value of string and set the state to NormalState */
 		void append(const char* str, std::size_t size) {
 			state_ = NormalState;
 			value_.append(str, size);
 		}
 
+		/** Reset to initial state */
 		void reset() {
 			state_ = DefaultState;
 			value_.resize(0);
 		}
 
+		/** Encode to binary data */
 		void encode(seastar::sstring& data) const {
 			if (state_ != NormalState) {
 				LengthType size = seastar::cpu_to_be(static_cast<LengthType>(state_));
@@ -52,6 +62,7 @@ namespace cql {
 			}
 		}
 
+		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			LengthType size = 0;
 			if (ptr + sizeof(size) > end) {
@@ -74,6 +85,7 @@ namespace cql {
 			}
 		}
 
+		/** Constructors */
 		CqlProtocolSizedStringBase() : value_(), state_(DefaultState) { }
 		explicit CqlProtocolSizedStringBase(StateType state) : value_(), state_(state) { }
 		explicit CqlProtocolSizedStringBase(seastar::sstring&& value) :

@@ -22,7 +22,10 @@ namespace cql {
 		using CqlProtocolSizedStringBase::encode;
 		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
 
+		/** Check whether the value is representing null */
 		bool isNull() const { return state_ == CqlProtocolBytesState::Null; }
+
+		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			CqlProtocolSizedStringBase::decode(ptr, end);
 			if (state_ != CqlProtocolBytesState::Normal) {

@@ -21,6 +21,7 @@ namespace cql {
 		using CqlProtocolSizedStringBase::encode;
 		using CqlProtocolSizedStringBase::CqlProtocolSizedStringBase;
 
+		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			CqlProtocolSizedStringBase::decode(ptr, end);
 			if (state_ != CqlProtocolLongStringState::Normal) {
