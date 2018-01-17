@@ -81,5 +81,15 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<CqlBatchType, const char*>>&
+		EnumDescriptions<CqlBatchType>::get() {
+		static std::vector<std::pair<CqlBatchType, const char*>> staticNames({
+			{ CqlBatchType::Logged, "Logged" },
+			{ CqlBatchType::UnLogged, "UnLogged" },
+			{ CqlBatchType::Counter, "Counter" },
+		});
+		return staticNames;
+	}
 }
 

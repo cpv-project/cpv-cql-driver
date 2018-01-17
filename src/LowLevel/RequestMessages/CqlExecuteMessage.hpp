@@ -18,11 +18,11 @@ namespace cql {
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 
-		/** Query id returned from prepare result */
+		/** The query id returned from prepare result */
 		const CqlProtocolShortBytes& getPreparedQueryId() const& { return preparedQueryId_; }
 		CqlProtocolShortBytes& getPreparedQueryId() & { return preparedQueryId_; }
 
-		/** Query parameters same as QUERY message */
+		/** The query parameters same as QUERY message */
 		const CqlProtocolQueryParameters& getQueryParameters() const& { return queryParameters_; }
 		CqlProtocolQueryParameters& getQueryParameters() & { return queryParameters_; }
 

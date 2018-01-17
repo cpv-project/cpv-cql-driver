@@ -121,5 +121,21 @@ namespace cql {
 	struct EnumDescriptions<CqlBatchQueryKind> {
 		static const std::vector<std::pair<CqlBatchQueryKind, const char*>>& get();
 	};
+
+	/**
+	 * Indicating the type of batch to use
+	 * The value of this enum is the <type> in batch message.
+	 * Check native_protocol_v4.spec section 4.1.7.
+	 */
+	enum class CqlBatchType {
+		Logged = 0,
+		UnLogged = 1,
+		Counter = 2
+	};
+
+	template <>
+	struct EnumDescriptions<CqlBatchType> {
+		static const std::vector<std::pair<CqlBatchType, const char*>>& get();
+	};
 }
 

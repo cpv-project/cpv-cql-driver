@@ -22,7 +22,7 @@ namespace cql {
 		const CqlProtocolLongString& getQuery() const& { return query_; }
 		CqlProtocolLongString& getQuery() & { return query_; }
 
-		/** Query parameters */
+		/** The query parameters */
 		const CqlProtocolQueryParameters& getQueryParameters() const& { return queryParameters_; }
 		CqlProtocolQueryParameters& getQueryParameters() & { return queryParameters_; }
 
