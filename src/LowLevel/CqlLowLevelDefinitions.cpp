@@ -105,13 +105,13 @@ namespace cql {
 		return staticNames;
 	}
 
-	const std::vector<std::pair<CqlResultMetadataFlags, const char*>>&
-		EnumDescriptions<CqlResultMetadataFlags>::get() {
-		static std::vector<std::pair<CqlResultMetadataFlags, const char*>> staticNames({
-			{ CqlResultMetadataFlags::None, "None" },
-			{ CqlResultMetadataFlags::GlobalTableSpec, "GlobalTableSpec" },
-			{ CqlResultMetadataFlags::HasMorePages, "HasMorePages" },
-			{ CqlResultMetadataFlags::NoMetadata, "NoMetadata" },
+	const std::vector<std::pair<CqlResultRowsMetadataFlags, const char*>>&
+		EnumDescriptions<CqlResultRowsMetadataFlags>::get() {
+		static std::vector<std::pair<CqlResultRowsMetadataFlags, const char*>> staticNames({
+			{ CqlResultRowsMetadataFlags::None, "None" },
+			{ CqlResultRowsMetadataFlags::GlobalTableSpec, "GlobalTableSpec" },
+			{ CqlResultRowsMetadataFlags::HasMorePages, "HasMorePages" },
+			{ CqlResultRowsMetadataFlags::NoMetadata, "NoMetadata" },
 		});
 		return staticNames;
 	}

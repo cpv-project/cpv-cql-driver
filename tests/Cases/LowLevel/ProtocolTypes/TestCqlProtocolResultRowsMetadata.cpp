@@ -1,26 +1,26 @@
-#include <LowLevel/ProtocolTypes/CqlProtocolResultMetadata.hpp>
+#include <LowLevel/ProtocolTypes/CqlProtocolResultRowsMetadata.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlProtocolResultMetadata, getset) {
+TEST(TestCqlProtocolResultRowsMetadata, getset) {
 	{
-		cql::CqlProtocolResultMetadata value;
+		cql::CqlProtocolResultRowsMetadata value;
 		value.setColumnsCount(123);
 		value.setPagingState("abc");
 		ASSERT_EQ(value.getFlags(),
-			cql::CqlResultMetadataFlags::NoMetadata |
-			cql::CqlResultMetadataFlags::HasMorePages);
+			cql::CqlResultRowsMetadataFlags::NoMetadata |
+			cql::CqlResultRowsMetadataFlags::HasMorePages);
 		ASSERT_EQ(value.getColumnsCount(), 123);
 		ASSERT_EQ(value.getPagingState(), "abc");
 	}
 	{
-		cql::CqlProtocolResultMetadata value;
+		cql::CqlProtocolResultRowsMetadata value;
 		value.setGlobalKeySpaceAndTable("asd", "qwe");
 		value.setColumns({ cql::CqlProtocolResultColumn(), cql::CqlProtocolResultColumn() });
 		value.getColumns().at(0).setName("a");
 		value.getColumns().at(0).setType(cql::CqlProtocolColumnOption(cql::CqlColumnType::Int));
 		value.getColumns().at(1).setName("b");
 		value.getColumns().at(1).setType(cql::CqlProtocolColumnOption(cql::CqlColumnType::Ascii));
-		ASSERT_EQ(value.getFlags(), cql::CqlResultMetadataFlags::GlobalTableSpec);
+		ASSERT_EQ(value.getFlags(), cql::CqlResultRowsMetadataFlags::GlobalTableSpec);
 		ASSERT_EQ(value.getColumnsCount(), 2);
 		ASSERT_EQ(value.getGlobalKeySpace(), "asd");
 		ASSERT_EQ(value.getGlobalTable(), "qwe");
@@ -31,9 +31,9 @@ TEST(TestCqlProtocolResultMetadata, getset) {
 	}
 }
 
-TEST(TestCqlProtocolResultMetadata, encode) {
+TEST(TestCqlProtocolResultRowsMetadata, encode) {
 	{
-		cql::CqlProtocolResultMetadata value;
+		cql::CqlProtocolResultRowsMetadata value;
 		value.setColumnsCount(123);
 		value.setPagingState("abc");
 		seastar::sstring data;
@@ -44,7 +44,7 @@ TEST(TestCqlProtocolResultMetadata, encode) {
 			"\x00\x00\x00\x03""abc"));
 	}
 	{
-		cql::CqlProtocolResultMetadata value;
+		cql::CqlProtocolResultRowsMetadata value;
 		value.setGlobalKeySpaceAndTable("asd", "qwe");
 		value.setColumns({ cql::CqlProtocolResultColumn(), cql::CqlProtocolResultColumn() });
 		value.getColumns().at(0).setName("a");
@@ -62,7 +62,7 @@ TEST(TestCqlProtocolResultMetadata, encode) {
 			"\x00\x01""b""\x00\x01"));
 	}
 	{
-		cql::CqlProtocolResultMetadata value;
+		cql::CqlProtocolResultRowsMetadata value;
 		value.setColumns({ cql::CqlProtocolResultColumn() });
 		value.getColumns().at(0).setKeySpace("k");
 		value.getColumns().at(0).setTable("t");
@@ -77,8 +77,8 @@ TEST(TestCqlProtocolResultMetadata, encode) {
 	}
 }
 
-TEST(TestCqlProtocolResultMetadata, decode) {
-	cql::CqlProtocolResultMetadata value;
+TEST(TestCqlProtocolResultRowsMetadata, decode) {
+	cql::CqlProtocolResultRowsMetadata value;
 	{
 		auto data = makeTestString(
 			"\x00\x00\x00\x06"
@@ -89,8 +89,8 @@ TEST(TestCqlProtocolResultMetadata, decode) {
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.getFlags(),
-			cql::CqlResultMetadataFlags::NoMetadata |
-			cql::CqlResultMetadataFlags::HasMorePages);
+			cql::CqlResultRowsMetadataFlags::NoMetadata |
+			cql::CqlResultRowsMetadataFlags::HasMorePages);
 		ASSERT_EQ(value.getColumnsCount(), 123);
 		ASSERT_EQ(value.getPagingState(), "abc");
 	}
@@ -106,7 +106,7 @@ TEST(TestCqlProtocolResultMetadata, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.getFlags(), cql::CqlResultMetadataFlags::GlobalTableSpec);
+		ASSERT_EQ(value.getFlags(), cql::CqlResultRowsMetadataFlags::GlobalTableSpec);
 		ASSERT_EQ(value.getColumnsCount(), 2);
 		ASSERT_EQ(value.getGlobalKeySpace(), "asd");
 		ASSERT_EQ(value.getGlobalTable(), "qwe");
@@ -124,7 +124,7 @@ TEST(TestCqlProtocolResultMetadata, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.getFlags(), cql::CqlResultMetadataFlags::None);
+		ASSERT_EQ(value.getFlags(), cql::CqlResultRowsMetadataFlags::None);
 		ASSERT_EQ(value.getColumnsCount(), 1);
 		ASSERT_EQ(value.getColumns().at(0).getKeySpace(), "k");
 		ASSERT_EQ(value.getColumns().at(0).getTable(), "t");

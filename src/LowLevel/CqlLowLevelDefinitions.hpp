@@ -158,11 +158,11 @@ namespace cql {
 	};
 
 	/**
-	 * Flags in result metadata.
-	 * The value of this enum is the <flags> in metadata part of result message.
+	 * Flags in metadata of rows result.
+	 * The value of this enum is the <flags> in metadata of rows result.
 	 * Check native_protocol_v4.spec section 4.2.5.2.
 	 */
-	enum class CqlResultMetadataFlags {
+	enum class CqlResultRowsMetadataFlags {
 		None = 0,
 		GlobalTableSpec = 1,
 		HasMorePages = 2,
@@ -170,8 +170,8 @@ namespace cql {
 	};
 
 	template <>
-	struct EnumDescriptions<CqlResultMetadataFlags> {
-		static const std::vector<std::pair<CqlResultMetadataFlags, const char*>>& get();
+	struct EnumDescriptions<CqlResultRowsMetadataFlags> {
+		static const std::vector<std::pair<CqlResultRowsMetadataFlags, const char*>>& get();
 	};
 }
 

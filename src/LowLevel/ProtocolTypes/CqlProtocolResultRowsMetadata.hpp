@@ -13,13 +13,15 @@ namespace cql {
 	 * and [<global_table_spec>?<col_spec_1>...<col_spec_n>] will not present.
 	 * Check native_protocol_v4.spec section 4.2.5.2.
 	 */
-	class CqlProtocolResultMetadata {
+	class CqlProtocolResultRowsMetadata {
 	public:
 		/** Reset to initial state */
 		void reset();
 
 		/** Call setters below will alter flags to indicate which component is included */
-		CqlResultMetadataFlags getFlags() const { return static_cast<CqlResultMetadataFlags>(flags_.get()); }
+		CqlResultRowsMetadataFlags getFlags() const {
+			return static_cast<CqlResultRowsMetadataFlags>(flags_.get());
+		}
 
 		/** How many columns selected by the query that produced this result */
 		std::size_t getColumnsCount() const { return columnsCount_.get(); }
@@ -48,7 +50,7 @@ namespace cql {
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructor */
-		CqlProtocolResultMetadata();
+		CqlProtocolResultRowsMetadata();
 
 	private:
 		CqlProtocolInt flags_;

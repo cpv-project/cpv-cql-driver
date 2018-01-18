@@ -1,66 +1,66 @@
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
-#include "CqlProtocolResultMetadata.hpp"
+#include "CqlProtocolResultRowsMetadata.hpp"
 
 namespace cql {
 	/** Reset to initial state */
-	void CqlProtocolResultMetadata::reset() {
-		flags_.set(enumValue(CqlResultMetadataFlags::NoMetadata));
+	void CqlProtocolResultRowsMetadata::reset() {
+		flags_.set(enumValue(CqlResultRowsMetadataFlags::NoMetadata));
 		columnsCount_.reset();
 	}
 
 	/** Set the value used to retrieve the next page of results, also indicates there are more pages */
-	void CqlProtocolResultMetadata::setPagingState(const seastar::sstring& pagingState) {
+	void CqlProtocolResultRowsMetadata::setPagingState(const seastar::sstring& pagingState) {
 		pagingState_.set(pagingState);
-		flags_.set(enumValue(getFlags() | CqlResultMetadataFlags::HasMorePages));
+		flags_.set(enumValue(getFlags() | CqlResultRowsMetadataFlags::HasMorePages));
 	}
 
 	/** Set the value used to retrieve the next page of results, also indicates there are more pages */
-	void CqlProtocolResultMetadata::setPagingState(seastar::sstring&& pagingState) {
+	void CqlProtocolResultRowsMetadata::setPagingState(seastar::sstring&& pagingState) {
 		pagingState_.set(std::move(pagingState));
-		flags_.set(enumValue(getFlags() | CqlResultMetadataFlags::HasMorePages));
+		flags_.set(enumValue(getFlags() | CqlResultRowsMetadataFlags::HasMorePages));
 	}
 
 	/** Set the keyspace name and table name of all the columns belong to */
-	void CqlProtocolResultMetadata::setGlobalKeySpaceAndTable(
+	void CqlProtocolResultRowsMetadata::setGlobalKeySpaceAndTable(
 		const seastar::sstring& keySpace, const seastar::sstring& table) {
 		globalKeySpace_.set(keySpace);
 		globalTable_.set(table);
-		flags_.set(enumValue(getFlags() | CqlResultMetadataFlags::GlobalTableSpec));
+		flags_.set(enumValue(getFlags() | CqlResultRowsMetadataFlags::GlobalTableSpec));
 	}
 
 	/** Set the keyspace name and table name of all the columns belong to */
-	void CqlProtocolResultMetadata::setGlobalKeySpaceAndTable(
+	void CqlProtocolResultRowsMetadata::setGlobalKeySpaceAndTable(
 		seastar::sstring&& keySpace, seastar::sstring&& table) {
 		globalKeySpace_.set(std::move(keySpace));
 		globalTable_.set(std::move(table));
-		flags_.set(enumValue(getFlags() | CqlResultMetadataFlags::GlobalTableSpec));
+		flags_.set(enumValue(getFlags() | CqlResultRowsMetadataFlags::GlobalTableSpec));
 	}
 
 	/** The columns selected by the query that produced this result */
-	void CqlProtocolResultMetadata::setColumns(const std::vector<CqlProtocolResultColumn>& columns) {
+	void CqlProtocolResultRowsMetadata::setColumns(const std::vector<CqlProtocolResultColumn>& columns) {
 		columnsCount_.set(columns.size());
 		columns_ = columns;
-		flags_.set(enumValue(getFlags() & ~CqlResultMetadataFlags::NoMetadata));
+		flags_.set(enumValue(getFlags() & ~CqlResultRowsMetadataFlags::NoMetadata));
 	}
 
 	/** The columns selected by the query that produced this result */
-	void CqlProtocolResultMetadata::setColumns(std::vector<CqlProtocolResultColumn>&& columns) {
+	void CqlProtocolResultRowsMetadata::setColumns(std::vector<CqlProtocolResultColumn>&& columns) {
 		columnsCount_.set(columns.size());
 		columns_ = std::move(columns);
-		flags_.set(enumValue(getFlags() & ~CqlResultMetadataFlags::NoMetadata));
+		flags_.set(enumValue(getFlags() & ~CqlResultRowsMetadataFlags::NoMetadata));
 	}
 
 	/** Encode to binary data */
-	void CqlProtocolResultMetadata::encode(seastar::sstring& data) const {
+	void CqlProtocolResultRowsMetadata::encode(seastar::sstring& data) const {
 		auto flags = getFlags();
 		flags_.encode(data);
 		columnsCount_.encode(data);
-		if (enumTrue(flags & CqlResultMetadataFlags::HasMorePages)) {
+		if (enumTrue(flags & CqlResultRowsMetadataFlags::HasMorePages)) {
 			pagingState_.encode(data);
 		}
-		if (enumFalse(flags & CqlResultMetadataFlags::NoMetadata)) {
+		if (enumFalse(flags & CqlResultRowsMetadataFlags::NoMetadata)) {
 			bool columnContainsTableSpec = true;
-			if (enumTrue(flags & CqlResultMetadataFlags::GlobalTableSpec)) {
+			if (enumTrue(flags & CqlResultRowsMetadataFlags::GlobalTableSpec)) {
 				globalKeySpace_.encode(data);
 				globalTable_.encode(data);
 				columnContainsTableSpec = false;
@@ -75,16 +75,16 @@ namespace cql {
 	}
 
 	/** Decode from binary data */
-	void CqlProtocolResultMetadata::decode(const char*& ptr, const char* end) {
+	void CqlProtocolResultRowsMetadata::decode(const char*& ptr, const char* end) {
 		flags_.decode(ptr, end);
 		auto flags = getFlags();
 		columnsCount_.decode(ptr, end);
-		if (enumTrue(flags & CqlResultMetadataFlags::HasMorePages)) {
+		if (enumTrue(flags & CqlResultRowsMetadataFlags::HasMorePages)) {
 			pagingState_.decode(ptr, end);
 		}
-		if (enumFalse(flags & CqlResultMetadataFlags::NoMetadata)) {
+		if (enumFalse(flags & CqlResultRowsMetadataFlags::NoMetadata)) {
 			bool columnContainsTableSpec = true;
-			if (enumTrue(flags & CqlResultMetadataFlags::GlobalTableSpec)) {
+			if (enumTrue(flags & CqlResultRowsMetadataFlags::GlobalTableSpec)) {
 				globalKeySpace_.decode(ptr, end);
 				globalTable_.decode(ptr, end);
 				columnContainsTableSpec = false;
@@ -107,8 +107,8 @@ namespace cql {
 	}
 
 	/** Constructor */
-	CqlProtocolResultMetadata::CqlProtocolResultMetadata() :
-		flags_(enumValue(CqlResultMetadataFlags::NoMetadata)),
+	CqlProtocolResultRowsMetadata::CqlProtocolResultRowsMetadata() :
+		flags_(enumValue(CqlResultRowsMetadataFlags::NoMetadata)),
 		columnsCount_(),
 		pagingState_(),
 		globalKeySpace_(),

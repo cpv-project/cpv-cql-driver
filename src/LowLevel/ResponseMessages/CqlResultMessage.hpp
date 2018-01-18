@@ -1,4 +1,9 @@
 #pragma once
+#include "../ProtocolTypes/CqlProtocolInt.hpp"
+#include "../ProtocolTypes/CqlProtocolResultRowsMetadata.hpp"
+#include "../ProtocolTypes/CqlProtocolBytes.hpp"
+#include "../ProtocolTypes/CqlProtocolString.hpp"
+// #include "../ProtocolTypes/CqlProtocolResultPreparedMetadata.hpp"
 #include "CqlResponseMessageBase.hpp"
 
 namespace cql {
@@ -12,9 +17,20 @@ namespace cql {
 		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
 
 	private:
-		// CqlProtocolResultMetadata metadata_;
-		// CqlProtocolInt rowsCount_;
-		// std::vector<CqlProtocolBytes> rowsContents_;
+		CqlProtocolInt kind_;
+		// For Kind Rows
+		CqlProtocolResultRowsMetadata rowsMetadata_;
+		CqlProtocolInt rowsCount_;
+		std::vector<CqlProtocolBytes> rowsContents_;
+		// For Kind SetKeySpace
+		CqlProtocolString keySpaceSet_;
+		// For Kind Prepared
+		// CqlProtocolResultPreparedMetadata preparedMetadata_;
+		CqlProtocolResultRowsMetadata preparedRowsMetadata_;
+		// For Kind SchemaChange
+		CqlProtocolString schemaChangeType_;
+		CqlProtocolString schemaChangeTarget_;
+		seastar::sstring schemaChangeOptions_;
 	};
 }
 
