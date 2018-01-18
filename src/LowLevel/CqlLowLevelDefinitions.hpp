@@ -156,5 +156,22 @@ namespace cql {
 	struct EnumDescriptions<CqlResultKind> {
 		static const std::vector<std::pair<CqlResultKind, const char*>>& get();
 	};
+
+	/**
+	 * Flags in result metadata.
+	 * The value of this enum is the <flags> in metadata part of result message.
+	 * Check native_protocol_v4.spec section 4.2.5.2.
+	 */
+	enum class CqlResultMetadataFlags {
+		None = 0,
+		GlobalTableSpec = 1,
+		HasMorePages = 2,
+		NoMetadata = 4
+	};
+
+	template <>
+	struct EnumDescriptions<CqlResultMetadataFlags> {
+		static const std::vector<std::pair<CqlResultMetadataFlags, const char*>>& get();
+	};
 }
 
