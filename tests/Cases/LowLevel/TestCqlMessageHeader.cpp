@@ -29,8 +29,11 @@ TEST(TestCqlMessageHeader, encode) {
 TEST(TestCqlMessageHeader, decode) {
 	cql::CqlMessageHeader header;
 	cql::CqlConnectionInfo info;
-	seastar::temporary_buffer<char> buf("\x84\x01\x00\x7b\x02\x00\x00\x00\x08", 9);
-	header.decodeHeader(info, buf);
+	auto data = makeTestString("\x84\x01\x00\x7b\x02\x00\x00\x00\x08");
+	const char* ptr = data.data();
+	const char* end = ptr + data.size();
+	header.decodeHeader(info, ptr, end);
+	ASSERT_TRUE(ptr == end);
 	ASSERT_EQ(header.getFlags(), cql::CqlMessageHeaderFlags::Compression);
 	ASSERT_EQ(header.getStreamId(), 123);
 	ASSERT_EQ(header.getOpCode(), cql::CqlMessageType::Ready);

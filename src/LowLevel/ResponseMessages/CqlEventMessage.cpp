@@ -2,7 +2,7 @@
 
 namespace cql {
 	/** Decode message body from binary data */
-	void CqlEventMessage::decodeBody(const CqlConnectionInfo&, const seastar::temporary_buffer<char>&) {
+	void CqlEventMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		// TODO
 	}
 }

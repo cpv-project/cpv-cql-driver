@@ -6,7 +6,7 @@ namespace cql {
 	class CqlResponseMessageBase : public CqlMessageBase {
 	public:
 		/** Decode message body from binary data */
-		virtual void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) = 0;
+		virtual void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) = 0;
 	};
 }
 

@@ -10,9 +10,7 @@ namespace cql {
 	}
 
 	/** Decode message body from binary data */
-	void CqlErrorMessage::decodeBody(const CqlConnectionInfo&, const seastar::temporary_buffer<char>& data) {
-		const char* ptr = data.begin();
-		const char* end = data.end();
+	void CqlErrorMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		errorCode_.decode(ptr, end);
 		errorMessage_.decode(ptr, end);
 		extraContents_.resize(0);

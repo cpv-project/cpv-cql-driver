@@ -14,7 +14,7 @@ namespace cql {
 		void reset(CqlMessageHeader&& header);
 
 		/** Decode message body from binary data */
-		void decodeBody(const CqlConnectionInfo& info, const seastar::temporary_buffer<char>& data) override;
+		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
 
 		/** The error code, check native_protocol_v4.spec section 9 */
 		CqlErrorCode getErrorCode() const { return static_cast<CqlErrorCode>(errorCode_.get()); }
