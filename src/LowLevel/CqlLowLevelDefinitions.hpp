@@ -137,5 +137,24 @@ namespace cql {
 	struct EnumDescriptions<CqlBatchType> {
 		static const std::vector<std::pair<CqlBatchType, const char*>>& get();
 	};
+
+	/**
+	 * The kind of the query result.
+	 * The value of this enum is the <kind> in result message.
+	 * Check native_protocol_v4.spec section 4.2.5.
+	 */
+	enum class CqlResultKind {
+		Unknown = 0x0000,
+		Void = 0x0001,
+		Rows = 0x0002,
+		SetKeySpace = 0x0003,
+		Prepared = 0x0004,
+		SchemaChange = 0x0005
+	};
+
+	template <>
+	struct EnumDescriptions<CqlResultKind> {
+		static const std::vector<std::pair<CqlResultKind, const char*>>& get();
+	};
 }
 

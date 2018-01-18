@@ -23,14 +23,13 @@ namespace cql {
 
 	/** Set the CQL query string, also modify the query kind */
 	void CqlProtocolBatchQuery::setQuery(const seastar::sstring& query) {
-		query_.set(query.data(), query.size());
+		query_.set(query);
 		kind_.set(enumValue(CqlBatchQueryKind::Query));
 	}
 
 	/** Set the CQL query string, also modify the query kind */
 	void CqlProtocolBatchQuery::setQuery(seastar::sstring&& query) {
-		query_.set(CqlProtocolLongStringState::Normal);
-		query_.get() = std::move(query);
+		query_.set(std::move(query));
 		kind_.set(enumValue(CqlBatchQueryKind::Query));
 	}
 
@@ -41,14 +40,13 @@ namespace cql {
 
 	/** Set the query id from prepare result, also modify the query kind */
 	void CqlProtocolBatchQuery::setPreparedQueryId(const seastar::sstring& preparedQueryId) {
-		preparedQueryId_.set(preparedQueryId.data(), preparedQueryId.size());
+		preparedQueryId_.set(preparedQueryId);
 		kind_.set(enumValue(CqlBatchQueryKind::PreparedQueryId));
 	}
 
 	/** Set the query id from prepare result, also modify the query kind */
 	void CqlProtocolBatchQuery::setPreparedQueryId(seastar::sstring&& preparedQueryId) {
-		preparedQueryId_.set(CqlProtocolShortBytesState::Normal);
-		preparedQueryId_.get() = std::move(preparedQueryId);
+		preparedQueryId_.set(std::move(preparedQueryId));
 		kind_.set(enumValue(CqlBatchQueryKind::PreparedQueryId));
 	}
 

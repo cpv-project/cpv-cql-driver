@@ -91,5 +91,18 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<CqlResultKind, const char*>>&
+		EnumDescriptions<CqlResultKind>::get() {
+		static std::vector<std::pair<CqlResultKind, const char*>> staticNames({
+			{ CqlResultKind::Unknown, "Unknown" },
+			{ CqlResultKind::Void, "Void" },
+			{ CqlResultKind::Rows, "Rows" },
+			{ CqlResultKind::SetKeySpace, "SetKeySpace" },
+			{ CqlResultKind::Prepared, "Prepared" },
+			{ CqlResultKind::SchemaChange, "SchemaChange" },
+		});
+		return staticNames;
+	}
 }
 

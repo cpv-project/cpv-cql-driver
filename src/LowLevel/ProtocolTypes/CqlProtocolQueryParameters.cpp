@@ -62,14 +62,13 @@ namespace cql {
 
 	/** Set the paging state */
 	void CqlProtocolQueryParameters::setPagingState(const seastar::sstring& pagingState) {
-		pagingState_.set(pagingState.data(), pagingState.size());
+		pagingState_.set(pagingState);
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPagingState));
 	}
 
 	/** Set the paging state */
 	void CqlProtocolQueryParameters::setPagingState(seastar::sstring&& pagingState) {
-		pagingState_.set(CqlProtocolBytesState::Normal);
-		pagingState_.get() = std::move(pagingState);
+		pagingState_.set(std::move(pagingState));
 		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPagingState));
 	}
 

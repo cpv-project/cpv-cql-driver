@@ -10,6 +10,11 @@ namespace cql {
 
 		/** Decode message body from binary data */
 		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
+
+	private:
+		// CqlProtocolResultMetadata metadata_;
+		// CqlProtocolInt rowsCount_;
+		// std::vector<CqlProtocolBytes> rowsContents_;
 	};
 }
 

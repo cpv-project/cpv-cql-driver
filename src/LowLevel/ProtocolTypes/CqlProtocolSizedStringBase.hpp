@@ -35,6 +35,18 @@ namespace cql {
 			value_.append(str, size);
 		}
 
+		/** Set the value of string and set the state to NormalState */
+		void set(const seastar::sstring& value) {
+			state_ = NormalState;
+			value_ = value;
+		}
+
+		/** Set the value of string and set the state to NormalState */
+		void set(seastar::sstring&& value) {
+			state_ = NormalState;
+			value_ = std::move(value);
+		}
+
 		/** Append the value of string and set the state to NormalState */
 		void append(const char* str, std::size_t size) {
 			state_ = NormalState;
