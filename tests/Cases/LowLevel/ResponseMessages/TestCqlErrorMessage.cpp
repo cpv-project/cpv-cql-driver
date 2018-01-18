@@ -12,6 +12,7 @@ TEST(TestCqlErrorMessage, decode) {
 		header.decodeHeader(info, headerDataPtr, headerDataEnd);
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
+		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Error);
 		cql::CqlObject<cql::CqlErrorMessage> message(std::move(baseMessage));
  		auto bodyData = makeTestString("\x00\x00\x00\x0a""\x00\x03""abc""123");
 		const char* bodyDataPtr = bodyData.data();

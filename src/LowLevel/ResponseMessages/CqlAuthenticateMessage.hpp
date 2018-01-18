@@ -1,4 +1,5 @@
 #pragma once
+#include "../ProtocolTypes/CqlProtocolString.hpp"
 #include "CqlResponseMessageBase.hpp"
 
 namespace cql {
@@ -10,10 +11,22 @@ namespace cql {
 	class CqlAuthenticateMessage : public CqlResponseMessageBase {
 	public:
 		using CqlResponseMessageBase::freeResources;
-		using CqlResponseMessageBase::reset;
+
+		/** For CqlObject */
+		void reset(CqlMessageHeader&& header);
 
 		/** Decode message body from binary data */
 		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
+
+		/** The full class name of the IAuthenticator in use */
+		const CqlProtocolString& getAuthenticatorClass() const& { return authenticatorClass_; }
+		CqlProtocolString& getAuthenticatorClass() & { return authenticatorClass_; }
+
+		/** Constructor */
+		CqlAuthenticateMessage();
+
+	private:
+		CqlProtocolString authenticatorClass_;
 	};
 }
 

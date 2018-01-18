@@ -12,6 +12,7 @@ TEST(TestCqlReadyMessage, decode) {
 		header.decodeHeader(info, headerDataPtr, headerDataEnd);
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
+		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Ready);
 		cql::CqlObject<cql::CqlReadyMessage> message(std::move(baseMessage));
  		auto bodyData = makeTestString("");
 		const char* bodyDataPtr = bodyData.data();

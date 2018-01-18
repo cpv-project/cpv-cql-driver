@@ -10,6 +10,7 @@ namespace cql {
 
 	/** Encode message body to binary data */
 	void CqlExecuteMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
+		// The body of the message must be: <id><query_parameters>
 		preparedQueryId_.encode(data);
 		queryParameters_.encode(data);
 	}

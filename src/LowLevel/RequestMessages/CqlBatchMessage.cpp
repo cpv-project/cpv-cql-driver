@@ -11,6 +11,12 @@ namespace cql {
 
 	/** Encode message body to binary data */
 	void CqlBatchMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
+		// The body of the message must be:
+		// <type>
+		// <query_list> which is:
+		//   <n><query_1>...<query_n>
+		// <batch_parameters> which is:
+		//   <consistency><flags>[<serial_consistency>][<timestamp>]
 		type_.encode(data);
 		queries_.encode(data);
 		batchParameters_.encode(data);

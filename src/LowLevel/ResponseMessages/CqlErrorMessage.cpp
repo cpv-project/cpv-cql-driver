@@ -11,6 +11,8 @@ namespace cql {
 
 	/** Decode message body from binary data */
 	void CqlErrorMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
+		// the body of the message will be an [int] error code followed by a [string] error message
+		// then, depending on the exception, more content may follow
 		errorCode_.decode(ptr, end);
 		errorMessage_.decode(ptr, end);
 		extraContents_.resize(0);
