@@ -38,14 +38,14 @@ namespace cql {
 
 	/** The columns selected by the query that produced this result */
 	void CqlProtocolResultMetadata::setColumns(const std::vector<CqlProtocolResultColumn>& columns) {
-		columnsCount_.set(columns_.size());
+		columnsCount_.set(columns.size());
 		columns_ = columns;
 		flags_.set(enumValue(getFlags() & ~CqlResultMetadataFlags::NoMetadata));
 	}
 
 	/** The columns selected by the query that produced this result */
 	void CqlProtocolResultMetadata::setColumns(std::vector<CqlProtocolResultColumn>&& columns) {
-		columnsCount_.set(columns_.size());
+		columnsCount_.set(columns.size());
 		columns_ = std::move(columns);
 		flags_.set(enumValue(getFlags() & ~CqlResultMetadataFlags::NoMetadata));
 	}
@@ -59,14 +59,15 @@ namespace cql {
 			pagingState_.encode(data);
 		}
 		if (enumFalse(flags & CqlResultMetadataFlags::NoMetadata)) {
-			if (getColumnsCount() != columns_.size()) {
-				throw CqlLogicException(CQL_CODEINFO, "columns count != columns.size()");
-			}
+			bool columnContainsTableSpec = true;
 			if (enumTrue(flags & CqlResultMetadataFlags::GlobalTableSpec)) {
 				globalKeySpace_.encode(data);
 				globalTable_.encode(data);
+				columnContainsTableSpec = false;
 			}
-			bool columnContainsTableSpec = enumFalse(flags & CqlResultMetadataFlags::GlobalTableSpec);
+			if (getColumnsCount() != columns_.size()) {
+				throw CqlLogicException(CQL_CODEINFO, "columns count != columns.size()");
+			}
 			for (const auto& column : columns_) {
 				column.encode(data, columnContainsTableSpec);
 			}
@@ -82,13 +83,18 @@ namespace cql {
 			pagingState_.decode(ptr, end);
 		}
 		if (enumFalse(flags & CqlResultMetadataFlags::NoMetadata)) {
+			bool columnContainsTableSpec = true;
+			if (enumTrue(flags & CqlResultMetadataFlags::GlobalTableSpec)) {
+				globalKeySpace_.decode(ptr, end);
+				globalTable_.decode(ptr, end);
+				columnContainsTableSpec = false;
+			}
 			if (columnsCount_.get() < 0) {
 				throw CqlLogicException(CQL_CODEINFO, "columns count < 0");
 			}
 			if (columns_.size() > columnsCount_.get()) {
 				columns_.resize(columnsCount_.get());
 			}
-			bool columnContainsTableSpec = enumFalse(flags & CqlResultMetadataFlags::GlobalTableSpec);
 			for (std::size_t i = 0, j = columnsCount_.get(); i < j; ++i) {
 				if (i < columns_.size()) {
 					columns_[i].decode(ptr, end, columnContainsTableSpec);
