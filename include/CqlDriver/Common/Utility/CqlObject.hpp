@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <type_traits>
 
 namespace cql {
 	/**
@@ -31,10 +32,21 @@ namespace cql {
 			ptr_(std::move(object.ptr_)),
 			deleter_(object.deleter_) { }
 
-		/** Move constructor */
-		template <class U>
+		/** Move constructor, T is base of U (up casting) */
+		template <class U, std::enable_if_t<std::is_base_of<T, U>::value, int> = 0>
 		CqlObject(CqlObject<U>&& object) noexcept :
 			ptr_(std::move(object.ptr_)),
+			deleter_(reinterpret_cast<decltype(deleter_)>(object.deleter_)) {
+			static_assert(sizeof(ptr_) == sizeof(object.ptr_), "ensure unique_ptr<> have same layout");
+		}
+
+		/**
+		 * Move constructor, U is base of T (down casting)
+		 * Use static_cast instead of dynamic_cast for performance concern, use it carefully
+		 */
+		template <class U, std::enable_if_t<std::is_base_of<U, T>::value, int> = 0>
+		CqlObject(CqlObject<U>&& object) noexcept :
+			ptr_(std::unique_ptr<T>(static_cast<T*>(object.ptr_.release()))) ,
 			deleter_(reinterpret_cast<decltype(deleter_)>(object.deleter_)) {
 			static_assert(sizeof(ptr_) == sizeof(object.ptr_), "ensure unique_ptr<> have same layout");
 		}
@@ -69,7 +81,11 @@ namespace cql {
 
 		/** Get the modifiable capacity value, defines how many objects can store in free list per thread */
 		static std::size_t& getCapacity() {
+#if defined(CQL_FREE_LIST_DEFAULT_CAPACITY)
+			static std::size_t capacity = CQL_FREE_LIST_DEFAULT_CAPACITY;
+#else
 			static std::size_t capacity = 128;
+#endif
 			return capacity;
 		}
 

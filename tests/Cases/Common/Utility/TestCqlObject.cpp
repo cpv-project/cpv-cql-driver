@@ -30,12 +30,24 @@ TEST(TestCqlObject, Simple) {
 	}
 }
 
-TEST(TestCqlObject, Polymorphism) {
+TEST(TestCqlObject, UpCasting) {
 	auto record = seastar::make_shared<int>(0);
 	for (std::size_t i = 0; i < 3; ++i) {
 		ASSERT_EQ(*record, i);
 		{
 			cql::CqlObject<Base> base(cql::makeObject<Derived>(record));
+		}
+		ASSERT_EQ(*record, i+1);
+	}
+}
+
+TEST(TestCqlObject, DownCasting) {
+	auto record = seastar::make_shared<int>(0);
+	for (std::size_t i = 0; i < 3; ++i) {
+		ASSERT_EQ(*record, i);
+		{
+			cql::CqlObject<Base> base(cql::makeObject<Derived>(record));
+			cql::CqlObject<Derived> derived(std::move(base));
 		}
 		ASSERT_EQ(*record, i+1);
 	}
