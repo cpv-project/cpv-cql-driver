@@ -1,4 +1,5 @@
 #pragma once
+#include "../ProtocolTypes/CqlProtocolString.hpp"
 #include "CqlResponseMessageBase.hpp"
 
 namespace cql {
@@ -9,10 +10,27 @@ namespace cql {
 	class CqlEventMessage : public CqlResponseMessageBase {
 	public:
 		using CqlResponseMessageBase::freeResources;
-		using CqlResponseMessageBase::reset;
+		
+		/** For CqlObject */
+		void reset(CqlMessageHeader&& header);
 
 		/** Decode message body from binary data */
 		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
+
+		/** The event type */
+		const CqlProtocolString& getType() const& { return type_; }
+		CqlProtocolString& getType() & { return type_; }
+
+		/** The event data, depends on the event type */
+		const seastar::sstring& getData() const& { return data_; }
+		seastar::sstring& getData() & { return data_; }
+
+		/** Constructor */
+		CqlEventMessage();
+
+	private:
+		CqlProtocolString type_;
+		seastar::sstring data_;
 	};
 }
 

@@ -15,7 +15,7 @@ namespace cql {
 		preparedRowsMetadata_.reset();
 		schemaChangeType_.reset();
 		schemaChangeTarget_.reset();
-		schemaChangeOptions_.reset();
+		schemaChangeOptions_.resize(0);
 	}
 
 	/** Decode message body from binary data */
