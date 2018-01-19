@@ -18,6 +18,7 @@ TEST(TestCqlReadyMessage, decode) {
 		const char* bodyDataPtr = bodyData.data();
 		const char* bodyDataEnd = bodyDataPtr + bodyData.size();
 		message->decodeBody(info, bodyDataPtr, bodyDataEnd);
+		ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
 	}
 }
 

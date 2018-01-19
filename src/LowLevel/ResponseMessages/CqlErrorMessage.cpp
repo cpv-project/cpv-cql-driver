@@ -17,6 +17,7 @@ namespace cql {
 		errorMessage_.decode(ptr, end);
 		extraContents_.resize(0);
 		extraContents_.append(ptr, end - ptr);
+		ptr = end;
 	}
 
 	/** Constructor */

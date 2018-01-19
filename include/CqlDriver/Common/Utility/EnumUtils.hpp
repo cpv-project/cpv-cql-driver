@@ -59,12 +59,21 @@ namespace cql {
 	/** Write text description of enum to stream */
 	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
 	std::ostream& operator<<(std::ostream& stream, T value) {
-		bool isFirst = true;
 		auto& descriptions = EnumDescriptions<T>::get();
+		// find the value exactly matched
 		for (const auto& pair : descriptions) {
-			if (enumValue(pair.first) == 0 ?
-				(value == pair.first) :
-				((value & pair.first) == pair.first)) {
+			if (value == pair.first) {
+				stream << pair.second;
+				return stream;
+			}
+		}
+		// find the bits combination of the value
+		bool isFirst = true;
+		for (const auto& pair : descriptions) {
+			if (enumValue(pair.first) == 0) {
+				continue;
+			}
+			if ((value & pair.first) == pair.first) {
 				if (isFirst) {
 					isFirst = false;
 				} else {

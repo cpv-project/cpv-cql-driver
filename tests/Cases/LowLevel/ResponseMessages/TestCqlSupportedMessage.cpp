@@ -21,6 +21,7 @@ TEST(TestCqlSupportedMessage, decode) {
 		const char* bodyDataPtr = bodyData.data();
 		const char* bodyDataEnd = bodyDataPtr + bodyData.size();
 		message->decodeBody(info, bodyDataPtr, bodyDataEnd);
+		ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
 		auto& options = message->getOptions();
 		ASSERT_EQ(options.get().size(), 2);
 		ASSERT_EQ(options.get().at(cql::CqlProtocolString("apple")).get().size(), 2);
