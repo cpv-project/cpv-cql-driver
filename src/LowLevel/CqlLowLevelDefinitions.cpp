@@ -115,5 +115,14 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<CqlResultPreparedMetadataFlags, const char*>>&
+		EnumDescriptions<CqlResultPreparedMetadataFlags>::get() {
+		static std::vector<std::pair<CqlResultPreparedMetadataFlags, const char*>> staticNames({
+			{ CqlResultPreparedMetadataFlags::None, "None" },
+			{ CqlResultPreparedMetadataFlags::GlobalTableSpec, "GlobalTableSpec" },
+		});
+		return staticNames;
+	}
 }
 
