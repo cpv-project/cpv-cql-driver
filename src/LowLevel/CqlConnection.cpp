@@ -95,12 +95,14 @@ namespace cql {
 		}).then([self] (auto message) {
 			// send STARTUP
 			if (message->getHeader().getOpCode() != CqlMessageType::Supported) {
-				seastar::make_exception_future(CqlLogicException(CQL_CODEINFO));
+				return seastar::make_exception_future(CqlLogicException(
+					CQL_CODEINFO, "unexcepted response to OPTION message: ", message->toString()));
 			}
 			auto startupMessage = CqlRequestMessageFactory::makeRequestMessage<CqlStartupMessage>();
 			return self->sendMessage(std::move(startupMessage), self->streamZero_);
 		}).then([self] {
 			// perform authentication
+			// TODO
 			return seastar::sleep(std::chrono::seconds(3));
 		}).then([self] {
 			// ready now
