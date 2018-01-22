@@ -76,6 +76,7 @@ namespace cql {
 			self->socket_ = std::move(fd);
 			self->readStream_ = self->socket_.input();
 			self->writeStream_ = self->socket_.output();
+			self->isConnected_ = true;
 		}).handle_exception([self] (std::exception_ptr ex) {
 			return seastar::make_exception_future(CqlNetworkException(
 				CQL_CODEINFO, "connect to",
@@ -120,10 +121,10 @@ namespace cql {
 	seastar::future<> CqlConnection::sendMessage(
 		CqlObject<CqlRequestMessageBase>&& message, const CqlConnection::Stream& stream) {
 		// check connection state
-		if (!isReady_) {
+		if (!isConnected_) {
 			return seastar::make_exception_future(
 				CqlNetworkException(CQL_CODEINFO,
-				"connection is not ready, either ready() is not called or it's closed"));
+				"connection is not connected, either ready() is not called or it's closed"));
 		}
 		// ensure only one message is sending at the same time
 		message->getHeader().setStreamId(stream.getStreamId());
@@ -167,10 +168,10 @@ namespace cql {
 	seastar::future<CqlObject<CqlResponseMessageBase>> CqlConnection::waitNextMessage(
 		const CqlConnection::Stream& stream) {
 		// check connection state
-		if (!isReady_) {
+		if (!isConnected_) {
 			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
 				CqlNetworkException(CQL_CODEINFO,
-				"connection is not ready, either ready() is not called or it's closed"));
+				"connection is not connected, either ready() is not called or it's closed"));
 		}
 		// try getting message directly from received queue
 		auto streamId = stream.getStreamId();
@@ -274,6 +275,7 @@ namespace cql {
 		socket_(),
 		readStream_(),
 		writeStream_(),
+		isConnected_(false),
 		isReady_(false),
 		connectionInfo_(),
 		streamStates_(nodeConfiguration_->getMaxStreams()),
@@ -305,9 +307,10 @@ namespace cql {
 
 	/** Close the connection */
 	void CqlConnection::close(const seastar::sstring& errorMessage) {
-		if (!isReady_) {
+		if (!isConnected_) {
 			return;
 		}
+		isConnected_ = false;
 		isReady_ = false;
 		readStream_ = {};
 		writeStream_ = {};

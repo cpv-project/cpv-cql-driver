@@ -91,6 +91,7 @@ namespace cql {
 		seastar::connected_socket socket_;
 		seastar::input_stream<char> readStream_;
 		seastar::output_stream<char> writeStream_;
+		bool isConnected_;
 		bool isReady_;
 		CqlConnectionInfo connectionInfo_;
 
