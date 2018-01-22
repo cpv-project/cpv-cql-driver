@@ -42,12 +42,22 @@ namespace cql {
 	}
 
 	/** Set how many streams can hold in single connection */
-	CqlNodeConfiguration& CqlNodeConfiguration::setMaxStream(std::size_t value) {
+	CqlNodeConfiguration& CqlNodeConfiguration::setMaxStreams(std::size_t value) {
 		if (!(value >= 2 && value <= 255)) {
 			throw CqlFormatException(CQL_CODEINFO,
-				"invalid max stream value, it should >= 2 and <= 255");
+				"invalid max streams value, it should >= 2 and <= 255");
 		}
-		maxStream_ = value;
+		maxStreams_ = value;
+		return *this;
+	}
+
+	/** Set how many messages can hold in a received queue for single stream */
+	CqlNodeConfiguration& CqlNodeConfiguration::setMaxPendingMessages(std::size_t value) {
+		if (!(value >= 1)) {
+			throw CqlFormatException(CQL_CODEINFO,
+				"invalid max pending messages value, it should >= 1");
+		}
+		maxPendingMessages_ = value;
 		return *this;
 	}
 
@@ -78,8 +88,13 @@ namespace cql {
 	}
 
 	/** Get how many streams can hold in single connection */
-	std::size_t CqlNodeConfiguration::getMaxStream() const {
-		return maxStream_;
+	std::size_t CqlNodeConfiguration::getMaxStreams() const {
+		return maxStreams_;
+	}
+
+	/** Get how many messages can hold in a received queue for single stream */
+	std::size_t CqlNodeConfiguration::getMaxPendingMessages() const {
+		return maxPendingMessages_;
 	}
 
 	/** Get the full authentication class name */
@@ -120,7 +135,8 @@ namespace cql {
 		address_(),
 		useSsl_(false),
 		useCompression_(false),
-		maxStream_(20),
+		maxStreams_(20),
+		maxPendingMessages_(20),
 		authenticatorClass_(CqlAuthenticatorClasses::AllowAllAuthenticator),
 		authenticatorData_(),
 		ipAddress_(),

@@ -41,7 +41,7 @@ TEST(TestConnection, openStream) {
 		seastar::make_shared<cql::CqlNodeConfiguration>(
 			cql::CqlNodeConfiguration()
 				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
-				.setMaxStream(testMaxStream)));
+				.setMaxStreams(testMaxStream)));
 	for (std::size_t i = 0; i < 3; ++i) {
 		// test 3 round
 		std::vector<cql::CqlConnection::Stream> streams;

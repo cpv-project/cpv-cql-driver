@@ -66,7 +66,7 @@ namespace cql {
 						self->nodeConfiguration_->updateIpAddress(address);
 						return self->connector_->connect(*self->nodeConfiguration_, address);
 					} else {
-						// seastar's socket_address only support ipv4 now so throw a exception for ipv6
+						// seastar's socket_address only support ipv4 for now
 						return seastar::make_exception_future<seastar::connected_socket>(
 							CqlNotImplementedException(CQL_CODEINFO, "ipv6 address is unsupported yet"));
 					}
@@ -119,6 +119,12 @@ namespace cql {
 	/** Send a message to the given stream and wait for success */
 	seastar::future<> CqlConnection::sendMessage(
 		CqlObject<CqlRequestMessageBase>&& message, const CqlConnection::Stream& stream) {
+		// check connection state
+		if (!isReady_) {
+			return seastar::make_exception_future(
+				CqlNetworkException(CQL_CODEINFO,
+				"connection is not ready, either ready() is not called or it's closed"));
+		}
 		// ensure only one message is sending at the same time
 		message->getHeader().setStreamId(stream.getStreamId());
 		auto previousSendingFuture = std::move(sendingFuture_);
@@ -160,7 +166,89 @@ namespace cql {
 	/** Wait for the next message from the given stream */
 	seastar::future<CqlObject<CqlResponseMessageBase>> CqlConnection::waitNextMessage(
 		const CqlConnection::Stream& stream) {
-		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+		// check connection state
+		if (!isReady_) {
+			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
+				CqlNetworkException(CQL_CODEINFO,
+				"connection is not ready, either ready() is not called or it's closed"));
+		}
+		// try getting message directly from received queue
+		auto streamId = stream.getStreamId();
+		auto& queue = receivedMessageQueueMap_.at(streamId);
+		if (!queue.empty()) {
+			return seastar::make_ready_future<CqlObject<CqlResponseMessageBase>>(queue.pop());
+		}
+		// message not available, try receiving it from network
+		auto& promiseSlot = receivingPromiseMap_.at(streamId);
+		if (promiseSlot.first) {
+			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
+				CqlLogicException(CQL_CODEINFO, "there already a message waiter registered for this stream"));
+		}
+		promiseSlot.first = true;
+		promiseSlot.second = {};
+		if (receivingPromiseCount_++ == 0) {
+			// the first who made promise has responsibility to start the receiver
+			auto self = shared_from_this();
+			seastar::do_with(std::move(self), [](auto& self) {
+				return seastar::repeat([&self] {
+					// receive message header
+					return self->readStream_.read_exactly(self->connectionInfo_.getHeaderSize())
+					.then([&self] (seastar::temporary_buffer<char> buf) {
+						const char* ptr = buf.begin();
+						const char* end = buf.end();
+						CqlMessageHeader header;
+						header.decodeHeader(self->connectionInfo_, ptr, end);
+						auto bodyLength = header.getBodyLength();
+						if (bodyLength > self->connectionInfo_.getMaximumMessageBodySize()) {
+							self->close(joinString(" ", "message body too large:", bodyLength));
+							return seastar::make_ready_future<seastar::stop_iteration>(
+								seastar::stop_iteration::yes);
+						}
+						// receive message body
+						return self->readStream_.read_exactly(bodyLength)
+						.then([&self, header=std::move(header)] (seastar::temporary_buffer<char> buf) mutable {
+							const char* ptr = buf.begin();
+							const char* end = buf.end();
+							auto message = CqlResponseMessageFactory::makeResponseMessage(std::move(header));
+							message->decodeBody(self->connectionInfo_, ptr, end);
+							// find the corresponding promise
+							auto streamId = message->getHeader().getStreamId();
+							if (streamId >= self->receivedMessageQueueMap_.size()) {
+								self->close(joinString(" ", "stream id of received message out of range:", streamId));
+								return seastar::stop_iteration::yes;
+							}
+							auto& promiseSlot = self->receivingPromiseMap_[streamId];
+							if (promiseSlot.first) {
+								// pass message directly to the promise
+								promiseSlot.first = false;
+								promiseSlot.second.set_value(std::move(message));
+								if (self->receivingPromiseCount_ == 0) {
+									self->close("incorrect receiving promise count, should be logic error");
+									return seastar::stop_iteration::yes;
+								}
+								--self->receivingPromiseCount_;
+							} else {
+								// enqueue message to received queue
+								if (!self->receivedMessageQueueMap_[streamId].push(std::move(message))) {
+									self->close(joinString(" ", "max pending messages is reached, stream id:", streamId));
+									return seastar::stop_iteration::yes;
+								}
+							}
+							if (self->receivingPromiseCount_ == 0) {
+								// no more message waiter is waiting, exit receiver
+								return seastar::stop_iteration::yes;
+							} else {
+								// continue to receive next message
+								return seastar::stop_iteration::no;
+							}
+						});
+					});
+				}).handle_exception([&self] (std::exception_ptr ex) {
+					self->close(joinString(" ", "receive message failed:", ex));
+				});
+			});
+		}
+		return promiseSlot.second.get_future();
 	}
 
 	/** Constructor */
@@ -188,23 +276,50 @@ namespace cql {
 		writeStream_(),
 		isReady_(false),
 		connectionInfo_(),
-		streamStates_(nodeConfiguration_->getMaxStream()),
+		streamStates_(nodeConfiguration_->getMaxStreams()),
 		streamZero_(0, nullptr),
 		lastOpenedStream_(0),
 		sendingFuture_(seastar::make_ready_future<>()),
 		sendingBuffer_(),
-		receivePromiseMap_(nodeConfiguration_->getMaxStream()),
-		receiveMessageQueueMap_(),
-		receivePromiseCount_(0),
-		receiverIsStarted_(false) {
-		// initialize receive message queues
-		for (std::size_t i = 0, j = nodeConfiguration_->getMaxStream(); i < j; ++i) {
-			receiveMessageQueueMap_.emplace_back(std::numeric_limits<std::size_t>::max());
+		receivingPromiseMap_(nodeConfiguration_->getMaxStreams()),
+		receivedMessageQueueMap_(),
+		receivingPromiseCount_(0) {
+		// initialize received message queues
+		for (std::size_t i = 0, j = nodeConfiguration_->getMaxStreams(); i < j; ++i) {
+			receivedMessageQueueMap_.emplace_back(nodeConfiguration->getMaxPendingMessages());
 		}
 		// open stream zero, which is for internal communication
 		auto state = seastar::make_lw_shared<Stream::State>();
 		streamStates_.at(0) = state;
 		streamZero_ = Stream(0, state);
+	}
+
+	/** Destructor */
+	CqlConnection::~CqlConnection() {
+		try {
+			close("close from destructor");
+		} catch (...) {
+			std::cerr << std::current_exception() << std::endl;
+		}
+	}
+
+	/** Close the connection */
+	void CqlConnection::close(const seastar::sstring& errorMessage) {
+		if (!isReady_) {
+			return;
+		}
+		isReady_ = false;
+		readStream_ = {};
+		writeStream_ = {};
+		socket_ = {};
+		// notify all message waiters
+		receivingPromiseCount_ = 0;
+		for (auto& slot : receivingPromiseMap_) {
+			if (slot.first) {
+				slot.first = false;
+				slot.second.set_exception(CqlNetworkException(CQL_CODEINFO, errorMessage));
+			}
+		}
 	}
 }
 

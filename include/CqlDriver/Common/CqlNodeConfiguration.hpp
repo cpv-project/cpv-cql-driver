@@ -21,7 +21,10 @@ namespace cql {
 		CqlNodeConfiguration& setUseCompression(bool value);
 
 		/** Set how many streams can hold in single connection, default value is 20 */
-		CqlNodeConfiguration& setMaxStream(std::size_t value);
+		CqlNodeConfiguration& setMaxStreams(std::size_t value);
+
+		/** Set how many messages can hold in a received queue for single stream */
+		CqlNodeConfiguration& setMaxPendingMessages(std::size_t value);
 
 		/** Set to use password authentication for this node */
 		CqlNodeConfiguration& setPasswordAuthentication(
@@ -37,7 +40,10 @@ namespace cql {
 		bool getUseCompression() const;
 
 		/** Get how many streams can hold in single connection */
-		std::size_t getMaxStream() const;
+		std::size_t getMaxStreams() const;
+
+		/** Get how many messages can hold in a received queue for single stream */
+		std::size_t getMaxPendingMessages() const;
 
 		/** Get the full authentication class name */
 		const seastar::sstring& getAuthenticatorClass() const&;
@@ -60,7 +66,8 @@ namespace cql {
 		std::pair<seastar::sstring, std::uint16_t> address_;
 		bool useSsl_;
 		bool useCompression_;
-		std::size_t maxStream_;
+		std::size_t maxStreams_;
+		std::size_t maxPendingMessages_;
 		seastar::sstring authenticatorClass_;
 		seastar::sstring authenticatorData_;
 		seastar::socket_address ipAddress_;

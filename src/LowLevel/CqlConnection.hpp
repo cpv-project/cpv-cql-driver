@@ -69,6 +69,19 @@ namespace cql {
 			const seastar::shared_ptr<CqlConnectorBase>& connector,
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
 
+		/** Destructor */
+		~CqlConnection();
+
+		/** Disallow copy and move */
+		CqlConnection(const CqlConnection&) = delete;
+		CqlConnection(CqlConnection&&) = delete;
+		CqlConnection& operator=(const CqlConnection&) = delete;
+		CqlConnection& operator=(CqlConnection&&) = delete;
+
+	private:
+		/** Close the connection */
+		void close(const seastar::sstring& errorMessage);
+
 	private:
 		seastar::shared_ptr<CqlSessionConfiguration> sessionConfiguration_;
 		seastar::shared_ptr<CqlNodeConfiguration> nodeConfiguration_;
@@ -88,10 +101,9 @@ namespace cql {
 		seastar::future<> sendingFuture_;
 		seastar::sstring sendingBuffer_;
 
-		std::vector<std::pair<bool, seastar::promise<>>> receivePromiseMap_;
-		std::vector<seastar::queue<CqlObject<CqlResponseMessageBase>>> receiveMessageQueueMap_;
-		std::size_t receivePromiseCount_;
-		bool receiverIsStarted_;
+		std::vector<std::pair<bool, seastar::promise<CqlObject<CqlResponseMessageBase>>>> receivingPromiseMap_;
+		std::vector<seastar::queue<CqlObject<CqlResponseMessageBase>>> receivedMessageQueueMap_;
+		std::size_t receivingPromiseCount_;
 	};
 }
 
