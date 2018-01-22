@@ -7,8 +7,12 @@
 #include "./Connectors/CqlConnectorFactory.hpp"
 #include "./Authenticators/CqlAuthenticatorFactory.hpp"
 #include "./RequestMessages/CqlRequestMessageFactory.hpp"
+#include "./RequestMessages/CqlOptionsMessage.hpp"
+#include "./RequestMessages/CqlStartupMessage.hpp"
 #include "./ResponseMessages/CqlResponseMessageFactory.hpp"
 #include "CqlConnection.hpp"
+
+#include <core/sleep.hh>
 
 namespace cql {
 	/** Constructor */
@@ -83,16 +87,21 @@ namespace cql {
 				self->nodeConfiguration_->getAddress().first, "failed:", ex));
 		}).then([self] {
 			// send OPTION
-
+			auto optionMessage = CqlRequestMessageFactory::makeRequestMessage<CqlOptionsMessage>();
+			return self->sendMessage(std::move(optionMessage), self->streamZero_);
 		}).then([self] {
 			// receive SUPPORTED
-
-		}).then([self] {
-			// send ready
-
+			return self->waitNextMessage(self->streamZero_);
+		}).then([self] (auto message) {
+			// send STARTUP
+			if (message->getHeader().getOpCode() != CqlMessageType::Supported) {
+				seastar::make_exception_future(CqlLogicException(CQL_CODEINFO));
+			}
+			auto startupMessage = CqlRequestMessageFactory::makeRequestMessage<CqlStartupMessage>();
+			return self->sendMessage(std::move(startupMessage), self->streamZero_);
 		}).then([self] {
 			// perform authentication
-
+			return seastar::sleep(std::chrono::seconds(3));
 		}).then([self] {
 			// ready now
 			self->isReady_ = true;
