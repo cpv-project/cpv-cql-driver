@@ -7,6 +7,12 @@ namespace cql {
 		authenticatorClass_.reset();
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlAuthenticateMessage::toString() const {
+		return joinString("",
+			"CqlAuthChallengeMessage(authenticatorClass: ", authenticatorClass_.get(), ")");
+	}
+
 	/** Decode message body from binary data */
 	void CqlAuthenticateMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		// The body consists of a single [string] indicating the full class name of

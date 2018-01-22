@@ -7,6 +7,11 @@ namespace cql {
 		token_.reset();
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlAuthResponseMessage::toString() const {
+		return "CqlAuthResponseMessage()";
+	}
+
 	/** Encode message body to binary data */
 	void CqlAuthResponseMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
 		// the body of this message is a single [bytes] token.

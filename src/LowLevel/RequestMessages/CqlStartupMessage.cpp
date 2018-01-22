@@ -14,6 +14,11 @@ namespace cql {
 		options_.get().emplace(CqlVersionKey, CqlVersionValue);
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlStartupMessage::toString() const {
+		return "CqlStartupMessage()";
+	}
+
 	/** Encode message body to binary data */
 	void CqlStartupMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
 		// The body is a [string map] of options, possible options are

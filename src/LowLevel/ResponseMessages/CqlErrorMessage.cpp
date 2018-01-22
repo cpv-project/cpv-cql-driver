@@ -9,6 +9,14 @@ namespace cql {
 		extraContents_.resize(0);
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlErrorMessage::toString() const {
+		return joinString("",
+			"CqlErrorMessage(errorCode: ", getErrorCode(),
+			", errorCodeInt: ", errorCode_.get(),
+			", errorMessage: ", errorMessage_.get(), ")");
+	}
+
 	/** Decode message body from binary data */
 	void CqlErrorMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		// the body of the message will be an [int] error code followed by a [string] error message

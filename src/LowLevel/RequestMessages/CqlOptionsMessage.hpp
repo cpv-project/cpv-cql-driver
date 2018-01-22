@@ -11,6 +11,9 @@ namespace cql {
 		using CqlRequestMessageBase::freeResources;
 		using CqlRequestMessageBase::reset;
 
+		/** Get description of this message */
+		seastar::sstring toString() const override;
+
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 	};

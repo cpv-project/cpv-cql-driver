@@ -18,6 +18,14 @@ namespace cql {
 		schemaChangeOptions_.resize(0);
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlResultMessage::toString() const {
+		return joinString("",
+			"CqlResultMessage(kind: ", getKind(),
+			", columnsCount: ", rowsMetadata_.getColumnsCount(),
+			", rowsCount: ", rowsCount_.get(), ")");
+	}
+
 	/** Decode message body from binary data */
 	void CqlResultMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		kind_.decode(ptr, end);

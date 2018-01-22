@@ -15,6 +15,9 @@ namespace cql {
 		/** For CqlObject */
 		void reset(CqlMessageHeader&& header);
 
+		/** Get description of this message */
+		seastar::sstring toString() const override;
+
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 

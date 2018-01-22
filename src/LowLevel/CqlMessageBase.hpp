@@ -29,6 +29,9 @@ namespace cql {
 		/** Get the message header */
 		CqlMessageHeader& getHeader() &;
 
+		/** Get description of this message */
+		virtual seastar::sstring toString() const = 0;
+
 		/** Constructor */
 		CqlMessageBase(); 
 

@@ -8,6 +8,11 @@ namespace cql {
 		data_.resize(0);
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlEventMessage::toString() const {
+		return "CqlEventMessage()";
+	}
+
 	/** Decode message body from binary data */
 	void CqlEventMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		// the body of an EVENT message will start with a [string] represeting the event type,

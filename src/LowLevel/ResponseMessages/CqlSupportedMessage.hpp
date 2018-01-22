@@ -17,6 +17,9 @@ namespace cql {
 		/** Decode message body from binary data */
 		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
 
+		/** Get description of this message */
+		seastar::sstring toString() const override;
+
 		/** The supported STARTUP options */
 		const CqlProtocolStringMultiMap& getOptions() const& { return options_; }
 		CqlProtocolStringMultiMap& getOptions() & { return options_; }

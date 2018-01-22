@@ -7,6 +7,11 @@ namespace cql {
 		events_.reset();
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlRegisterMessage::toString() const {
+		return "CqlRegisterMessage()";
+	}
+
 	/** Encode message body to binary data */
 	void CqlRegisterMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
 		// The body of the message is a [string list] representing the event types to register for.

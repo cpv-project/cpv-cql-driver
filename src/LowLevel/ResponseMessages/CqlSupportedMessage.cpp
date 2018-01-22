@@ -7,6 +7,11 @@ namespace cql {
 		options_.reset();
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlSupportedMessage::toString() const {
+		return "CqlSupportedMessage()";
+	}
+
 	/** Decode message body from binary data */
 	void CqlSupportedMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
 		// The body of a SUPPORTED message is a [string multimap]

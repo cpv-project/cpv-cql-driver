@@ -9,6 +9,11 @@ namespace cql {
 		batchParameters_.reset();
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlBatchMessage::toString() const {
+		return joinString("", "CqlBatchMessage(type: ", getType(), ")");
+	}
+
 	/** Encode message body to binary data */
 	void CqlBatchMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
 		// The body of the message must be:

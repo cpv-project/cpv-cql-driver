@@ -8,6 +8,11 @@ namespace cql {
 		queryParameters_.reset();
 	}
 
+	/** Get description of this message */
+	seastar::sstring CqlQueryMessage::toString() const {
+		return joinString("", "CqlQueryMessage(query: ", query_.get(), ")");
+	}
+
 	/** Encode message body to binary data */
 	void CqlQueryMessage::encodeBody(const CqlConnectionInfo&, seastar::sstring& data) const {
 		// The body of the message must be: <query><query_parameters>
