@@ -67,15 +67,19 @@ namespace cql {
 						return self->connector_->connect(*self->nodeConfiguration_, address);
 					} else {
 						// seastar's socket_address only support ipv4 now so throw a exception for ipv6
-						throw CqlNotImplementedException(CQL_CODEINFO, "ipv6 address isn't supported yet");
+						return seastar::make_exception_future<seastar::connected_socket>(
+							CqlNotImplementedException(CQL_CODEINFO, "ipv6 address is unsupported yet"));
 					}
 				});
 			}
 		}).then([self] (seastar::connected_socket fd) {
 			self->socket_ = std::move(fd);
+			self->readStream_ = self->socket_.input();
+			self->writeStream_ = self->socket_.output();
 		}).handle_exception([self] (std::exception_ptr ex) {
-			throw CqlNetworkException(CQL_CODEINFO, "connect to",
-				self->nodeConfiguration_->getAddress().first, "failed:", ex);
+			return seastar::make_exception_future(CqlNetworkException(
+				CQL_CODEINFO, "connect to",
+				self->nodeConfiguration_->getAddress().first, "failed:", ex));
 		}).then([self] {
 			// send OPTION
 
@@ -101,6 +105,7 @@ namespace cql {
 			std::size_t nextStreamId = (lastOpenedStream_ + i) % j;
 			auto& state = streamStates_[nextStreamId];
 			if (state.get() == nullptr) {
+				// lazy initialize
 				state = seastar::make_lw_shared<CqlConnection::Stream::State>();
 			}
 			if (!state->isInUse) {
@@ -114,7 +119,42 @@ namespace cql {
 	/** Send a message to the given stream and wait for success */
 	seastar::future<> CqlConnection::sendMessage(
 		CqlObject<CqlRequestMessageBase>&& message, const CqlConnection::Stream& stream) {
-		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+		// ensure only one message is sending at the same time
+		message->getHeader().setStreamId(stream.getStreamId());
+		auto previousSendingFuture = std::move(sendingFuture_);
+		seastar::promise<> sendingPromise;
+		sendingFuture_ = sendingPromise.get_future();
+		auto self = shared_from_this();
+		return seastar::do_with(
+			std::move(self),
+			std::move(message),
+			std::move(sendingPromise),
+			std::move(previousSendingFuture), [] (
+			auto& self,
+			auto& message,
+			auto& sendingPromise,
+			auto& previousSendingFuture) {
+			return previousSendingFuture.then([&self, &message] {
+				// encode message to binary data
+				self->sendingBuffer_.resize(0);
+				message->getHeader().encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
+				message->encodeBody(self->connectionInfo_, self->sendingBuffer_);
+				message->getHeader().encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
+				// send the encoded binary data
+				return self->writeStream_.write(self->sendingBuffer_).then([&self] {
+					return self->writeStream_.flush();
+				});
+			}).then([&self, &sendingPromise] {
+				// this message is successful, allow next message to start sending
+				sendingPromise.set_value();
+			}).handle_exception([&self, &sendingPromise] (std::exception_ptr ex) {
+				// this message is failed, report the error to both waiters
+				sendingPromise.set_exception(ex);
+				return seastar::make_exception_future(CqlNetworkException(
+					CQL_CODEINFO, "send message to",
+					self->nodeConfiguration_->getAddress().first, "failed:", ex));
+			});
+		});
 	}
 
 	/** Wait for the next message from the given stream */
@@ -144,14 +184,15 @@ namespace cql {
 		connector_(connector),
 		authenticator_(authenticator),
 		socket_(),
+		readStream_(),
+		writeStream_(),
 		isReady_(false),
 		connectionInfo_(),
 		streamStates_(nodeConfiguration_->getMaxStream()),
 		streamZero_(0, nullptr),
 		lastOpenedStream_(0),
-		sendPromiseMap_(nodeConfiguration_->getMaxStream()),
-		sendMessageQueue_(nodeConfiguration_->getMaxStream()),
-		senderIsStarted_(false),
+		sendingFuture_(seastar::make_ready_future<>()),
+		sendingBuffer_(),
 		receivePromiseMap_(nodeConfiguration_->getMaxStream()),
 		receiveMessageQueueMap_(),
 		receivePromiseCount_(0),
@@ -164,19 +205,6 @@ namespace cql {
 		auto state = seastar::make_lw_shared<Stream::State>();
 		streamStates_.at(0) = state;
 		streamZero_ = Stream(0, state);
-	}
-
-	/** Start background message sender */
-	void CqlConnection::startSender() {
-		// sender will only run when needed
-		// if we make sender to run forever, it will be very hard to control connection's livetime
-		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
-	}
-
-	/** Start background message receiver */
-	void CqlConnection::startReceiver() {
-		// receiver will only run when needed, same as above
-		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
 	}
 }
 

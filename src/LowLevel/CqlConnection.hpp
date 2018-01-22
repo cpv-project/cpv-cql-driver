@@ -48,15 +48,12 @@ namespace cql {
 		 */
 		Stream openStream();
 
-		/**
-		 * Send a message to the given stream and wait for success.
-		 * Only one message can be sent at a time for the same stream.
-		 */
+		/** Send a message to the given stream and wait for success.  */
 		seastar::future<> sendMessage(CqlObject<CqlRequestMessageBase>&& message, const Stream& stream);
 
 		/**
 		 * Wait for the next message from the given stream.
-		 * Only one message can be received at a time for the same stream.
+		 * Only one waiter can register at a time for each stream.
 		 */
 		seastar::future<CqlObject<CqlResponseMessageBase>> waitNextMessage(const Stream& stream);
 
@@ -73,25 +70,14 @@ namespace cql {
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
 
 	private:
-		/**
-		 * Start background message sender.
-		 * Only one sender can run at the same time, and it will exit after jobs are finished.
-		 */
-		void startSender();
-
-		/**
-		 * Start background message receiver.
-		 * Only one receiver and run at the same time, and it will exit after jobs are finished.
-		 */
-		void startReceiver();
-
-	private:
 		seastar::shared_ptr<CqlSessionConfiguration> sessionConfiguration_;
 		seastar::shared_ptr<CqlNodeConfiguration> nodeConfiguration_;
 		seastar::shared_ptr<CqlConnectorBase> connector_;
 		seastar::shared_ptr<CqlAuthenticatorBase> authenticator_;
 
 		seastar::connected_socket socket_;
+		seastar::input_stream<char> readStream_;
+		seastar::output_stream<char> writeStream_;
 		bool isReady_;
 		CqlConnectionInfo connectionInfo_;
 
@@ -99,9 +85,8 @@ namespace cql {
 		Stream streamZero_;
 		std::size_t lastOpenedStream_;
 
-		std::vector<std::pair<bool, seastar::promise<>>> sendPromiseMap_;
-		seastar::queue<CqlObject<CqlRequestMessageBase>> sendMessageQueue_;
-		bool senderIsStarted_;
+		seastar::future<> sendingFuture_;
+		seastar::sstring sendingBuffer_;
 
 		std::vector<std::pair<bool, seastar::promise<>>> receivePromiseMap_;
 		std::vector<seastar::queue<CqlObject<CqlResponseMessageBase>>> receiveMessageQueueMap_;
