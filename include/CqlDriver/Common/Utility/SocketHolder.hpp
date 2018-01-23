@@ -6,7 +6,7 @@
 namespace cql {
 	/**
 	 * Class use to delay the memory release phase of socket instance
-	 * Since close a socket is an asynchronous operation and destructor is not,
+	 * Since close a socket is an asynchronous operation and destruction is not,
 	 * delete a socket without close it and it's opened stream will cause use-after-free error,
 	 * this class will help close the socket in background and the destructor can return immediately.
 	 */
