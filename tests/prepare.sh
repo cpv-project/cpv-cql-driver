@@ -7,6 +7,11 @@ cd ../3rd-party/cpv-manage-scripts/scylla
 sh docker_setup.sh
 sh ssl_generate_cadb.sh || true
 
+# trust the ca certificate
+sudo mkdir -p /usr/local/share/ca-certificates
+sudo cp -f ~/scylla-keys/cadb.pem /usr/local/share/ca-certificates/cadb.crt
+sudo update-ca-certificates
+
 # create 1 scylla server without password and ssl
 docker rm -f db-simple-1 || true
 docker run \

@@ -12,7 +12,7 @@ TEST_FUTURE(TestConnection, waitForReadySimple) {
 	return connection->ready();
 }
 
-/* TEST_FUTURE(TestConnection, waitForReadySsl) {
+TEST_FUTURE(TestConnection, waitForReadySsl) {
 	auto connection = seastar::make_shared<cql::CqlConnection>(
 		seastar::make_shared<cql::CqlSessionConfiguration>(),
 		seastar::make_shared<cql::CqlNodeConfiguration>(
@@ -21,7 +21,7 @@ TEST_FUTURE(TestConnection, waitForReadySimple) {
 				.setUseSsl(true)
 				.setUseCompression(true)));
 	return connection->ready();
-} TODO: enable it */
+}
 
 TEST_FUTURE(TestConnection, waitForReadyFailed) {
 	auto connection = seastar::make_shared<cql::CqlConnection>(
