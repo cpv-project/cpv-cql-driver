@@ -4,6 +4,7 @@
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlNetworkException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlConnectionInitializeException.hpp>
 #include "./Connectors/CqlConnectorFactory.hpp"
 #include "./Authenticators/CqlAuthenticatorFactory.hpp"
 #include "./RequestMessages/CqlRequestMessageFactory.hpp"
@@ -22,7 +23,7 @@ namespace cql {
 		}
 		auto self = shared_from_this();
 		return seastar::futurize_apply([self] {
-			// build connection
+			// connect to database server
 			seastar::socket_address address;
 			if (self->nodeConfiguration_->getIpAddress(
 				address, self->sessionConfiguration_->getDnsCacheTime())) {
@@ -43,8 +44,10 @@ namespace cql {
 				});
 			}
 		}).then([self] (seastar::connected_socket fd) {
+			// connect successful
 			self->socket_ = SocketHolder(std::move(fd));
 		}).handle_exception([self] (std::exception_ptr ex) {
+			// connect failed
 			return seastar::make_exception_future(CqlNetworkException(
 				CQL_CODEINFO, "connect to",
 				self->nodeConfiguration_->getAddress().first, "failed:", ex));
@@ -67,8 +70,13 @@ namespace cql {
 			// perform authentication
 			return self->authenticator_->authenticate(self, self->streamZero_);
 		}).then([self] {
-			// ready now
+			// the connection is ready
 			self->isReady_ = true;
+		}).handle_exception([self] (std::exception_ptr ex) {
+			// initialize failed
+			return seastar::make_exception_future(CqlConnectionInitializeException(
+				CQL_CODEINFO, "initialize connection to",
+				self->nodeConfiguration_->getAddress().first, "failed:", ex));
 		});
 	}
 
