@@ -10,13 +10,21 @@
 	} \
 	static seastar::future<> caseName##_##testName##_FutureTestBody()
 
-#define ASSERT_THROWS(exception, expression) \
+#define ASSERT_THROWS_CONTAINS(exception, expression, contains) \
 	do { \
 		try { expression; } \
-		catch (const exception&) { break; } \
+		catch (const exception& ex) { \
+			std::string message(ex.what()); \
+			if (message.find(contains) == std::string::npos) { \
+				FAIL() << "exception message didn't contains excepted words: " << message; \
+			} \
+			break; \
+		} \
 		catch (...) { throw; } \
-		ASSERT_FALSE("No exception throws"); \
+		FAIL() << "No exception throws"; \
 	} while (0)
+
+#define ASSERT_THROWS(exception, expression) ASSERT_THROWS_CONTAINS(exception, expression, "")
 
 namespace cql {
 	namespace Internal_Gtest {

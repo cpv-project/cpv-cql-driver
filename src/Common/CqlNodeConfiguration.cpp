@@ -66,6 +66,7 @@ namespace cql {
 		seastar::sstring&& username, seastar::sstring&& password) {
 		authenticatorClass_ = CqlAuthenticatorClasses::PasswordAuthenticator;
 		authenticatorData_.resize(0);
+		authenticatorData_.append("\x00", 1);
 		authenticatorData_.append(username.c_str(), username.size());
 		authenticatorData_.append("\x00", 1);
 		authenticatorData_.append(password.c_str(), password.size());

@@ -50,7 +50,7 @@ namespace cql {
 			// connect failed
 			return seastar::make_exception_future(CqlNetworkException(
 				CQL_CODEINFO, "connect to",
-				self->nodeConfiguration_->getAddress().first, "failed:", ex));
+				self->nodeConfiguration_->getAddress().first, "failed:\n", ex));
 		}).then([self] {
 			// send OPTION
 			auto optionMessage = CqlRequestMessageFactory::makeRequestMessage<CqlOptionsMessage>();
@@ -76,7 +76,7 @@ namespace cql {
 			// initialize failed
 			return seastar::make_exception_future(CqlConnectionInitializeException(
 				CQL_CODEINFO, "initialize connection to",
-				self->nodeConfiguration_->getAddress().first, "failed:", ex));
+				self->nodeConfiguration_->getAddress().first, "failed:\n", ex));
 		});
 	}
 

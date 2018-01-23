@@ -22,6 +22,15 @@ namespace cql {
 	class CqlConnection :
 		public seastar::enable_shared_from_this<CqlConnection> {
 	public:
+		/** Get the session configuration used by this connection */
+		const CqlSessionConfiguration& getSessionConfiguration() const& { return *sessionConfiguration_; }
+
+		/** Get the node configuration used by this connection */
+		const CqlNodeConfiguration& getNodeConfiguration() const& { return *nodeConfiguration_; }
+
+		/** Get the connection information */
+		const CqlConnectionInfo& getConnectionInfo() const& { return connectionInfo_; }
+
 		/** Initialize connection and wait until it's ready to send ordinary messages */
 		seastar::future<> ready();
 

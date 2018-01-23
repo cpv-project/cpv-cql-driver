@@ -33,7 +33,7 @@ TEST(TestCqlNodeConfiguration, all) {
 		ASSERT_EQ(configuration.getMaxStreams(), 21);
 		ASSERT_EQ(configuration.getMaxPendingMessages(), 22);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::CqlAuthenticatorClasses::PasswordAuthenticator);
-		ASSERT_EQ(configuration.getAuthenticatorData(), makeTestString("abc""\x00""asdfg"));
+		ASSERT_EQ(configuration.getAuthenticatorData(), makeTestString("\x00""abc""\x00""asdfg"));
 		seastar::socket_address address;
 		ASSERT_TRUE(configuration.getIpAddress(address, std::chrono::milliseconds(1000)));
 		ASSERT_EQ(cql::joinString("", address), "127.0.0.1:9000");

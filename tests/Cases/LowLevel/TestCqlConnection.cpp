@@ -1,4 +1,4 @@
-#include <CqlDriver/Common/Exceptions/CqlNetworkException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlConnectionInitializeException.hpp>
 #include <LowLevel/CqlConnection.hpp>
 #include <TestUtility/GTestUtils.hpp>
 #include <core/sleep.hh>
@@ -19,18 +19,51 @@ TEST_FUTURE(TestConnection, waitForReadySsl) {
 			cql::CqlNodeConfiguration()
 				.setAddress(DB_SSL_1_IP, DB_SSL_1_PORT)
 				.setUseSsl(true)
-				.setUseCompression(true)));
+				.setUseCompression(true)
+				.setPasswordAuthentication("cassandra", "cassandra")));
 	return connection->ready();
 }
 
-TEST_FUTURE(TestConnection, waitForReadyFailed) {
+TEST_FUTURE(TestConnection, waitForReadyConnectFailed) {
 	auto connection = seastar::make_shared<cql::CqlConnection>(
 		seastar::make_shared<cql::CqlSessionConfiguration>(),
 		seastar::make_shared<cql::CqlNodeConfiguration>(
 			cql::CqlNodeConfiguration()
 				.setAddress("host.not.exist", 123)));
 	return connection->ready().then_wrapped([] (auto&& f) {
-		ASSERT_THROWS(cql::CqlNetworkException, f.get());
+		ASSERT_THROWS_CONTAINS(
+			cql::CqlConnectionInitializeException, f.get(),
+			"connect to host.not.exist failed:");
+	});
+}
+
+TEST_FUTURE(TestConnection, waitForReadyAllowAllAuthenticateFailed) {
+	auto connection = seastar::make_shared<cql::CqlConnection>(
+		seastar::make_shared<cql::CqlSessionConfiguration>(),
+		seastar::make_shared<cql::CqlNodeConfiguration>(
+			cql::CqlNodeConfiguration()
+				.setAddress(DB_SSL_1_IP, DB_SSL_1_PORT)
+				.setUseSsl(true)));
+	return connection->ready().then_wrapped([] (auto&& f) {
+		ASSERT_THROWS_CONTAINS(
+			cql::CqlConnectionInitializeException, f.get(),
+			"server required authentication: org.apache.cassandra.auth.PasswordAuthenticator");
+	});
+}
+
+TEST_FUTURE(TestConnection, waitForReadyPasswordAuthenticateFailed) {
+	auto connection = seastar::make_shared<cql::CqlConnection>(
+		seastar::make_shared<cql::CqlSessionConfiguration>(),
+		seastar::make_shared<cql::CqlNodeConfiguration>(
+			cql::CqlNodeConfiguration()
+				.setAddress(DB_SSL_1_IP, DB_SSL_1_PORT)
+				.setUseSsl(true)
+				.setUseCompression(true)
+				.setPasswordAuthentication("cassandra", "cassandra_")));
+	return connection->ready().then_wrapped([] (auto&& f) {
+		ASSERT_THROWS_CONTAINS(
+			cql::CqlConnectionInitializeException, f.get(),
+			"authenticate with password failed: CqlErrorMessage");
 	});
 }
 

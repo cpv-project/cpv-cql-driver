@@ -100,8 +100,8 @@ namespace cql {
 
 	/** The full class name of the IAuthenticator in use */
 	namespace CqlAuthenticatorClasses {
-		static const char* AllowAllAuthenticator = "AllowAllAuthenticator";
-		static const char* PasswordAuthenticator = "PasswordAuthenticator";
+		static const char* AllowAllAuthenticator = "org.apache.cassandra.auth.AllowAllAuthenticator";
+		static const char* PasswordAuthenticator = "org.apache.cassandra.auth.PasswordAuthenticator";
 	}
 }
 
