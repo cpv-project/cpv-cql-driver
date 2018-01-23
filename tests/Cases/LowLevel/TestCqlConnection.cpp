@@ -44,7 +44,7 @@ TEST(TestConnection, openStream) {
 				.setMaxStreams(testMaxStream)));
 	for (std::size_t i = 0; i < 3; ++i) {
 		// test 3 round
-		std::vector<cql::CqlConnection::Stream> streams;
+		std::vector<cql::CqlConnectionStream> streams;
 		for (std::size_t j = 1; j < testMaxStream; ++j) {
 			// stream 0 is reserved
 			auto stream = connection->openStream();

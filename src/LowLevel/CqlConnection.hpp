@@ -10,6 +10,7 @@
 #include "./RequestMessages/CqlRequestMessageBase.hpp"
 #include "./ResponseMessages/CqlResponseMessageBase.hpp"
 #include "CqlConnectionInfo.hpp"
+#include "CqlConnectionStream.hpp"
 
 namespace cql {
 	/**
@@ -20,24 +21,6 @@ namespace cql {
 	class CqlConnection :
 		public seastar::enable_shared_from_this<CqlConnection> {
 	public:
-		/** Representing an in use stream */
-		class Stream {
-		public:
-			struct State { bool isInUse; State() : isInUse(false) { } };
-			std::uint16_t getStreamId() const { return streamId_; }
-			bool isValid() const { return state_.get() != nullptr; }
-			Stream(std::uint16_t streamId, const seastar::lw_shared_ptr<State>& state);
-			Stream(const Stream&) = delete;
-			Stream& operator=(const Stream&) = delete;
-			Stream(Stream&& stream);
-			Stream& operator=(Stream&& stream);
-			~Stream();
-
-		private:
-			std::uint16_t streamId_;
-			seastar::lw_shared_ptr<State> state_;
-		};
-
 		/** Initialize connection and wait until it's ready to send ordinary messages */
 		seastar::future<> ready();
 
@@ -46,16 +29,19 @@ namespace cql {
 		 * If the maximum numbers of streams have reached a invalid Stream object will be returned.
 		 * Please don't forget to check stream.isValid().
 		 */
-		Stream openStream();
+		CqlConnectionStream openStream();
 
 		/** Send a message to the given stream and wait for success.  */
-		seastar::future<> sendMessage(CqlObject<CqlRequestMessageBase>&& message, const Stream& stream);
+		seastar::future<> sendMessage(
+			CqlObject<CqlRequestMessageBase>&& message,
+			const CqlConnectionStream& stream);
 
 		/**
 		 * Wait for the next message from the given stream.
 		 * Only one waiter can register at a time for each stream.
 		 */
-		seastar::future<CqlObject<CqlResponseMessageBase>> waitNextMessage(const Stream& stream);
+		seastar::future<CqlObject<CqlResponseMessageBase>> waitNextMessage(
+			const CqlConnectionStream& stream);
 
 		/** Constructor */
 		CqlConnection(
@@ -95,8 +81,8 @@ namespace cql {
 		bool isReady_;
 		CqlConnectionInfo connectionInfo_;
 
-		std::vector<seastar::lw_shared_ptr<Stream::State>> streamStates_;
-		Stream streamZero_;
+		std::vector<seastar::lw_shared_ptr<CqlConnectionStream::State>> streamStates_;
+		CqlConnectionStream streamZero_;
 		std::size_t lastOpenedStream_;
 
 		seastar::future<> sendingFuture_;

@@ -15,40 +15,6 @@
 #include <core/sleep.hh>
 
 namespace cql {
-	/** Constructor */
-	CqlConnection::Stream::Stream(std::uint16_t streamId, const seastar::lw_shared_ptr<State>& state) :
-		streamId_(streamId),
-		state_(state) {
-		if (state_.get() != nullptr) {
-			if (state_->isInUse) {
-				throw CqlLogicException(CQL_CODEINFO, "construct stream with a already in use state");
-			}
-			state_->isInUse = true;
-		}
-	}
-
-	/** Move constructor */
-	CqlConnection::Stream::Stream(CqlConnection::Stream&& stream) :
-		streamId_(stream.streamId_),
-		state_(std::move(stream.state_)) {
-		stream.state_ = nullptr;
-	}
-
-	/** Move assignment */
-	CqlConnection::Stream& CqlConnection::Stream::operator=(CqlConnection::Stream&& stream) {
-		if (&stream != this) {
-			new (this) CqlConnection::Stream(std::move(stream));
-		}
-		return *this;
-	}
-
-	/** Destructor */
-	CqlConnection::Stream::~Stream() {
-		if (state_.get() != nullptr) {
-			state_->isInUse = false;
-		}
-	}
-	
 	/** Initialize connection and wait until it's ready to send ordinary messages */
 	seastar::future<> CqlConnection::ready() {
 		if (isReady_) {
@@ -111,31 +77,37 @@ namespace cql {
 	}
 
 	/** Open a new stream */
-	CqlConnection::Stream CqlConnection::openStream() {
+	CqlConnectionStream CqlConnection::openStream() {
 		// OPTIMIZE: it's a O(n) search, can we do better here?
 		for (std::size_t i = 1, j = streamStates_.size(); i < j; ++i) {
 			std::size_t nextStreamId = (lastOpenedStream_ + i) % j;
 			auto& state = streamStates_[nextStreamId];
 			if (state.get() == nullptr) {
 				// lazy initialize
-				state = seastar::make_lw_shared<CqlConnection::Stream::State>();
+				state = seastar::make_lw_shared<CqlConnectionStream::State>();
 			}
 			if (!state->isInUse) {
 				lastOpenedStream_ = nextStreamId;
-				return CqlConnection::Stream(nextStreamId, state);
+				return CqlConnectionStream(nextStreamId, state);
 			}
 		}
-		return CqlConnection::Stream(0, nullptr);
+		return CqlConnectionStream(0, nullptr);
 	}
 
 	/** Send a message to the given stream and wait for success */
 	seastar::future<> CqlConnection::sendMessage(
-		CqlObject<CqlRequestMessageBase>&& message, const CqlConnection::Stream& stream) {
-		// check connection state
+		CqlObject<CqlRequestMessageBase>&& message,
+		const CqlConnectionStream& stream) {
+		// check the connection state
 		if (!isConnected_) {
 			return seastar::make_exception_future(
 				CqlNetworkException(CQL_CODEINFO,
 				"connection is not connected, either ready() is not called or it's closed"));
+		}
+		// check the stream state
+		if (!stream.isValid()) {
+			return seastar::make_exception_future(
+				CqlLogicException(CQL_CODEINFO, "invalid stream"));
 		}
 		// ensure only one message is sending at the same time
 		message->getHeader().setStreamId(stream.getStreamId());
@@ -177,12 +149,17 @@ namespace cql {
 
 	/** Wait for the next message from the given stream */
 	seastar::future<CqlObject<CqlResponseMessageBase>> CqlConnection::waitNextMessage(
-		const CqlConnection::Stream& stream) {
+		const CqlConnectionStream& stream) {
 		// check connection state
 		if (!isConnected_) {
 			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
 				CqlNetworkException(CQL_CODEINFO,
 				"connection is not connected, either ready() is not called or it's closed"));
+		}
+		// check the stream state
+		if (!stream.isValid()) {
+			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
+				CqlLogicException(CQL_CODEINFO, "invalid stream"));
 		}
 		// try getting message directly from received queue
 		auto streamId = stream.getStreamId();
@@ -226,7 +203,8 @@ namespace cql {
 							// find the corresponding promise
 							auto streamId = message->getHeader().getStreamId();
 							if (streamId >= self->receivedMessageQueueMap_.size()) {
-								self->close(joinString(" ", "stream id of received message out of range:", streamId));
+								self->close(joinString(" ",
+									"stream id of received message out of range:", streamId));
 								return seastar::stop_iteration::yes;
 							}
 							auto& promiseSlot = self->receivingPromiseMap_[streamId];
@@ -242,7 +220,8 @@ namespace cql {
 							} else {
 								// enqueue message to received queue
 								if (!self->receivedMessageQueueMap_[streamId].push(std::move(message))) {
-									self->close(joinString(" ", "max pending messages is reached, stream id:", streamId));
+									self->close(joinString(" ",
+										"max pending messages is reached, stream id:", streamId));
 									return seastar::stop_iteration::yes;
 								}
 							}
@@ -302,9 +281,9 @@ namespace cql {
 			receivedMessageQueueMap_.emplace_back(nodeConfiguration->getMaxPendingMessages());
 		}
 		// open stream zero, which is for internal communication
-		auto state = seastar::make_lw_shared<Stream::State>();
+		auto state = seastar::make_lw_shared<CqlConnectionStream::State>();
 		streamStates_.at(0) = state;
-		streamZero_ = Stream(0, state);
+		streamZero_ = CqlConnectionStream(0, state);
 	}
 
 	/** Destructor */

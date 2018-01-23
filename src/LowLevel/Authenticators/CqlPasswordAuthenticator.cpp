@@ -3,7 +3,9 @@
 
 namespace cql {
 	/** Perform the authentication */
-	seastar::future<> CqlPasswordAuthenticator::authenticate(CqlConnection&) const {
+	seastar::future<> CqlPasswordAuthenticator::authenticate(
+		const seastar::shared_ptr<CqlConnection>& connection,
+		const CqlConnectionStream& stream) const {
 		// TODO
 		throw CqlNotImplementedException(CQL_CODEINFO);
 	}
