@@ -10,7 +10,7 @@ namespace cql {
 	/** Get description of this message */
 	seastar::sstring CqlAuthenticateMessage::toString() const {
 		return joinString("",
-			"CqlAuthChallengeMessage(authenticatorClass: ", authenticatorClass_.get(), ")");
+			"CqlAuthenticateMessage(authenticatorClass: ", authenticatorClass_.get(), ")");
 	}
 
 	/** Decode message body from binary data */
