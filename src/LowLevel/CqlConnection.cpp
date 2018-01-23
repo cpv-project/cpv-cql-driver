@@ -43,10 +43,7 @@ namespace cql {
 				});
 			}
 		}).then([self] (seastar::connected_socket fd) {
-			self->socket_ = std::move(fd);
-			self->readStream_ = self->socket_.input();
-			self->writeStream_ = self->socket_.output();
-			self->isConnected_ = true;
+			self->socket_ = SocketHolder(std::move(fd));
 		}).handle_exception([self] (std::exception_ptr ex) {
 			return seastar::make_exception_future(CqlNetworkException(
 				CQL_CODEINFO, "connect to",
@@ -62,14 +59,13 @@ namespace cql {
 			// send STARTUP
 			if (message->getHeader().getOpCode() != CqlMessageType::Supported) {
 				return seastar::make_exception_future(CqlLogicException(
-					CQL_CODEINFO, "unexcepted response to OPTION message: ", message->toString()));
+					CQL_CODEINFO, "unexcepted response to OPTION message:", message->toString()));
 			}
 			auto startupMessage = CqlRequestMessageFactory::makeRequestMessage<CqlStartupMessage>();
 			return self->sendMessage(std::move(startupMessage), self->streamZero_);
 		}).then([self] {
 			// perform authentication
-			// TODO
-			return seastar::sleep(std::chrono::seconds(3));
+			return self->authenticator_->authenticate(self, self->streamZero_);
 		}).then([self] {
 			// ready now
 			self->isReady_ = true;
@@ -98,12 +94,6 @@ namespace cql {
 	seastar::future<> CqlConnection::sendMessage(
 		CqlObject<CqlRequestMessageBase>&& message,
 		const CqlConnectionStream& stream) {
-		// check the connection state
-		if (!isConnected_) {
-			return seastar::make_exception_future(
-				CqlNetworkException(CQL_CODEINFO,
-				"connection is not connected, either ready() is not called or it's closed"));
-		}
 		// check the stream state
 		if (!stream.isValid()) {
 			return seastar::make_exception_future(
@@ -131,8 +121,8 @@ namespace cql {
 				message->encodeBody(self->connectionInfo_, self->sendingBuffer_);
 				message->getHeader().encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
 				// send the encoded binary data
-				return self->writeStream_.write(self->sendingBuffer_).then([&self] {
-					return self->writeStream_.flush();
+				return self->socket_.out().write(self->sendingBuffer_).then([&self] {
+					return self->socket_.out().flush();
 				});
 			}).then([&self, &sendingPromise] {
 				// this message is successful, allow next message to start sending
@@ -150,12 +140,6 @@ namespace cql {
 	/** Wait for the next message from the given stream */
 	seastar::future<CqlObject<CqlResponseMessageBase>> CqlConnection::waitNextMessage(
 		const CqlConnectionStream& stream) {
-		// check connection state
-		if (!isConnected_) {
-			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
-				CqlNetworkException(CQL_CODEINFO,
-				"connection is not connected, either ready() is not called or it's closed"));
-		}
 		// check the stream state
 		if (!stream.isValid()) {
 			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
@@ -181,7 +165,7 @@ namespace cql {
 			seastar::do_with(std::move(self), [](auto& self) {
 				return seastar::repeat([&self] {
 					// receive message header
-					return self->readStream_.read_exactly(self->connectionInfo_.getHeaderSize())
+					return self->socket_.in().read_exactly(self->connectionInfo_.getHeaderSize())
 					.then([&self] (seastar::temporary_buffer<char> buf) {
 						const char* ptr = buf.begin();
 						const char* end = buf.end();
@@ -194,7 +178,7 @@ namespace cql {
 								seastar::stop_iteration::yes);
 						}
 						// receive message body
-						return self->readStream_.read_exactly(bodyLength)
+						return self->socket_.in().read_exactly(bodyLength)
 						.then([&self, header=std::move(header)] (seastar::temporary_buffer<char> buf) mutable {
 							const char* ptr = buf.begin();
 							const char* end = buf.end();
@@ -263,9 +247,6 @@ namespace cql {
 		connector_(connector),
 		authenticator_(authenticator),
 		socket_(),
-		readStream_(),
-		writeStream_(),
-		isConnected_(false),
 		isReady_(false),
 		connectionInfo_(),
 		streamStates_(nodeConfiguration_->getMaxStreams()),
@@ -297,14 +278,9 @@ namespace cql {
 
 	/** Close the connection */
 	void CqlConnection::close(const seastar::sstring& errorMessage) {
-		if (!isConnected_) {
-			return;
-		}
-		isConnected_ = false;
+		// close the socket and reset the ready state
+		socket_ = SocketHolder();
 		isReady_ = false;
-		readStream_ = {};
-		writeStream_ = {};
-		socket_ = {};
 		// notify all message waiters
 		receivingPromiseCount_ = 0;
 		for (auto& slot : receivingPromiseMap_) {

@@ -25,7 +25,9 @@ namespace cql {
 	/** Move assignment */
 	CqlConnectionStream& CqlConnectionStream::operator=(CqlConnectionStream&& stream) {
 		if (&stream != this) {
-			new (this) CqlConnectionStream(std::move(stream));
+			streamId_ = stream.streamId_;
+			state_ = std::move(stream.state_);
+			stream.state_ = nullptr;
 		}
 		return *this;
 	}
@@ -33,6 +35,7 @@ namespace cql {
 	/** Destructor */
 	CqlConnectionStream::~CqlConnectionStream() {
 		if (state_.get() != nullptr) {
+			// no longer use this stream
 			state_->isInUse = false;
 		}
 	}

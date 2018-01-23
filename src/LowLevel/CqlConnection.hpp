@@ -3,6 +3,7 @@
 #include <utility>
 #include <core/queue.hh>
 #include <CqlDriver/Common/Utility/CqlObject.hpp>
+#include <CqlDriver/Common/Utility/SocketHolder.hpp>
 #include <CqlDriver/Common/CqlSessionConfiguration.hpp>
 #include <CqlDriver/Common/CqlNodeConfiguration.hpp>
 #include "./Connectors/CqlConnectorBase.hpp"
@@ -74,10 +75,7 @@ namespace cql {
 		seastar::shared_ptr<CqlConnectorBase> connector_;
 		seastar::shared_ptr<CqlAuthenticatorBase> authenticator_;
 
-		seastar::connected_socket socket_;
-		seastar::input_stream<char> readStream_;
-		seastar::output_stream<char> writeStream_;
-		bool isConnected_;
+		SocketHolder socket_;
 		bool isReady_;
 		CqlConnectionInfo connectionInfo_;
 
