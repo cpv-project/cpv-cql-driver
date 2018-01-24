@@ -1,5 +1,6 @@
 #include <core/app-template.hh>
 #include <core/thread.hh>
+#include <core/sleep.hh>
 #include "GTestUtils.hpp"
 
 namespace cql {
@@ -13,6 +14,8 @@ namespace cql {
 					return RUN_ALL_TESTS();
 				}).then([&returnValue] (int result) {
 					returnValue = result;
+					// wait 1s for cleanup
+					return seastar::sleep(std::chrono::seconds(1));
 				});
 			});
 			return returnValue;

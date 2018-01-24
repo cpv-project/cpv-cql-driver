@@ -110,24 +110,23 @@ CqlConnectionPool
 			return (connection, stream)
 
 	getConnection()
-		loop
-			if connection count < min pool size
-				makeConnection()
-				stream = connection.getStream()
-				assert stream.isValid()
-				return (connection, stream)
-			connection, stream = tryGetConnection()
-			if ok
-				return (connection, stream)
-			if connection count < max pool size
-				makeConnection()
-				stream = connection.getStream()
-				assert stream.isValid()
-				return (connection, stream)
-			make promise
-			push promise to waiting queue
-			connection, stream = wait future
+		if connection count < min pool size
+			makeConnection()
+			stream = connection.getStream()
+			assert stream.isValid()
 			return (connection, stream)
+		connection, stream = tryGetConnection()
+		if ok
+			return (connection, stream)
+		if connection count < max pool size
+			makeConnection()
+			stream = connection.getStream()
+			assert stream.isValid()
+			return (connection, stream)
+		make promise
+		push promise to waiting queue
+		connection, stream = wait future
+		return (connection, stream)
 
 	notifyConnectionBecomeIdle(connection)
 		stream = connection.getStream()
