@@ -101,11 +101,6 @@ namespace cql {
 	seastar::future<> CqlConnection::sendMessage(
 		CqlObject<CqlRequestMessageBase>&& message,
 		const CqlConnectionStream& stream) {
-		// check the stream state
-		if (!stream.isValid()) {
-			return seastar::make_exception_future(
-				CqlLogicException(CQL_CODEINFO, "invalid stream"));
-		}
 		// ensure only one message is sending at the same time
 		message->getHeader().setStreamId(stream.getStreamId());
 		auto previousSendingFuture = std::move(sendingFuture_);
@@ -147,11 +142,6 @@ namespace cql {
 	/** Wait for the next message from the given stream */
 	seastar::future<CqlObject<CqlResponseMessageBase>> CqlConnection::waitNextMessage(
 		const CqlConnectionStream& stream) {
-		// check the stream state
-		if (!stream.isValid()) {
-			return seastar::make_exception_future<CqlObject<CqlResponseMessageBase>>(
-				CqlLogicException(CQL_CODEINFO, "invalid stream"));
-		}
 		// try getting message directly from received queue
 		auto streamId = stream.getStreamId();
 		auto& queue = receivedMessageQueueMap_.at(streamId);
