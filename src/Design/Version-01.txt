@@ -94,3 +94,52 @@ CqlConnection
 		set receiver started flag to false
 		# no race condition here, same as above
 
+==========================================
+
+CqlConnectionPool
+	makeConnection()
+		select node from CqlNodeCollection
+		make connection from node
+		connections.emplace_back(connection)
+		return connection
+
+	tryGetConnection()
+		find connection with smallest stream count
+		stream = connection.getStream()
+		if stream.isValid()
+			return (connection, stream)
+
+	getConnection()
+		loop
+			if connection count < min pool size
+				makeConnection()
+				stream = connection.getStream()
+				assert stream.isValid()
+				return (connection, stream)
+			connection, stream = tryGetConnection()
+			if ok
+				return (connection, stream)
+			if connection count < max pool size
+				makeConnection()
+				stream = connection.getStream()
+				assert stream.isValid()
+				return (connection, stream)
+			make promise
+			push promise to waiting queue
+			connection, stream = wait future
+			return (connection, stream)
+
+	notifyConnectionBecomeIdle(connection)
+		stream = connection.getStream()
+		assert stream.isValid()
+		take promise from queue and set value
+
+	findConnectionBecomeIdleTimer()
+		sleep sometime
+		if waiting queue not empty
+			connection, stream = tryGetConnection()
+			if ok
+				take promise from queue and set value
+		if waiting queue not empty
+			findConnectionBecomeIdleTimer()
+
