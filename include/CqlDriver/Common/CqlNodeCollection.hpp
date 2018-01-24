@@ -8,7 +8,7 @@ namespace cql {
 	class CqlNodeCollection {
 	public:
 		/** Choose a node for the new database connection */
-		virtual seastar::shared_ptr<CqlNodeConfiguration> chooseOneNode() = 0;
+		virtual seastar::lw_shared_ptr<CqlNodeConfiguration> chooseOneNode() = 0;
 		
 		/** Report connect to this node has failed */
 		virtual void reportFailure(const seastar::shared_ptr<CqlNodeConfiguration>& node) = 0;

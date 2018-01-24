@@ -225,8 +225,8 @@ namespace cql {
 
 	/** Constructor */
 	CqlConnection::CqlConnection(
-		const seastar::shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
-		const seastar::shared_ptr<CqlNodeConfiguration>& nodeConfiguration) :
+		const seastar::lw_shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
+		const seastar::lw_shared_ptr<CqlNodeConfiguration>& nodeConfiguration) :
 		CqlConnection(
 			sessionConfiguration,
 			nodeConfiguration,
@@ -235,8 +235,8 @@ namespace cql {
 
 	/** Constructor */
 	CqlConnection::CqlConnection(
-		const seastar::shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
-		const seastar::shared_ptr<CqlNodeConfiguration>& nodeConfiguration,
+		const seastar::lw_shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
+		const seastar::lw_shared_ptr<CqlNodeConfiguration>& nodeConfiguration,
 		const seastar::shared_ptr<CqlConnectorBase>& connector,
 		const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator) :
 		sessionConfiguration_(sessionConfiguration),

@@ -6,7 +6,7 @@ namespace cql {
 	class CqlNodeCollectionImpl : public CqlNodeCollection {
 	public:
 		/** Choose a node for the new database connection */
-		seastar::shared_ptr<CqlNodeConfiguration> chooseOneNode() override;
+		seastar::lw_shared_ptr<CqlNodeConfiguration> chooseOneNode() override;
 		
 		/** Report connect to this node has failed */
 		void reportFailure(const seastar::shared_ptr<CqlNodeConfiguration>& node) override;

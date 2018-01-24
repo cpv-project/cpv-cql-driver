@@ -11,7 +11,7 @@ namespace cql {
 	public:
 		/** Perform the authentication */
 		virtual seastar::future<> authenticate(
-			const seastar::shared_ptr<CqlConnection>& connection,
+			const seastar::lw_shared_ptr<CqlConnection>& connection,
 			const CqlConnectionStream& stream) const = 0;
 
 		/** Virtual destructor */

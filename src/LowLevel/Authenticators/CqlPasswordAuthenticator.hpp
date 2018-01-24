@@ -8,7 +8,7 @@ namespace cql {
 	public:
 		/** Perform the authentication */
 		seastar::future<> authenticate(
-			const seastar::shared_ptr<CqlConnection>& connection,
+			const seastar::lw_shared_ptr<CqlConnection>& connection,
 			const CqlConnectionStream& stream) const override;
 	};
 }

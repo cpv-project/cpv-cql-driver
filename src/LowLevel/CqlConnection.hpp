@@ -20,7 +20,7 @@ namespace cql {
 	 * Only one message can be sent or received at a time for the same stream.
 	 */
 	class CqlConnection :
-		public seastar::enable_shared_from_this<CqlConnection> {
+		public seastar::enable_lw_shared_from_this<CqlConnection> {
 	public:
 		/** Get the session configuration used by this connection */
 		const CqlSessionConfiguration& getSessionConfiguration() const& { return *sessionConfiguration_; }
@@ -58,13 +58,13 @@ namespace cql {
 
 		/** Constructor */
 		CqlConnection(
-			const seastar::shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
-			const seastar::shared_ptr<CqlNodeConfiguration>& nodeConfiguration);
+			const seastar::lw_shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
+			const seastar::lw_shared_ptr<CqlNodeConfiguration>& nodeConfiguration);
 
 		/** Constructor */
 		CqlConnection(
-			const seastar::shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
-			const seastar::shared_ptr<CqlNodeConfiguration>& nodeConfiguration,
+			const seastar::lw_shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
+			const seastar::lw_shared_ptr<CqlNodeConfiguration>& nodeConfiguration,
 			const seastar::shared_ptr<CqlConnectorBase>& connector,
 			const seastar::shared_ptr<CqlAuthenticatorBase>& authenticator);
 
@@ -82,8 +82,8 @@ namespace cql {
 		void close(const seastar::sstring& errorMessage);
 
 	private:
-		seastar::shared_ptr<CqlSessionConfiguration> sessionConfiguration_;
-		seastar::shared_ptr<CqlNodeConfiguration> nodeConfiguration_;
+		seastar::lw_shared_ptr<CqlSessionConfiguration> sessionConfiguration_;
+		seastar::lw_shared_ptr<CqlNodeConfiguration> nodeConfiguration_;
 		seastar::shared_ptr<CqlConnectorBase> connector_;
 		seastar::shared_ptr<CqlAuthenticatorBase> authenticator_;
 

@@ -6,7 +6,7 @@
 namespace cql {
 	/** Perform the authentication */
 	seastar::future<> CqlAllowAllAuthenticator::authenticate(
-		const seastar::shared_ptr<CqlConnection>& connection,
+		const seastar::lw_shared_ptr<CqlConnection>& connection,
 		const CqlConnectionStream& stream) const {
 		return connection->waitNextMessage(stream).then([] (auto message) {
 			auto opCode = message->getHeader().getOpCode();

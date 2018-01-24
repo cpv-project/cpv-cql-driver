@@ -3,7 +3,7 @@
 
 namespace cql {
 	/** Choose a node for the new database connection */
-	seastar::shared_ptr<CqlNodeConfiguration> CqlNodeCollectionImpl::chooseOneNode() {
+	seastar::lw_shared_ptr<CqlNodeConfiguration> CqlNodeCollectionImpl::chooseOneNode() {
 		throw cql::CqlNotImplementedException(CQL_CODEINFO, "not implemented");
 	}
 	
