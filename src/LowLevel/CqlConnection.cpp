@@ -82,20 +82,19 @@ namespace cql {
 
 	/** Open a new stream */
 	CqlConnectionStream CqlConnection::openStream() {
-		// OPTIMIZE: it's a O(n) search, can we do better here?
-		for (std::size_t i = 1, j = streamStates_.size(); i < j; ++i) {
-			std::size_t nextStreamId = (lastOpenedStream_ + i) % j;
-			auto& state = streamStates_[nextStreamId];
-			if (state.get() == nullptr) {
-				// lazy initialize
-				state = seastar::make_lw_shared<CqlConnectionStream::State>();
-			}
-			if (!state->isInUse) {
-				lastOpenedStream_ = nextStreamId;
-				return CqlConnectionStream(nextStreamId, state);
-			}
+		if (freeStreamIds_->empty()) {
+			// no available stream
+			return CqlConnectionStream();
+		} else {
+			auto streamId = freeStreamIds_->back();
+			freeStreamIds_->pop_back();
+			return CqlConnectionStream(streamId, freeStreamIds_);
 		}
-		return CqlConnectionStream(0, nullptr);
+	}
+
+	/** Get how many free streams available */
+	std::size_t CqlConnection::getFreeStreamsCount() const {
+		return freeStreamIds_->size();
 	}
 
 	/** Send a message to the given stream and wait for success */
@@ -257,22 +256,22 @@ namespace cql {
 		socket_(),
 		isReady_(false),
 		connectionInfo_(),
-		streamStates_(nodeConfiguration_->getMaxStreams()),
-		streamZero_(0, nullptr),
-		lastOpenedStream_(0),
+		freeStreamIds_(seastar::make_lw_shared<decltype(freeStreamIds_)::element_type>()),
+		streamZero_(0, freeStreamIds_),
 		sendingFuture_(seastar::make_ready_future<>()),
 		sendingBuffer_(),
 		receivingPromiseMap_(nodeConfiguration_->getMaxStreams()),
 		receivedMessageQueueMap_(),
 		receivingPromiseCount_(0) {
+		// initialize free stream ids, exclude stream zero (which is for internal communication)
+		freeStreamIds_->resize(nodeConfiguration_->getMaxStreams() - 1);
+		for (std::size_t i = 0, j = freeStreamIds_->size(); i < j; ++i) {
+			(*freeStreamIds_)[i] = j-i;
+		}
 		// initialize received message queues
 		for (std::size_t i = 0, j = nodeConfiguration_->getMaxStreams(); i < j; ++i) {
 			receivedMessageQueueMap_.emplace_back(nodeConfiguration->getMaxPendingMessages());
 		}
-		// open stream zero, which is for internal communication
-		auto state = seastar::make_lw_shared<CqlConnectionStream::State>();
-		streamStates_.at(0) = state;
-		streamZero_ = CqlConnectionStream(0, state);
 	}
 
 	/** Destructor */

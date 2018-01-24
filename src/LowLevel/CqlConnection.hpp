@@ -36,10 +36,13 @@ namespace cql {
 
 		/**
 		 * Open a new stream.
-		 * If the maximum numbers of streams have reached a invalid Stream object will be returned.
+		 * If the no free stream available then a invalid stream object will be returned.
 		 * Please don't forget to check stream.isValid().
 		 */
 		CqlConnectionStream openStream();
+
+		/** Get how many free streams available */
+		std::size_t getFreeStreamsCount() const;
 
 		/** Send a message to the given stream and wait for success.  */
 		seastar::future<> sendMessage(
@@ -88,9 +91,8 @@ namespace cql {
 		bool isReady_;
 		CqlConnectionInfo connectionInfo_;
 
-		std::vector<seastar::lw_shared_ptr<CqlConnectionStream::State>> streamStates_;
+		seastar::lw_shared_ptr<std::vector<CqlConnectionStream::IdType>> freeStreamIds_;
 		CqlConnectionStream streamZero_;
-		std::size_t lastOpenedStream_;
 
 		seastar::future<> sendingFuture_;
 		seastar::sstring sendingBuffer_;

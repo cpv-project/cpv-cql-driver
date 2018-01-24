@@ -82,6 +82,11 @@ TEST(TestConnection, openStream) {
 			// stream 0 is reserved
 			auto stream = connection->openStream();
 			ASSERT_TRUE(stream.isValid());
+			ASSERT_GT(stream.getStreamId(), 0);
+			ASSERT_LT(stream.getStreamId(), testMaxStream);
+			for (const auto& existStream : streams) {
+				ASSERT_NE(stream.getStreamId(), existStream.getStreamId());
+			}
 			streams.emplace_back(std::move(stream));
 		}
 		auto invalidStream = connection->openStream();
