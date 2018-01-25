@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <core/sleep.hh>
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlConnectionNotAvailableException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
@@ -81,7 +82,8 @@ namespace cql {
 		sessionConfiguration_(sessionConfiguration),
 		nodeCollection_(nodeCollection),
 		allConnections_(),
-		waiters_(sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()) { }
+		waiters_(sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()),
+		findIdleConnectionTimerIsRunning_(false) { }
 
 	/** Make a new ready-to-use connection and return it with an idle stream */
 	seastar::future<seastar::lw_shared_ptr<CqlConnection>, CqlConnectionStream>
@@ -125,7 +127,31 @@ namespace cql {
 
 	/** Timer used to find idle connection and feed waiters */
 	void CqlConnectionPool::findIdleConnectionTimer() {
-		throw CqlNotImplementedException(CQL_CODEINFO, "not implemented");
+		if (findIdleConnectionTimerIsRunning_) {
+			return;
+		}
+		findIdleConnectionTimerIsRunning_ = true;
+		auto self = shared_from_this();
+		seastar::do_with(std::move(self), [] (auto& self) {
+			return seastar::repeat([&self] {
+				return seastar::sleep(std::chrono::milliseconds(1)).then([&self] {
+					while (!self->waiters_.empty()) {
+						auto result = self->tryGetConnection();
+						if (result.first.get() != nullptr) {
+							self->waiters_.pop().set_value(
+								std::move(result.first), std::move(result.second));
+						} else {
+							break;
+						}
+					}
+					return self->waiters_.empty() ?
+						seastar::stop_iteration::yes :
+						seastar::stop_iteration::no;
+				});
+			}).finally([&self] {
+				self->findIdleConnectionTimerIsRunning_ = false;
+			});
+		});
 	}
 
 	/** Timer used to drop idle connections */

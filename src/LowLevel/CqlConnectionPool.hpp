@@ -47,7 +47,9 @@ namespace cql {
 		seastar::lw_shared_ptr<CqlSessionConfiguration> sessionConfiguration_;
 		seastar::shared_ptr<CqlNodeCollection> nodeCollection_;
 		std::vector<seastar::lw_shared_ptr<CqlConnection>> allConnections_;
-		seastar::queue<seastar::promise<seastar::lw_shared_ptr<CqlConnection>, CqlConnectionStream>> waiters_;
+		seastar::queue<seastar::promise<
+			seastar::lw_shared_ptr<CqlConnection>, CqlConnectionStream>> waiters_;
+		bool findIdleConnectionTimerIsRunning_;
 	};
 }
 
