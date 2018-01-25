@@ -1,3 +1,4 @@
+#include <CqlDriver/Common/Exceptions/CqlConnectionNotAvailableException.hpp>
 #include <Common/CqlNodeCollectionImpl.hpp>
 #include <LowLevel/CqlConnectionPool.hpp>
 #include <LowLevel/CqlConnection.hpp>
@@ -36,9 +37,15 @@ TEST_FUTURE(TestCqlConnectionPool, tryGetConnection) {
 
 TEST_FUTURE(TestCqlConnectionPool, getConnection) {
 	static const std::size_t testMaxStream = 5;
-	static const std::size_t testMaxInUseStreams = (testMaxStream-1)*3;
+	static const std::size_t testMinPoolSize = 1;
+	static const std::size_t testMaxPoolSize = 3;
+	static const std::size_t totalMaxStreams = (testMaxStream-1)*testMaxPoolSize;
 	auto connectionPool = seastar::make_lw_shared<cql::CqlConnectionPool>(
-		seastar::make_lw_shared<cql::CqlSessionConfiguration>(cql::CqlSessionConfiguration()),
+		seastar::make_lw_shared<cql::CqlSessionConfiguration>(
+			cql::CqlSessionConfiguration()
+				.setMinPoolSize(testMinPoolSize)
+				.setMaxPoolSize(testMaxPoolSize)
+				.setMaxWaitersAfterConnectionsExhausted(0)),
 		seastar::make_shared<cql::CqlNodeCollectionImpl>(
 			std::vector<cql::CqlNodeConfiguration>({
 				cql::CqlNodeConfiguration()
@@ -61,7 +68,7 @@ TEST_FUTURE(TestCqlConnectionPool, getConnection) {
 		static_cast<std::size_t>(0),
 		[] (auto& connectionPool, auto& streams, auto& count) {
 			return seastar::repeat([&connectionPool, &streams, &count] {
-				if (count % testMaxInUseStreams == 0) {
+				if (count % totalMaxStreams == 0) {
 					streams.clear();
 				}
 				return connectionPool->getConnection()
@@ -70,7 +77,7 @@ TEST_FUTURE(TestCqlConnectionPool, getConnection) {
 					ASSERT_TRUE(stream.isValid());
 					streams.emplace_back(std::move(stream));
 				}).then([&count] {
-					if (++count >= testMaxInUseStreams * 3) {
+					if (++count >= totalMaxStreams * 3) {
 						return seastar::stop_iteration::yes;
 					} else {
 						return seastar::stop_iteration::no;
@@ -80,8 +87,49 @@ TEST_FUTURE(TestCqlConnectionPool, getConnection) {
 		});
 }
 
-TEST(TestCqlConnectionPool, getConnectionFailed) {
-
+TEST_FUTURE(TestCqlConnectionPool, getConnectionFailed) {
+	static const std::size_t testMaxStream = 5;
+	static const std::size_t testMinPoolSize = 1;
+	static const std::size_t testMaxPoolSize = 3;
+	static const std::size_t totalMaxStreams = (testMaxStream-1)*testMaxPoolSize;
+	auto connectionPool = seastar::make_lw_shared<cql::CqlConnectionPool>(
+		seastar::make_lw_shared<cql::CqlSessionConfiguration>(
+			cql::CqlSessionConfiguration()
+				.setMinPoolSize(testMinPoolSize)
+				.setMaxPoolSize(testMaxPoolSize)
+				.setMaxWaitersAfterConnectionsExhausted(0)),
+		seastar::make_shared<cql::CqlNodeCollectionImpl>(
+			std::vector<cql::CqlNodeConfiguration>({
+				cql::CqlNodeConfiguration()
+					.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
+					.setMaxStreams(testMaxStream)
+			})));
+	return seastar::do_with(
+		std::move(connectionPool),
+		std::vector<cql::CqlConnectionStream>(),
+		static_cast<std::size_t>(0),
+		[] (auto& connectionPool, auto& streams, auto& count) {
+			return seastar::repeat([&connectionPool, &streams, &count] {
+				return connectionPool->getConnection()
+				.then([&streams] (auto&& connection, auto&& stream) {
+					ASSERT_TRUE(connection.get() != nullptr);
+					ASSERT_TRUE(stream.isValid());
+					streams.emplace_back(std::move(stream));
+				}).then_wrapped([&count] (auto&& f) {
+					if (count < totalMaxStreams) {
+						f.get();
+					} else {
+						ASSERT_THROWS(cql::CqlConnectionNotAvailableException, f.get());
+					}
+				}).then([&count] {
+					if (++count >= totalMaxStreams+3) {
+						return seastar::stop_iteration::yes;
+					} else {
+						return seastar::stop_iteration::no;
+					}
+				});
+			});
+		});
 }
 
 TEST(TestCqlConnectionPool, getConnectionWithNotify) {
