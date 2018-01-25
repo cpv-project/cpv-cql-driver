@@ -96,19 +96,21 @@ namespace cql {
 				auto connection = seastar::make_lw_shared<CqlConnection>(
 					self->sessionConfiguration_, node);
 				// initialize connection
-				return connection->ready().then([&promise, &self, connection] {
+				return connection->ready().then([&promise, &self, node, connection] {
 					// initialize connection success
 					auto stream = connection->openStream();
 					if (!stream.isValid()) {
 						promise.set_exception(CqlLogicException(CQL_CODEINFO,
 							"open stream form a newly created connection failed"));
 					} else {
+						self->nodeCollection_->reportSuccess(node);
 						self->allConnections_.emplace_back(connection);
 						promise.set_value(std::move(connection), std::move(stream));
 					}
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&promise, &self, &count] (std::exception_ptr ex) {
+				}).handle_exception([&promise, &self, &count, node] (std::exception_ptr ex) {
 					// initialize connection failed, try next node until all tried
+					self->nodeCollection_->reportFailure(node);
 					if (++count >= self->nodeCollection_->getNodesCount()) {
 						promise.set_exception(ex);
 						return seastar::stop_iteration::yes;
