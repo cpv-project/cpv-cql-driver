@@ -68,7 +68,7 @@ TEST_FUTURE(TestConnection, waitForReadyPasswordAuthenticateFailed) {
 }
 
 TEST(TestConnection, openStream) {
-	std::size_t testMaxStream = 5;
+	static const std::size_t testMaxStream = 5;
 	auto connection = seastar::make_lw_shared<cql::CqlConnection>(
 		seastar::make_lw_shared<cql::CqlSessionConfiguration>(),
 		seastar::make_lw_shared<cql::CqlNodeConfiguration>(

@@ -25,7 +25,7 @@ namespace cql {
 		/** Constructor */
 		CqlConnectionPool(
 			const seastar::lw_shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
-			const seastar::shared_ptr<CqlNodeCollection> nodeCollection);
+			const seastar::shared_ptr<CqlNodeCollection>& nodeCollection);
 
 		/** Disallow copy and move */
 		CqlConnectionPool(const CqlConnectionPool&) = delete;

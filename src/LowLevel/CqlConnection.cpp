@@ -13,8 +13,6 @@
 #include "./ResponseMessages/CqlResponseMessageFactory.hpp"
 #include "CqlConnection.hpp"
 
-#include <core/sleep.hh>
-
 namespace cql {
 	/** Initialize connection and wait until it's ready to send ordinary messages */
 	seastar::future<> CqlConnection::ready() {

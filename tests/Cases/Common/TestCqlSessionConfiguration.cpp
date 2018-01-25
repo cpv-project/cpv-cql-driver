@@ -9,7 +9,7 @@ TEST(TestCqlSessionConfiguration, all) {
 		.setMinPoolSize(7)
 		.setMaxPoolSize(101)
 		.setMaxWaitersAfterConnectionsExhausted(102)
-		.setDnsCacheTime(std::chrono::milliseconds(30001));	
+		.setDnsCacheTime(std::chrono::milliseconds(30001));
 	ASSERT_EQ(configuration.getMinPoolSize(), 7);
 	ASSERT_EQ(configuration.getMaxPoolSize(), 101);
 	ASSERT_EQ(configuration.getMaxWaitersAfterConnectionsExhausted(), 102);

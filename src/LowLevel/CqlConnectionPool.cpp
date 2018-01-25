@@ -78,7 +78,7 @@ namespace cql {
 	/** Constructor */
 	CqlConnectionPool::CqlConnectionPool(
 		const seastar::lw_shared_ptr<CqlSessionConfiguration>& sessionConfiguration,
-		const seastar::shared_ptr<CqlNodeCollection> nodeCollection) :
+		const seastar::shared_ptr<CqlNodeCollection>& nodeCollection) :
 		sessionConfiguration_(sessionConfiguration),
 		nodeCollection_(nodeCollection),
 		allConnections_(),
@@ -91,8 +91,10 @@ namespace cql {
 		seastar::promise<seastar::lw_shared_ptr<CqlConnection>, CqlConnectionStream> promise;
 		auto future = promise.get_future();
 		auto self = shared_from_this();
-		seastar::do_with(std::move(promise), std::move(self), [] (auto& promise, auto& self) {
-			return seastar::repeat([&promise, &self, count=0U] () mutable {
+		seastar::do_with(
+			std::move(promise), std::move(self), static_cast<std::size_t>(0U),
+			[] (auto& promise, auto& self, auto& count) {
+			return seastar::repeat([&promise, &self, &count] {
 				// choose one node and create connection
 				auto node = self->nodeCollection_->chooseOneNode();
 				auto connection = seastar::make_lw_shared<CqlConnection>(
