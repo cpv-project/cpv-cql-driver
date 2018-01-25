@@ -28,8 +28,8 @@ namespace cql {
 		CqlConnectionStream& operator=(const CqlConnectionStream&) = delete;
 
 		/** Allow move */
-		CqlConnectionStream(CqlConnectionStream&& stream);
-		CqlConnectionStream& operator=(CqlConnectionStream&& stream);
+		CqlConnectionStream(CqlConnectionStream&& stream) noexcept;
+		CqlConnectionStream& operator=(CqlConnectionStream&& stream) noexcept;
 
 		/** Destructor */
 		~CqlConnectionStream();

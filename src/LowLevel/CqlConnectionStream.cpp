@@ -30,7 +30,7 @@ namespace cql {
 		freeStreamIds_(freeStreamIds) { }
 
 	/** Move constructor */
-	CqlConnectionStream::CqlConnectionStream(CqlConnectionStream&& stream) :
+	CqlConnectionStream::CqlConnectionStream(CqlConnectionStream&& stream) noexcept :
 		isValid_(stream.isValid_),
 		streamId_(stream.streamId_),
 		freeStreamIds_(std::move(stream.freeStreamIds_)) {
@@ -38,7 +38,7 @@ namespace cql {
 	}
 
 	/** Move assignment */
-	CqlConnectionStream& CqlConnectionStream::operator=(CqlConnectionStream&& stream) {
+	CqlConnectionStream& CqlConnectionStream::operator=(CqlConnectionStream&& stream) noexcept {
 		if (&stream != this) {
 			isValid_ = stream.isValid_;
 			streamId_ = stream.streamId_;
