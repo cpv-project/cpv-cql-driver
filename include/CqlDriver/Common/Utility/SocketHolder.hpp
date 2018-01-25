@@ -56,13 +56,21 @@ namespace cql {
 
 		/** Move assignment */
 		SocketHolder& operator=(SocketHolder&& socket) {
-			this->~SocketHolder();
-			state_ = std::move(socket.state_);
+			if (&socket != this) {
+				close();
+				state_ = std::move(socket.state_);
+			}
 			return *this;
 		}
 
 		/** Destructor */
 		~SocketHolder() {
+			close();
+		}
+
+	private:
+		/** Close this socket */
+		void close() {
 			if (state_ == nullptr) {
 				return;
 			}

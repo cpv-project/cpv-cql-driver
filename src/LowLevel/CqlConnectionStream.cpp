@@ -40,6 +40,7 @@ namespace cql {
 	/** Move assignment */
 	CqlConnectionStream& CqlConnectionStream::operator=(CqlConnectionStream&& stream) noexcept {
 		if (&stream != this) {
+			close();
 			isValid_ = stream.isValid_;
 			streamId_ = stream.streamId_;
 			freeStreamIds_ = std::move(stream.freeStreamIds_);
@@ -50,6 +51,11 @@ namespace cql {
 
 	/** Destructor */
 	CqlConnectionStream::~CqlConnectionStream() {
+		close();
+	}
+
+	/** Release this stream */
+	void CqlConnectionStream::close() {
 		if (isValid_) {
 			isValid_ = false;
 			if (freeStreamIds_.get() != nullptr) {

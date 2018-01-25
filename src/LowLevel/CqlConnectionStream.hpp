@@ -35,6 +35,10 @@ namespace cql {
 		~CqlConnectionStream();
 
 	private:
+		/** Release this stream */
+		void close();
+
+	private:
 		bool isValid_;
 		IdType streamId_;
 		seastar::lw_shared_ptr<std::vector<IdType>> freeStreamIds_;
