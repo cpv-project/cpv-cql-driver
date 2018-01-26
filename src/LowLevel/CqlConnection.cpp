@@ -161,11 +161,9 @@ namespace cql {
 				return seastar::repeat([&self] {
 					// receive message header
 					return self->socket_.in().read_exactly(self->connectionInfo_.getHeaderSize())
-					.then([&self] (seastar::temporary_buffer<char> buf) {
-						const char* ptr = buf.begin();
-						const char* end = buf.end();
+					.then([&self] (seastar::temporary_buffer<char>&& buf) {
 						CqlMessageHeader header;
-						header.decodeHeader(self->connectionInfo_, ptr, end);
+						header.decodeHeader(self->connectionInfo_, std::move(buf));
 						auto bodyLength = header.getBodyLength();
 						if (bodyLength > self->connectionInfo_.getMaximumMessageBodySize()) {
 							self->close(joinString(" ", "message body too large:", bodyLength));
@@ -174,11 +172,10 @@ namespace cql {
 						}
 						// receive message body
 						return self->socket_.in().read_exactly(bodyLength)
-						.then([&self, header=std::move(header)] (seastar::temporary_buffer<char> buf) mutable {
-							const char* ptr = buf.begin();
-							const char* end = buf.end();
+						.then([&self, header=std::move(header)] (
+							seastar::temporary_buffer<char>&& buf) mutable {
 							auto message = CqlResponseMessageFactory::makeResponseMessage(std::move(header));
-							message->decodeBody(self->connectionInfo_, ptr, end);
+							message->decodeBody(self->connectionInfo_, std::move(buf));
 							// find the corresponding promise
 							auto streamId = message->getHeader().getStreamId();
 							if (streamId >= self->receivedMessageQueueMap_.size()) {

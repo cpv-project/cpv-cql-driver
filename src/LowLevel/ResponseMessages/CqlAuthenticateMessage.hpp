@@ -19,7 +19,7 @@ namespace cql {
 		seastar::sstring toString() const override;
 
 		/** Decode message body from binary data */
-		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
+		void decodeBody(const CqlConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;
 
 		/** The full class name of the IAuthenticator in use */
 		const CqlProtocolString& getAuthenticatorClass() const& { return authenticatorClass_; }

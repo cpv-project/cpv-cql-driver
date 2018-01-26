@@ -13,8 +13,11 @@ namespace cql {
 	}
 
 	/** Decode message body from binary data */
-	void CqlAuthChallengeMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
+	void CqlAuthChallengeMessage::decodeBody(
+		const CqlConnectionInfo&, seastar::temporary_buffer<char>&& buffer) {
 		// the body of this message is a single [bytes] token
+		const char* ptr = buffer.begin();
+		const char* end = buffer.end();
 		token_.decode(ptr, end);
 	}
 

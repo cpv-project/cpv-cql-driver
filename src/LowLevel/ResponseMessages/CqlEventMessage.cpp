@@ -14,13 +14,15 @@ namespace cql {
 	}
 
 	/** Decode message body from binary data */
-	void CqlEventMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
+	void CqlEventMessage::decodeBody(
+		const CqlConnectionInfo&, seastar::temporary_buffer<char>&& buffer) {
 		// the body of an EVENT message will start with a [string] represeting the event type,
 		// the reset of the message depends on the event type.
+		const char* ptr = buffer.begin();
+		const char* end = buffer.end();
 		type_.decode(ptr, end);
 		data_.resize(0);
 		data_.append(ptr, end - ptr);
-		ptr = end;
 	}
 
 	/** Constructor */

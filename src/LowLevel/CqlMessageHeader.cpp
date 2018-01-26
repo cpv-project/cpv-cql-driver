@@ -42,8 +42,10 @@ namespace cql {
 
 	/** Decode message header from binary data */
 	void CqlMessageHeader::decodeHeader(
-		const CqlConnectionInfo& info, const char*& ptr, const char* end) {
+		const CqlConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) {
 		// assume it's version 4
+		const char* ptr = buffer.begin();
+		const char* end = buffer.end();
 		CqlProtocolByte version;
 		version.decode(ptr, end);
 		flags_.decode(ptr, end);

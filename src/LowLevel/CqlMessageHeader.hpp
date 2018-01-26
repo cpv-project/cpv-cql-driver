@@ -21,7 +21,7 @@ namespace cql {
 		void encodeHeaderPost(const CqlConnectionInfo& info, seastar::sstring& data) const;
 
 		/** Decode message header from binary data */
-		void decodeHeader(const CqlConnectionInfo& info, const char*& ptr, const char* end);
+		void decodeHeader(const CqlConnectionInfo& info, seastar::temporary_buffer<char>&& buffer);
 
 		/**
 		 * Get the flags of message

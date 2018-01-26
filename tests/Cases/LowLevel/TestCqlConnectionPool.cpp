@@ -215,6 +215,7 @@ TEST_FUTURE(TestCqlConnectionPool, getConnectionWithTimer) {
 						seastar::sleep(std::chrono::milliseconds(1))
 						.then([connectionPool, stream=std::move(stream)] () mutable {
 							stream = {};
+							// did not call notifyConnectionBecomeIdle
 						});
 					}
 				}).then([&count] {

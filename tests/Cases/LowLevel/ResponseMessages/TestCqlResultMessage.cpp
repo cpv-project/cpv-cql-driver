@@ -5,10 +5,9 @@
 TEST(TestCqlResultMessage, decode) {
 	cql::CqlConnectionInfo info;
 	auto headerData = makeTestString("\x04\x00\x00\x00\x08\x00\x00\x00\x00");
-	const char* headerDataPtr = headerData.data();
-	const char* headerDataEnd = headerDataPtr + headerData.size();
+	seastar::temporary_buffer<char> headerBuffer(headerData.data(), headerData.size());
 	cql::CqlMessageHeader header;
-	header.decodeHeader(info, headerDataPtr, headerDataEnd);
+	header.decodeHeader(info, std::move(headerBuffer));
 	for (std::size_t i = 0; i < 3; ++i) {
 		{
 			// Void
@@ -16,9 +15,8 @@ TEST(TestCqlResultMessage, decode) {
 			ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Result);
 			cql::CqlObject<cql::CqlResultMessage> message(std::move(baseMessage));
 			auto bodyData = makeTestString("\x00\x00\x00\x01");
-			const char* bodyDataPtr = bodyData.data();
-			const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-			message->decodeBody(info, bodyDataPtr, bodyDataEnd);
+			seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::CqlResultKind::Void);
 		}
 		{
@@ -34,10 +32,8 @@ TEST(TestCqlResultMessage, decode) {
 				"\x00\x00\x00\x03""b_1""\x00\x00\x00\x03""b_2""\x00\x00\x00\x03""b_3"
 				"\x00\x00\x00\x03""c_1""\x00\x00\x00\x03""c_2""\x00\x00\x00\x03""c_3"
 				"\x00\x00\x00\x03""d_1""\x00\x00\x00\x03""d_2""\x00\x00\x00\x05""d_3__");
-			const char* bodyDataPtr = bodyData.data();
-			const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-			message->decodeBody(info, bodyDataPtr, bodyDataEnd);
-			ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
+			seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::CqlResultKind::Rows);
 			ASSERT_EQ(message->getRowsMetadata().getFlags(), cql::CqlResultRowsMetadataFlags::NoMetadata);
 			ASSERT_EQ(message->getRowsMetadata().getColumnsCount(), 3);
@@ -64,10 +60,8 @@ TEST(TestCqlResultMessage, decode) {
 			auto bodyData = makeTestString(
 				"\x00\x00\x00\x03"
 				"\x00\x01""k");
-			const char* bodyDataPtr = bodyData.data();
-			const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-			message->decodeBody(info, bodyDataPtr, bodyDataEnd);
-			ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
+			seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::CqlResultKind::SetKeySpace);
 			ASSERT_EQ(message->getKeySpaceSet().get(), "k");
 		}
@@ -84,10 +78,8 @@ TEST(TestCqlResultMessage, decode) {
 				"\x00\x00\x00\x00" // 0 pk indexes
 				"\x00\x01""k""\x00\x01""t""\x00\x01""c""\x00\x09"
 				"\x00\x00\x00\x04""\x00\x00\x00\x03"); // no metadata, 3 columns
-			const char* bodyDataPtr = bodyData.data();
-			const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-			message->decodeBody(info, bodyDataPtr, bodyDataEnd);
-			ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
+			seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::CqlResultKind::Prepared);
 			ASSERT_EQ(message->getPreparedQueryId().get(), "abc");
 			ASSERT_EQ(message->getPreparedMetadata().getColumns().size(), 1);
@@ -108,10 +100,8 @@ TEST(TestCqlResultMessage, decode) {
 				"\x00\x07""CREATED"
 				"\x00\x08""KEYSPACE"
 				"\x00\x03""abc");
-			const char* bodyDataPtr = bodyData.data();
-			const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-			message->decodeBody(info, bodyDataPtr, bodyDataEnd);
-			ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
+			seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::CqlResultKind::SchemaChange);
 			ASSERT_EQ(message->getSchemaChangeType().get(), "CREATED");
 			ASSERT_EQ(message->getSchemaChangeTarget().get(), "KEYSPACE");

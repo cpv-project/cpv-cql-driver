@@ -27,7 +27,10 @@ namespace cql {
 	}
 
 	/** Decode message body from binary data */
-	void CqlResultMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
+	void CqlResultMessage::decodeBody(
+		const CqlConnectionInfo&, seastar::temporary_buffer<char>&& buffer) {
+		const char* ptr = buffer.begin();
+		const char* end = buffer.end();
 		kind_.decode(ptr, end);
 		auto kind = getKind();
 		if (kind == CqlResultKind::Void) {
@@ -63,7 +66,6 @@ namespace cql {
 			schemaChangeTarget_.decode(ptr, end);
 			schemaChangeOptions_.resize(0);
 			schemaChangeOptions_.append(ptr, end - ptr);
-			ptr = end;
 		} else {
 			throw CqlLogicException(CQL_CODEINFO,
 				"unsupported result kind:", static_cast<std::size_t>(kind));

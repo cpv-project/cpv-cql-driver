@@ -18,7 +18,7 @@ namespace cql {
 		seastar::sstring toString() const override;
 
 		/** Decode message body from binary data */
-		void decodeBody(const CqlConnectionInfo& info, const char*& ptr, const char* end) override;
+		void decodeBody(const CqlConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;
 
 		/** The details of what this token contains depends on the actual authenticator used */
 		const CqlProtocolBytes& getToken() const& { return token_; }

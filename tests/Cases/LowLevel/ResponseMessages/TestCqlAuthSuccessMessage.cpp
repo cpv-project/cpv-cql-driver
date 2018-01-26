@@ -6,19 +6,16 @@ TEST(TestCqlAuthSuccessMessage, decode) {
 	cql::CqlConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto headerData = makeTestString("\x04\x00\x00\x00\x10\x00\x00\x00\x00");
-		const char* headerDataPtr = headerData.data();
-		const char* headerDataEnd = headerDataPtr + headerData.size();
+		seastar::temporary_buffer<char> headerBuffer(headerData.data(), headerData.size());
 		cql::CqlMessageHeader header;
-		header.decodeHeader(info, headerDataPtr, headerDataEnd);
+		header.decodeHeader(info, std::move(headerBuffer));
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
 		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::AuthSuccess);
 		cql::CqlObject<cql::CqlAuthSuccessMessage> message(std::move(baseMessage));
  		auto bodyData = makeTestString("\x00\x00\x00\x03""abc");
-		const char* bodyDataPtr = bodyData.data();
-		const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-		message->decodeBody(info, bodyDataPtr, bodyDataEnd);
-		ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
+		seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+		message->decodeBody(info, std::move(bodyBuffer));
 		ASSERT_EQ(message->getToken().get(), "abc");
 	}
 }

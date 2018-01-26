@@ -7,7 +7,8 @@ namespace cql {
 	}
 
 	/** Decode message body from binary data */
-	void CqlReadyMessage::decodeBody(const CqlConnectionInfo&, const char*&, const char*) {
+	void CqlReadyMessage::decodeBody(
+		const CqlConnectionInfo&, seastar::temporary_buffer<char>&&) {
 		// The body of a READY message is empty
 	}
 }

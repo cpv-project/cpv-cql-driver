@@ -13,9 +13,12 @@ namespace cql {
 	}
 
 	/** Decode message body from binary data */
-	void CqlSupportedMessage::decodeBody(const CqlConnectionInfo&, const char*& ptr, const char* end) {
+	void CqlSupportedMessage::decodeBody(
+		const CqlConnectionInfo&, seastar::temporary_buffer<char>&& buffer) {
 		// The body of a SUPPORTED message is a [string multimap]
 		// This multimap gives for each of the supported STARTUP options, the list of supported values
+		const char* ptr = buffer.begin();
+		const char* end = buffer.end();
 		options_.decode(ptr, end);
 	}
 

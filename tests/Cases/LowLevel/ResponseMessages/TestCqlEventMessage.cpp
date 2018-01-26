@@ -6,10 +6,9 @@ TEST(TestCqlEventMessage, decode) {
 	cql::CqlConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto headerData = makeTestString("\x04\x00\x00\x00\x0c\x00\x00\x00\x00");
-		const char* headerDataPtr = headerData.data();
-		const char* headerDataEnd = headerDataPtr + headerData.size();
+		seastar::temporary_buffer<char> headerBuffer(headerData.data(), headerData.size());
 		cql::CqlMessageHeader header;
-		header.decodeHeader(info, headerDataPtr, headerDataEnd);
+		header.decodeHeader(info, std::move(headerBuffer));
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
 		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Event);
@@ -19,10 +18,8 @@ TEST(TestCqlEventMessage, decode) {
 			"\x00\x07""CREATED"
 			"\x00\x08""KEYSPACE"
 			"\x00\x03""abc");
-		const char* bodyDataPtr = bodyData.data();
-		const char* bodyDataEnd = bodyDataPtr + bodyData.size();
-		message->decodeBody(info, bodyDataPtr, bodyDataEnd);
-		ASSERT_TRUE(bodyDataPtr == bodyDataEnd);
+		seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
+		message->decodeBody(info, std::move(bodyBuffer));
 		ASSERT_EQ(message->getType().get(), "SCHEMA_CHANGE");
 		ASSERT_EQ(message->getData(), makeTestString(
 			"\x00\x07""CREATED"
