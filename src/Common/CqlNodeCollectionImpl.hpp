@@ -27,6 +27,9 @@ namespace cql {
 		struct NodeRecord {
 			seastar::lw_shared_ptr<CqlNodeConfiguration> node;
 			bool isFault;
+			NodeRecord() : node(nullptr), isFault(false) { }
+			explicit NodeRecord(seastar::lw_shared_ptr<CqlNodeConfiguration>&& node) :
+				node(std::move(node)), isFault(false) { }
 		};
 
 		/**

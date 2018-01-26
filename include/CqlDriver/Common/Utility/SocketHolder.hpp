@@ -43,7 +43,7 @@ namespace cql {
 		SocketHolder() : state_(nullptr) { }
 
 		/** Constructor */
-		SocketHolder(seastar::connected_socket&& socket) :
+		explicit SocketHolder(seastar::connected_socket&& socket) :
 			state_(std::make_unique<State>()) {
 			state_->socket = std::move(socket);
 			state_->in = state_->socket.input();

@@ -72,10 +72,7 @@ namespace cql {
 			throw CqlLogicException(CQL_CODEINFO, "initial nodes can't be empty");
 		}
 		for (const auto& node : initialNodes) {
-			allNodes_.emplace_back(NodeRecord({
-				seastar::make_lw_shared<CqlNodeConfiguration>(node),
-				false
-			}));
+			allNodes_.emplace_back(seastar::make_lw_shared<CqlNodeConfiguration>(node));
 		}
 		std::sort(allNodes_.begin(), allNodes_.end(), [](auto& a, auto& b) {
 			return a.node.get() < b.node.get();
