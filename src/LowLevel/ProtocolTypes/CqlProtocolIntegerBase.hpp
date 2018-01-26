@@ -5,9 +5,7 @@
 #include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 
 namespace cql {
-	/**
-	 * Base class of integer types
-	 */
+	/** Base class of integer types */
 	template <class IntType>
 	class CqlProtocolIntegerBase {
 	public:
