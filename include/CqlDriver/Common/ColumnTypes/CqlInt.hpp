@@ -13,7 +13,7 @@ namespace cql {
 		using CqlIntegerBase::decode;
 		using CqlIntegerBase::CqlIntegerBase;
 		using CqlIntegerBase::operator=;
-		using CqlIntegerBase::operator std::int32_t;
+		using CqlIntegerBase::operator CqlUnderlyingType;
 		using CqlIntegerBase::operator bool;
 	};
 }
