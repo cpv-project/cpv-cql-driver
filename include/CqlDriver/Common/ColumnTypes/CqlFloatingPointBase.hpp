@@ -40,7 +40,7 @@ namespace cql {
 			if (std::isnan(value_) || std::isnan(other)) {
 				return false;
 			} else {
-				return std::fabs(value_ - other) <= epsilon;
+				return std::fabs(value_ - other) < epsilon;
 			}
 		}
 

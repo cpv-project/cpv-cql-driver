@@ -62,19 +62,21 @@ TEST(TestCqlFloat, operations) {
 	}
 	{
 		// addition
-		ASSERT_TRUE((cql::CqlFloat(1.3) + cql::CqlFloat(3.2)).approximatelyEquals(4.5));
-		ASSERT_TRUE((cql::CqlFloat(1.3) + 3.2f).approximatelyEquals(4.5));
-		ASSERT_TRUE(cql::CqlFloat(4.5).approximatelyEquals(1.3f + cql::CqlFloat(3.2)));
-		ASSERT_TRUE((cql::CqlFloat(1.3) + cql::CqlInt(2)).approximatelyEquals(3.3));
-		ASSERT_TRUE((cql::CqlInt(2) + cql::CqlFloat(1.3)).approximatelyEquals(3.3));
+		cql::CqlFloat::CqlUnderlyingType customEpsilon(0.00001);
+		ASSERT_TRUE((cql::CqlFloat(1.3) + cql::CqlFloat(3.2)).approximatelyEquals(4.5, customEpsilon));
+		ASSERT_TRUE((cql::CqlFloat(1.3) + 3.2f).approximatelyEquals(4.5, customEpsilon));
+		ASSERT_TRUE(cql::CqlFloat(4.5).approximatelyEquals(1.3f + cql::CqlFloat(3.2), customEpsilon));
+		ASSERT_TRUE((cql::CqlFloat(1.3) + cql::CqlInt(2)).approximatelyEquals(3.3, customEpsilon));
+		ASSERT_TRUE((cql::CqlInt(2) + cql::CqlFloat(1.3)).approximatelyEquals(3.3, customEpsilon));
 	}
 	{
 		// subtraction
-		ASSERT_TRUE((cql::CqlFloat(3.2) - cql::CqlFloat(1.3)).approximatelyEquals(1.9));
-		ASSERT_TRUE((cql::CqlFloat(3.2) - 1.3f).approximatelyEquals(1.9));
-		ASSERT_TRUE(cql::CqlFloat(1.9).approximatelyEquals(3.2f - cql::CqlFloat(1.3)));
-		ASSERT_TRUE((cql::CqlFloat(3.2) - cql::CqlInt(2)).approximatelyEquals(1.2));
-		ASSERT_TRUE((cql::CqlInt(3) - cql::CqlFloat(1.2)).approximatelyEquals(1.8));
+		cql::CqlFloat::CqlUnderlyingType customEpsilon(0.00001);
+		ASSERT_TRUE((cql::CqlFloat(3.2) - cql::CqlFloat(1.3)).approximatelyEquals(1.9, customEpsilon));
+		ASSERT_TRUE((cql::CqlFloat(3.2) - 1.3f).approximatelyEquals(1.9, customEpsilon));
+		ASSERT_TRUE(cql::CqlFloat(1.9).approximatelyEquals(3.2f - cql::CqlFloat(1.3), customEpsilon));
+		ASSERT_TRUE((cql::CqlFloat(3.2) - cql::CqlInt(2)).approximatelyEquals(1.2, customEpsilon));
+		ASSERT_TRUE((cql::CqlInt(3) - cql::CqlFloat(1.2)).approximatelyEquals(1.8, customEpsilon));
 	}
 	{
 		// multiplication
@@ -172,19 +174,21 @@ TEST(TestCqlFloat, operations) {
 	}
 	{
 		// addition assignment
+		cql::CqlFloat::CqlUnderlyingType customEpsilon(0.00001);
 		cql::CqlFloat a;
-		ASSERT_TRUE((a += cql::CqlFloat(1.1)).approximatelyEquals(1.1));
-		ASSERT_TRUE((a += 1.1f).approximatelyEquals(2.2));
+		ASSERT_TRUE((a += cql::CqlFloat(1.1)).approximatelyEquals(1.1, customEpsilon));
+		ASSERT_TRUE((a += 1.1f).approximatelyEquals(2.2, customEpsilon));
 		cql::CqlFloat::CqlUnderlyingType b(1.1);
-		ASSERT_TRUE(cql::CqlFloat(2.2).approximatelyEquals(b += cql::CqlFloat(1.1)));
+		ASSERT_TRUE(cql::CqlFloat(2.2).approximatelyEquals(b += cql::CqlFloat(1.1), customEpsilon));
 	}
 	{
 		// subtraction assignment
+		cql::CqlFloat::CqlUnderlyingType customEpsilon(0.00001);
 		cql::CqlFloat a(2.2);
-		ASSERT_TRUE((a -= cql::CqlFloat(1.1)).approximatelyEquals(1.1));
-		ASSERT_TRUE((a -= 1.1f).approximatelyEquals(0));
+		ASSERT_TRUE((a -= cql::CqlFloat(1.1)).approximatelyEquals(1.1, customEpsilon));
+		ASSERT_TRUE((a -= 1.1f).approximatelyEquals(0, customEpsilon));
 		cql::CqlFloat::CqlUnderlyingType b(2.2);
-		ASSERT_TRUE(cql::CqlFloat(1.1).approximatelyEquals(b -= cql::CqlFloat(1.1)));
+		ASSERT_TRUE(cql::CqlFloat(1.1).approximatelyEquals(b -= cql::CqlFloat(1.1), customEpsilon));
 	}
 	{
 		// multiplication assignment
