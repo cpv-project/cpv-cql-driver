@@ -98,7 +98,7 @@ namespace cql {
 		bool operator==(const char* other) const { return value_ == other; }
 		bool operator!=(const char* other) const { return value_ != other; }
 
-	private:
+	protected:
 		seastar::sstring value_;
 	};
 }

@@ -63,7 +63,7 @@ namespace cql {
 			return static_cast<bool>(value_);
 		}
 
-	private:
+	protected:
 		IntType value_;
 	};
 }
