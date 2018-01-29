@@ -1,8 +1,8 @@
-#include <CqlDriver/Common/ColumnTypes/CqlAscii.hpp>
+#include <CqlDriver/Common/ColumnTypes/CqlText.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
-TEST(TestCqlAscii, getset) {
-	cql::CqlAscii value("abc");
+TEST(TestCqlText, getset) {
+	cql::CqlText value("abc");
 	ASSERT_EQ(value.get(), "abc");
 	value.get().append("aaaaa", 5);
 	ASSERT_EQ(value.get(), "abcaaaaa");
@@ -13,10 +13,10 @@ TEST(TestCqlAscii, getset) {
 	value.set("abcde", 3);
 	ASSERT_EQ(value.get(), "abc");
 
-	value = cql::CqlAscii();
+	value = cql::CqlText();
 	ASSERT_EQ(value.get(), "");
 
-	value = cql::CqlAscii("qwert");
+	value = cql::CqlText("qwert");
 	ASSERT_EQ(value.get(), "qwert");
 	ASSERT_EQ(value.get(), seastar::sstring(value.data(), value.size()));
 	ASSERT_FALSE(value.empty());
@@ -25,22 +25,22 @@ TEST(TestCqlAscii, getset) {
 	ASSERT_TRUE(value.empty());
 }
 
-TEST(TestCqlAscii, encode) {
-	cql::CqlAscii value("abc\x00\x01");
+TEST(TestCqlText, encode) {
+	cql::CqlText value("abc\x00\x01");
 	seastar::sstring data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("abc\x00\x01"));
 }
 
-TEST(TestCqlAscii, decode) {
+TEST(TestCqlText, decode) {
 	auto data = makeTestString("abc\x00\x01");
-	cql::CqlAscii value;
+	cql::CqlText value;
 	value.decode(data.data(), data.size());
 	ASSERT_TRUE(value == makeTestString("abc\x00\x01"));
 }
 
-TEST(TestCqlAscii, operations) {
-	cql::CqlAscii value;
+TEST(TestCqlText, operations) {
+	cql::CqlText value;
 	value = seastar::sstring("aaa");
 
 	seastar::sstring str = value;
