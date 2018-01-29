@@ -2,7 +2,7 @@
 #include "CqlIntegerBase.hpp"
 
 namespace cql {
-	/** A 8 byte two's complement integer */
+	/** A 2 byte two's complement integer */
 	class CqlSmallInt : private CqlIntegerBase<std::int16_t> {
 	public:
 		using CqlIntegerBase::CqlUnderlyingType;
