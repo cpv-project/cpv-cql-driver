@@ -218,7 +218,7 @@ TEST(TestCqlInt, operations) {
 		// addition assignment
 		cql::CqlInt a(1);
 		ASSERT_EQ(a += cql::CqlInt(2), 3);
-		ASSERT_EQ(a += cql::CqlInt(2), 5);
+		ASSERT_EQ(a += 2, 5);
 		cql::CqlInt::CqlUnderlyingType b(1);
 		ASSERT_EQ(b += cql::CqlInt(2), 3);
 	}
@@ -226,7 +226,7 @@ TEST(TestCqlInt, operations) {
 		// subtraction assignment
 		cql::CqlInt a(3);
 		ASSERT_EQ(a -= cql::CqlInt(1), 2);
-		ASSERT_EQ(a -= cql::CqlInt(1), 1);
+		ASSERT_EQ(a -= 1, 1);
 		cql::CqlInt::CqlUnderlyingType b(3);
 		ASSERT_EQ(b -= cql::CqlInt(1), 2);
 	}
@@ -293,6 +293,10 @@ TEST(TestCqlInt, operations) {
 		ASSERT_EQ(a <<= 3, 128);
 		cql::CqlInt::CqlUnderlyingType b(2);
 		ASSERT_EQ(b <<= cql::CqlInt(3), 16);
+	}
+	{
+		// get text description
+		ASSERT_EQ(cql::joinString("", cql::CqlInt(123)), "123");
 	}
 }
 

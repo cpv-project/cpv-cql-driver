@@ -15,7 +15,7 @@ namespace cql {
 		/** Get the integer value */
 		IntType get() const& { return value_; }
 
-		/** Get the integer value */
+		/** Get the mutable integer value */
 		IntType& get() & { return value_; }
 
 		/** Set the integer value */

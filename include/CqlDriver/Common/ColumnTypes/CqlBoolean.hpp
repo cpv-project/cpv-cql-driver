@@ -18,7 +18,7 @@ namespace cql {
 		void set(bool value) { value_ = static_cast<CqlUnderlyingType>(value); }
 		bool get() const { return static_cast<bool>(value_); }
 		CqlBoolean() : CqlIntegerBase(0) { }
-		CqlBoolean(bool value) : CqlIntegerBase(static_cast<CqlUnderlyingType>(value)) { }
+		explicit CqlBoolean(bool value) : CqlIntegerBase(static_cast<CqlUnderlyingType>(value)) { }
 		void operator=(bool value) { value_ = static_cast<CqlUnderlyingType>(value); }
 	};
 }

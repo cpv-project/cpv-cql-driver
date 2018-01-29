@@ -42,7 +42,7 @@ namespace cql {
 		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
 	T operator op(const T& value) { \
 		return T(op value.get()); \
-	} \
+	}
 
 	DefineCqlIntegerUnaryOperation(+);
 	DefineCqlIntegerUnaryOperation(-);
@@ -114,7 +114,7 @@ namespace cql {
 	/** Write text representation of integer value to stream */
 	template <class T,
 		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0>
-	std::ostream& operator<<(std::ostream& stream, T value) {
+	std::ostream& operator<<(std::ostream& stream, const T& value) {
 		stream << value.get();
 		return stream;
 	}
