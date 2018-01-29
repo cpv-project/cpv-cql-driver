@@ -7,16 +7,14 @@
 #include <CqlDriver/Common/Exceptions/CqlEncodeException.hpp>
 
 namespace cql {
-	/**
-	 * Base class of sized string types
-	 */
+	/** Base class of sized string types */
 	template <class LengthType, class StateType, StateType DefaultState, StateType NormalState>
 	class CqlProtocolSizedStringBase {
 	public:
 		/** Get the value of string, only available when state is NormalState */
 		const seastar::sstring& get() const& { return value_; }
 
-		/** Set the value of string */
+		/** Get the mutable value of string */
 		seastar::sstring& get() & { return value_; }
 
 		/** Get the state */
