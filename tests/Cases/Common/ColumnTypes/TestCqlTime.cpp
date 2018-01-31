@@ -73,7 +73,6 @@ TEST(TestCqlTime, operations) {
 		ASSERT_EQ(timeValue, value.get());
 
 		value = std::chrono::seconds(123);
-		std::cout << static_cast<std::chrono::nanoseconds>(value).count() << std::endl;
 		ASSERT_EQ(static_cast<std::chrono::seconds>(value).count(), 123);
 	}
 	{

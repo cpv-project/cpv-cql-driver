@@ -80,8 +80,7 @@ namespace cql {
 			std::time_t localTime = ::timegm(&localTm);
 			std::uint64_t nanoseconds = (localTime % SecondsPerDay) * NanoSecondsPerSecond;
 			nanoseconds += (
-				std::chrono::nanoseconds(value_.time_since_epoch()).count() %
-				NanoSecondsPerSecond);
+				std::chrono::nanoseconds(value_.time_since_epoch()).count() % NanoSecondsPerSecond);
 			return std::chrono::nanoseconds(nanoseconds);
 		}
 
@@ -115,7 +114,7 @@ namespace cql {
 				static_cast<std::chrono::nanoseconds>(*this));
 		}
 
-		/** Create a CqlTime with specificed hour-minute-second */
+		/** Create a CqlTime with specificed hour:minute:second */
 		static CqlTime create(std::uint8_t hour, std::uint8_t minute, std::uint8_t second) {
 			std::tm localTm = {};
 			localTm.tm_sec = second; // [0, 60]
@@ -128,7 +127,7 @@ namespace cql {
 		}
 
 		/** Create a CqlTime with now, in local timezone */
-		static CqlTime today() {
+		static CqlTime now() {
 			return CqlTime(std::chrono::system_clock::now());
 		}
 	};
