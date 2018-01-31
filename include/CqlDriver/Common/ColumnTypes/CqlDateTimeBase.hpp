@@ -47,7 +47,7 @@ namespace cql {
 			set(std::forward<Args>(args)...);
 		}
 
-		/** Allow assign from time point */
+		/** Allow assign from whatever function "set" would take */
 		template <class... Args>
 		void operator=(Args&&... args) {
 			set(std::forward<Args>(args)...);

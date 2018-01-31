@@ -71,6 +71,7 @@ namespace cql {
 		}
 	};
 
+	/** Write text description expressed in local timezone of date */
 	std::ostream& operator<<(std::ostream& stream, const CqlDate& date) {
 		std::tm localTm = date;
 		stream << std::setfill('0') <<
