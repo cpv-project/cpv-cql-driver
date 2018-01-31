@@ -86,6 +86,13 @@ TEST(TestCqlTime, operations) {
 		ASSERT_EQ(cql::joinString("", value - std::chrono::seconds(2)), "01:02:01.000000000");
 	}
 	{
+		// difference
+		auto a = cql::CqlTime::create(1, 2, 3);
+		auto b = cql::CqlTime::create(1, 0, 3);
+		ASSERT_EQ(std::chrono::duration_cast<std::chrono::milliseconds>(a - b).count(), 120'000);
+		ASSERT_EQ(std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count(), -120'000);
+	}
+	{
 		// equal to
 		ASSERT_TRUE(cql::CqlTime::create(1, 2, 3) == cql::CqlTime::create(1, 2, 3));
 		ASSERT_FALSE(cql::CqlTime::create(1, 2, 3) == cql::CqlTime::create(1, 2, 5));

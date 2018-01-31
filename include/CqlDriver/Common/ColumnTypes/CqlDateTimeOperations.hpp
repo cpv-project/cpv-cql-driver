@@ -3,19 +3,37 @@
 #include <type_traits>
 
 namespace cql {
-#define DefineCqlDateTimeBinaryOperation(op) \
-	template <class T, class Rep, class Period, \
-		std::enable_if_t<std::is_same< \
-			typename T::CqlUnderlyingType, \
-			std::chrono::system_clock::time_point>::value, int> = 0> \
-		T operator op(const T& a, const std::chrono::duration<Rep, Period>& b) { \
-			return T(a.get() op b); \
-		}
+	template <class T, class Rep, class Period,
+		std::enable_if_t<std::is_same<
+			typename T::CqlUnderlyingType,
+			std::chrono::system_clock::time_point>::value, int> = 0>
+	T operator+(const T& a, const std::chrono::duration<Rep, Period>& b) {
+		return T(a.get() + b);
+	}
 
-	DefineCqlDateTimeBinaryOperation(+)
-	DefineCqlDateTimeBinaryOperation(-)
+	template <class T, class Rep, class Period,
+		std::enable_if_t<std::is_same<
+			typename T::CqlUnderlyingType,
+			std::chrono::system_clock::time_point>::value, int> = 0>
+	T operator+(const std::chrono::duration<Rep, Period>& a, const T& b) {
+		return T(a + b.get()); // this variant is addition only
+	}
 
-#undef DefineCqlDateTimeBinaryOperation
+	template <class T, class Rep, class Period,
+		std::enable_if_t<std::is_same<
+			typename T::CqlUnderlyingType,
+			std::chrono::system_clock::time_point>::value, int> = 0>
+	T operator-(const T& a, const std::chrono::duration<Rep, Period>& b) {
+		return T(a.get() - b);
+	}
+
+	template <class T,
+		std::enable_if_t<std::is_same<
+			typename T::CqlUnderlyingType,
+			std::chrono::system_clock::time_point>::value, int> = 0>
+	std::chrono::system_clock::duration operator-(const T& a, const T& b) {
+		return a.get() - b.get(); // this variant is subtraction only
+	}
 
 #define DefineCqlDateTimeCompareOperation(op) \
 	template <class TA, class TB, \

@@ -88,6 +88,13 @@ TEST(TestCqlTimeStamp, operations) {
 		ASSERT_EQ(cql::joinString("", dayBefore), "1970-01-01 01:02:03.000");
 	}
 	{
+		// difference
+		auto a = cql::CqlTimeStamp::create(1970, 1, 1, 1, 2, 3);
+		auto b = cql::CqlTimeStamp::create(1970, 1, 1, 1, 0, 3);
+		ASSERT_EQ(std::chrono::duration_cast<std::chrono::milliseconds>(a - b).count(), 120'000);
+		ASSERT_EQ(std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count(), -120'000);
+	}
+	{
 		// equal to
 		ASSERT_TRUE(
 			cql::CqlTimeStamp::create(1970, 1, 1, 0, 0, 0) ==

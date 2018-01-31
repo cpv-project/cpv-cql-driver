@@ -86,6 +86,13 @@ TEST(TestCqlDate, operations) {
 		ASSERT_EQ(cql::joinString("", dayBefore), "1970-01-14");
 	}
 	{
+		// difference
+		auto a = cql::CqlDate::create(1970, 1, 3);
+		auto b = cql::CqlDate::create(1970, 1, 1);
+		ASSERT_EQ(std::chrono::duration_cast<std::chrono::hours>(a - b).count(), 48);
+		ASSERT_EQ(std::chrono::duration_cast<std::chrono::hours>(b - a).count(), -48);
+	}
+	{
 		// equal to
 		ASSERT_TRUE(cql::CqlDate::create(1970, 1, 1) == cql::CqlDate::create(1970, 1, 1));
 		ASSERT_FALSE(cql::CqlDate::create(1970, 1, 1) == cql::CqlDate::create(1970, 1, 2));
