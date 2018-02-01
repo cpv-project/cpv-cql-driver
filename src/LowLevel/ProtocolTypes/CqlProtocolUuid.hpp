@@ -1,7 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <utility>
-#include <core/sstring.hh>
+#include <CqlDriver/Common/Utility/UuidUtils.hpp>
 
 namespace cql {
 	/**
@@ -12,38 +10,31 @@ namespace cql {
 	class CqlProtocolUuid {
 	public:
 		/** Get the binary value of uuid */
-		std::pair<std::uint64_t, std::uint64_t> get() const;
+		UuidDataType get() const { return value_; }
 
 		/** Set the binary value of uuid */
-		void set(std::pair<std::uint64_t, std::uint64_t> value);
+		void set(UuidDataType value) { value_ = value; }
 
 		/** Reset to initial state */
-		void reset();
+		void reset() { value_ = {}; }
 
 		/** Get the string representation of uuid */
-		seastar::sstring str() const;
+		seastar::sstring str() const { return uuidToStr(value_); }
 
 		/** Set the uuid by it's string representation */
-		void set(const seastar::sstring& str);
+		void set(const seastar::sstring& str) { value_ = strToUuid(str); }
 
 		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
 		void decode(const char*& ptr, const char* end);
 
-		/** Get the empty uuid */
-		static const CqlProtocolUuid& getEmpty();
-
-		/** Make a random uuid */
-		static CqlProtocolUuid makeRandom();
-
 		/** Constructors */
-		explicit CqlProtocolUuid(const seastar::sstring& value);
-		explicit CqlProtocolUuid(std::pair<std::uint64_t, std::uint64_t> value);
-		explicit CqlProtocolUuid(std::uint64_t highBits, std::uint64_t lowBits);
+		CqlProtocolUuid();
+		explicit CqlProtocolUuid(const seastar::sstring& str);
+		explicit CqlProtocolUuid(const UuidDataType& value);
 
 	private:
-		std::uint64_t highBits_;
-		std::uint64_t lowBits_;
+		UuidDataType value_;
 	};
 }
 
