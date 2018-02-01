@@ -1,4 +1,5 @@
 #include <CqlDriver/Common/ColumnTypes/CqlAscii.hpp>
+#include <CqlDriver/Common/Utility/StringUtils.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestCqlAscii, getset) {
@@ -40,24 +41,31 @@ TEST(TestCqlAscii, decode) {
 }
 
 TEST(TestCqlAscii, operations) {
-	cql::CqlAscii value;
-	value = seastar::sstring("aaa");
-
-	seastar::sstring str = value;
-	ASSERT_EQ(str, "aaa");
-
-	value = "abc\x00\x01";
-	str = value;
-	ASSERT_EQ(str, makeTestString("abc\x00\x01"));
-
-	value = "abc";
-	ASSERT_TRUE(value == seastar::sstring("abc"));
-	ASSERT_FALSE(value == seastar::sstring("cba"));
-	ASSERT_TRUE(value != seastar::sstring("cba"));
-	ASSERT_FALSE(value != seastar::sstring("abc"));
-	ASSERT_TRUE(value == "abc");
-	ASSERT_FALSE(value == "cba");
-	ASSERT_TRUE(value != "cba");
-	ASSERT_FALSE(value != "abc");
+	{
+		cql::CqlAscii value;
+		value = seastar::sstring("aaa");
+		seastar::sstring str = value;
+		ASSERT_EQ(str, "aaa");
+	}
+	{
+		cql::CqlAscii value("abc\x00\x01");
+		seastar::sstring str = value;
+		ASSERT_EQ(str, makeTestString("abc\x00\x01"));
+	}
+	{
+		cql::CqlAscii value("abc");
+		ASSERT_TRUE(value == seastar::sstring("abc"));
+		ASSERT_FALSE(value == seastar::sstring("cba"));
+		ASSERT_TRUE(value != seastar::sstring("cba"));
+		ASSERT_FALSE(value != seastar::sstring("abc"));
+		ASSERT_TRUE(value == "abc");
+		ASSERT_FALSE(value == "cba");
+		ASSERT_TRUE(value != "cba");
+		ASSERT_FALSE(value != "abc");
+	}
+	{
+		cql::CqlAscii value("qwert");
+		ASSERT_EQ(cql::joinString("", value), "qwert");
+	}
 }
 

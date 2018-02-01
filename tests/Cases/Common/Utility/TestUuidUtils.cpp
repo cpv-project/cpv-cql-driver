@@ -30,7 +30,7 @@ TEST(TestUuidUtils, makeTimeUuid) {
 	cql::UuidDataType a = cql::makeTimeUuid();
 	cql::UuidDataType b = cql::makeTimeUuid();
 	ASSERT_EQ(cql::getVersionFromUuid(a), cql::TimeUuidVersion);
-	ASSERT_TRUE((a.first == b.first && a.second < b.second) || (a.first < b.first));
+	ASSERT_TRUE(a < b);
 }
 
 TEST(TestUuidUtils, makeMinTimeUuid) {

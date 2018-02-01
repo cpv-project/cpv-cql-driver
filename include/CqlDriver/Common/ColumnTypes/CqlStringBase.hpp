@@ -101,5 +101,14 @@ namespace cql {
 	protected:
 		seastar::sstring value_;
 	};
+
+	/** Write the string content to stream */
+	template <class T,
+		std::enable_if_t<std::is_same<
+			typename T::CqlUnderlyingType, seastar::sstring>::value, int> = 0>
+	std::ostream& operator<<(std::ostream& stream, const T& value) {
+		stream << value.get();
+		return stream;
+	}
 }
 
