@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <core/byteorder.hh>
-#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
+#include "../Exceptions/CqlDecodeException.hpp"
 #include "CqlUuidOperations.hpp"
 
 namespace cql {
@@ -10,6 +10,7 @@ namespace cql {
 	class CqlUuidBase {
 	public:
 		using CqlUnderlyingType = UuidDataType;
+		static const std::size_t CqlEncodeSize = sizeof(UuidDataType::first) + sizeof(UuidDataType::second);
 
 		/** Get the uuid value */
 		UuidDataType get() const& { return value_; }

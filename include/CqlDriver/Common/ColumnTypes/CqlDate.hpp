@@ -22,6 +22,7 @@ namespace cql {
 		using CqlDateTimeBase::operator CqlUnderlyingType;
 		using CqlDateTimeBase::operator std::time_t;
 		using CqlDateTimeBase::operator std::tm;
+		static const std::size_t CqlEncodeSize = sizeof(std::uint32_t);
 		static const std::uint32_t EpochBoundary = 0x80000000;
 		static const std::int32_t SecondsPerDay = 86400;
 

@@ -17,6 +17,7 @@ namespace cql {
 		using CqlDateTimeBase::operator CqlUnderlyingType;
 		using CqlDateTimeBase::operator std::time_t;
 		using CqlDateTimeBase::operator std::tm;
+		static const std::size_t CqlEncodeSize = sizeof(std::int64_t);
 		static const std::uint32_t MilliSecondsPerSecond = 1'000;
 
 		/** Set duration since unix epoch, in utc */

@@ -10,11 +10,13 @@ namespace cql {
 	class CqlBoolean : private CqlIntegerBase<std::int8_t> {
 	public:
 		using CqlIntegerBase::CqlUnderlyingType;
+		using CqlIntegerBase::CqlEncodeSize;
 		using CqlIntegerBase::reset;
 		using CqlIntegerBase::encode;
 		using CqlIntegerBase::decode;
 		using CqlIntegerBase::operator CqlUnderlyingType;
 		using CqlIntegerBase::operator bool;
+
 		void set(bool value) { value_ = static_cast<CqlUnderlyingType>(value); }
 		bool get() const { return static_cast<bool>(value_); }
 		CqlBoolean() : CqlIntegerBase(0) { }

@@ -6,6 +6,7 @@ namespace cql {
 	class CqlFloat : private CqlFloatingPointBase<float> {
 	public:
 		using CqlFloatingPointBase::CqlUnderlyingType;
+		using CqlFloatingPointBase::CqlEncodeSize;
 		using CqlFloatingPointBase::get;
 		using CqlFloatingPointBase::set;
 		using CqlFloatingPointBase::reset;

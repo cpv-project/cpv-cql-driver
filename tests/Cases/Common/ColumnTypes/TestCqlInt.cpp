@@ -140,6 +140,22 @@ TEST(TestCqlInt, operations) {
 		ASSERT_EQ(-cql::CqlInt(123), -123);
 	}
 	{
+		// increment
+		cql::CqlInt a(3);
+		ASSERT_EQ(++a, 4);
+		ASSERT_EQ(a, 4);
+		ASSERT_EQ(a++, 4);
+		ASSERT_EQ(a, 5);
+	}
+	{
+		// decrement
+		cql::CqlInt a(3);
+		ASSERT_EQ(--a, 2);
+		ASSERT_EQ(a, 2);
+		ASSERT_EQ(a--, 2);
+		ASSERT_EQ(a, 1);
+	}
+	{
 		// bitwise not
 		ASSERT_EQ(~cql::CqlInt(123) & 0xffff, 65412);
 	}

@@ -6,6 +6,7 @@ namespace cql {
 	class CqlInt : private CqlIntegerBase<std::int32_t> {
 	public:
 		using CqlIntegerBase::CqlUnderlyingType;
+		using CqlIntegerBase::CqlEncodeSize;
 		using CqlIntegerBase::get;
 		using CqlIntegerBase::set;
 		using CqlIntegerBase::reset;

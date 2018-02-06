@@ -2,7 +2,7 @@
 #include <chrono>
 #include <core/sstring.hh>
 #include <core/byteorder.hh>
-#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
+#include "../Exceptions/CqlDecodeException.hpp"
 #include "CqlDateTimeOperations.hpp"
 
 namespace cql {

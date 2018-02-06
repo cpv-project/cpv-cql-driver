@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <core/sstring.hh>
 #include <core/byteorder.hh>
-#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
+#include "../Exceptions/CqlDecodeException.hpp"
 #include "CqlIntegerOperations.hpp"
 
 namespace cql {
@@ -11,6 +11,7 @@ namespace cql {
 	class CqlIntegerBase {
 	public:
 		using CqlUnderlyingType = IntType;
+		static const std::size_t CqlEncodeSize = sizeof(IntType);
 
 		/** Get the integer value */
 		IntType get() const& { return value_; }

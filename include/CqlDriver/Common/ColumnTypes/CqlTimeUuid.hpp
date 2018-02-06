@@ -6,6 +6,7 @@ namespace cql {
 	class CqlTimeUuid : private CqlUuidBase {
 	public:
 		using CqlUuidBase::CqlUnderlyingType;
+		using CqlUuidBase::CqlEncodeSize;
 		using CqlUuidBase::get;
 		using CqlUuidBase::set;
 		using CqlUuidBase::reset;

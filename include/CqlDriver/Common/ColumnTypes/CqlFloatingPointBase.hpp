@@ -3,7 +3,7 @@
 #include <cmath>
 #include <limits>
 #include <core/sstring.hh>
-#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
+#include "../Exceptions/CqlDecodeException.hpp"
 #include "CqlFloatingPointOperations.hpp"
 
 namespace cql {
@@ -12,6 +12,7 @@ namespace cql {
 	class CqlFloatingPointBase {
 	public:
 		using CqlUnderlyingType = FloatType;
+		static const std::size_t CqlEncodeSize = sizeof(FloatType);
 
 		static_assert(
 			std::numeric_limits<FloatType>::is_iec559,

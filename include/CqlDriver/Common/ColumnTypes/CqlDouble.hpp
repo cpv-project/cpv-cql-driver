@@ -6,6 +6,7 @@ namespace cql {
 	class CqlDouble : private CqlFloatingPointBase<double> {
 	public:
 		using CqlFloatingPointBase::CqlUnderlyingType;
+		using CqlFloatingPointBase::CqlEncodeSize;
 		using CqlFloatingPointBase::get;
 		using CqlFloatingPointBase::set;
 		using CqlFloatingPointBase::reset;

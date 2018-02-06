@@ -1,6 +1,6 @@
 #pragma once
 #include <type_traits>
-#include <CqlDriver/Common/Utility/UuidUtils.hpp>
+#include "../Utility/UuidUtils.hpp"
 
 namespace cql {
 #define DefineCqlUuidCompareOperation(op) \

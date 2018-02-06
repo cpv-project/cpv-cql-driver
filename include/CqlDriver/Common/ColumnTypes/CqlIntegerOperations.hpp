@@ -11,15 +11,17 @@ namespace cql {
 	TResult operator op(const TA& a, const TB& b) { \
 		return TResult(a.get() op b.get()); \
 	} \
-	template <class T, \
-		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
-	T operator op(const T& a, const typename T::CqlUnderlyingType& b) { \
-		return T(a.get() op b); \
+	template <class TA, class TB, \
+		std::enable_if_t<std::is_integral<typename TA::CqlUnderlyingType>::value, int> = 0, \
+		std::enable_if_t<std::is_integral<TB>::value, int> = 0> \
+	TA operator op(const TA& a, const TB& b) { \
+		return TA(a.get() op b); \
 	} \
-	template <class T, \
-		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
-	T operator op(const typename T::CqlUnderlyingType& a, const T& b) { \
-		return T(a op b.get()); \
+	template <class TA, class TB, \
+		std::enable_if_t<std::is_integral<TA>::value, int> = 0, \
+		std::enable_if_t<std::is_integral<typename TB::CqlUnderlyingType>::value, int> = 0> \
+	TA operator op(const TA& a, const TB& b) { \
+		return TA(a op b.get()); \
 	}
 
 	DefineCqlIntegerBinaryOperation(+)
@@ -51,6 +53,24 @@ namespace cql {
 
 #undef DefineCqlIntegerUnaryOperation
 
+#define DefineCqlIntegerPrefixOperation(op) \
+	template <class T, \
+		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
+	T& operator op(T& value) { \
+		op value.get(); \
+		return value; \
+	} \
+	template <class T, \
+		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
+	T operator op(T& value, int) { \
+		return T(value.get() op); \
+	}
+
+	DefineCqlIntegerPrefixOperation(++);
+	DefineCqlIntegerPrefixOperation(--);
+
+#undef DefineCqlIntegerPrefixOperation
+
 #define DefineCqlIntegerCompareOperation(op) \
 	template <class TA, class TB, \
 		std::enable_if_t<std::is_integral<typename TA::CqlUnderlyingType>::value, int> = 0, \
@@ -58,14 +78,16 @@ namespace cql {
 	bool operator op(const TA& a, const TB& b) { \
 		return a.get() op b.get(); \
 	} \
-	template <class T, \
-		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
-	bool operator op(const T& a, const typename T::CqlUnderlyingType& b) { \
+	template <class TA, class TB, \
+		std::enable_if_t<std::is_integral<typename TA::CqlUnderlyingType>::value, int> = 0, \
+		std::enable_if_t<std::is_integral<TB>::value, int> = 0> \
+	bool operator op(const TA& a, const TB& b) { \
 		return a.get() op b; \
 	} \
-	template <class T, \
-		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
-	bool operator op(const typename T::CqlUnderlyingType& a, const T& b) { \
+	template <class TA, class TB, \
+		std::enable_if_t<std::is_integral<TA>::value, int> = 0, \
+		std::enable_if_t<std::is_integral<typename TB::CqlUnderlyingType>::value, int> = 0> \
+	bool operator op(const TA& a, const TB& b) { \
 		return a op b.get(); \
 	}
 
@@ -86,15 +108,17 @@ namespace cql {
 		a.get() op b.get(); \
 		return a; \
 	} \
-	template <class T, \
-		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
-	T& operator op(T& a, const typename T::CqlUnderlyingType& b) { \
+	template <class TA, class TB, \
+		std::enable_if_t<std::is_integral<typename TA::CqlUnderlyingType>::value, int> = 0, \
+		std::enable_if_t<std::is_integral<TB>::value, int> = 0> \
+	TA& operator op(TA& a, const TB& b) { \
 		a.get() op b; \
 		return a; \
 	} \
-	template <class T, \
-		std::enable_if_t<std::is_integral<typename T::CqlUnderlyingType>::value, int> = 0> \
-	typename T::CqlUnderlyingType& operator op(typename T::CqlUnderlyingType& a, const T& b) { \
+	template <class TA, class TB, \
+		std::enable_if_t<std::is_integral<TA>::value, int> = 0, \
+		std::enable_if_t<std::is_integral<typename TB::CqlUnderlyingType>::value, int> = 0> \
+	TA& operator op(TA& a, const TB& b) { \
 		return a op b.get(); \
 	}
 
