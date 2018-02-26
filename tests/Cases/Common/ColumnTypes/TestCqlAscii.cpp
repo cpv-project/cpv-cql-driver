@@ -62,6 +62,14 @@ TEST(TestCqlAscii, operations) {
 		ASSERT_FALSE(value == "cba");
 		ASSERT_TRUE(value != "cba");
 		ASSERT_FALSE(value != "abc");
+		ASSERT_TRUE(seastar::sstring("abc") == value);
+		ASSERT_FALSE(seastar::sstring("cba") == value);
+		ASSERT_TRUE(seastar::sstring("cba") != value);
+		ASSERT_FALSE(seastar::sstring("abc") != value);
+		ASSERT_TRUE("abc" == value);
+		ASSERT_FALSE("cba" == value);
+		ASSERT_TRUE("cba" != value);
+		ASSERT_FALSE("abc" != value);
 	}
 	{
 		cql::CqlAscii value("qwert");

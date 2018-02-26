@@ -22,8 +22,6 @@ namespace cql {
 		using CqlStringBase::operator=;
 		using CqlStringBase::operator const CqlUnderlyingType&;
 		using CqlStringBase::operator CqlUnderlyingType&;
-		using CqlStringBase::operator==;
-		using CqlStringBase::operator!=;
 	};
 }
 

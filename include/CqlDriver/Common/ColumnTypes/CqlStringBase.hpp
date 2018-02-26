@@ -1,5 +1,5 @@
 #pragma once
-#include <core/sstring.hh>
+#include "CqlStringOperations.hpp"
 
 namespace cql {
 	/** Base class of string types */
@@ -91,12 +91,6 @@ namespace cql {
 		/** Allow cast to string implicitly */
 		operator const seastar::sstring&() const& { return value_; }
 		operator seastar::sstring&() & { return value_; }
-
-		/** Compare operators */
-		bool operator==(const seastar::sstring& other) const { return value_ == other; }
-		bool operator!=(const seastar::sstring& other) const { return value_ != other; }
-		bool operator==(const char* other) const { return value_ == other; }
-		bool operator!=(const char* other) const { return value_ != other; }
 
 	protected:
 		seastar::sstring value_;
