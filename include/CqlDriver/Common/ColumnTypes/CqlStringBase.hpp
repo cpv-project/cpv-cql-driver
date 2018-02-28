@@ -92,6 +92,14 @@ namespace cql {
 		operator const seastar::sstring&() const& { return value_; }
 		operator seastar::sstring&() & { return value_; }
 
+		/** Dereference operation */
+		const seastar::sstring& operator*() const& { return value_; }
+		seastar::sstring& operator*() & { return value_; }
+
+		/** Get pointer operation */
+		const seastar::sstring* operator->() const& { return &value_; }
+		seastar::sstring* operator->() & { return &value_; }
+
 	protected:
 		seastar::sstring value_;
 	};

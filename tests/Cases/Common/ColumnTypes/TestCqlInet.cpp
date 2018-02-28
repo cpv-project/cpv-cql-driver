@@ -68,6 +68,18 @@ TEST(TestCqlInet, operations) {
 		ASSERT_EQ(ipAddress, seastar::net::inet_address("127.0.0.1"));
 	}
 	{
+		// dereference
+		cql::CqlInet value("127.0.0.1");
+		ASSERT_EQ(*value, seastar::net::inet_address("127.0.0.1"));
+	}
+	{
+		// get pointer
+		cql::CqlInet value("127.0.0.1");
+		ASSERT_EQ(
+			seastar::sstring(reinterpret_cast<const char*>(value->data()), value->size()),
+			makeTestString("\x7f\x00\x00\x01"));
+	}
+	{
 		// equal to
 		ASSERT_TRUE(cql::CqlInet("127.0.0.1") == cql::CqlInet("127.0.0.1"));
 		ASSERT_TRUE(cql::CqlInet("127.0.0.1") == seastar::net::inet_address("127.0.0.1"));

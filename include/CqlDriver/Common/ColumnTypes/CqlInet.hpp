@@ -66,6 +66,14 @@ namespace cql {
 			return value_;
 		}
 
+		/** Dereference operation */
+		const CqlUnderlyingType& operator*() const& { return value_; }
+		CqlUnderlyingType& operator*() & { return value_; }
+
+		/** Get pointer operation */
+		const CqlUnderlyingType* operator->() const& { return &value_; }
+		CqlUnderlyingType* operator->() & { return &value_; }
+
 	private:
 		CqlUnderlyingType value_;
 	};

@@ -42,36 +42,55 @@ TEST(TestCqlAscii, decode) {
 
 TEST(TestCqlAscii, operations) {
 	{
+		// assign and cast
 		cql::CqlAscii value;
 		value = seastar::sstring("aaa");
 		seastar::sstring str = value;
 		ASSERT_EQ(str, "aaa");
 	}
 	{
+		// cast (contains \x00)
 		cql::CqlAscii value("abc\x00\x01");
 		seastar::sstring str = value;
 		ASSERT_EQ(str, makeTestString("abc\x00\x01"));
 	}
 	{
+		// dereference
+		cql::CqlAscii value("abc");
+		ASSERT_EQ(*value, "abc");
+	}
+	{
+		// get pointer
+		cql::CqlAscii value("abc");
+		value->append("de", 2);
+		ASSERT_EQ(value->size(), 5);
+	}
+	{
+		// equal to
 		cql::CqlAscii value("abc");
 		ASSERT_TRUE(value == seastar::sstring("abc"));
 		ASSERT_FALSE(value == seastar::sstring("cba"));
-		ASSERT_TRUE(value != seastar::sstring("cba"));
-		ASSERT_FALSE(value != seastar::sstring("abc"));
 		ASSERT_TRUE(value == "abc");
 		ASSERT_FALSE(value == "cba");
-		ASSERT_TRUE(value != "cba");
-		ASSERT_FALSE(value != "abc");
 		ASSERT_TRUE(seastar::sstring("abc") == value);
 		ASSERT_FALSE(seastar::sstring("cba") == value);
-		ASSERT_TRUE(seastar::sstring("cba") != value);
-		ASSERT_FALSE(seastar::sstring("abc") != value);
 		ASSERT_TRUE("abc" == value);
 		ASSERT_FALSE("cba" == value);
+	}
+	{
+		// not equal to
+		cql::CqlAscii value("abc");
+		ASSERT_TRUE(value != seastar::sstring("cba"));
+		ASSERT_FALSE(value != seastar::sstring("abc"));
+		ASSERT_TRUE(value != "cba");
+		ASSERT_FALSE(value != "abc");
+		ASSERT_TRUE(seastar::sstring("cba") != value);
+		ASSERT_FALSE(seastar::sstring("abc") != value);
 		ASSERT_TRUE("cba" != value);
 		ASSERT_FALSE("abc" != value);
 	}
 	{
+		// get text description
 		cql::CqlAscii value("qwert");
 		ASSERT_EQ(cql::joinString("", value), "qwert");
 	}

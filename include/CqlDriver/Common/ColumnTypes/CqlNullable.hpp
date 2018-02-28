@@ -55,8 +55,8 @@ namespace cql {
 			value_(std::forward<Args>(args)...), isNull_(false) { }
 
 		/** Dereference without null check */
-		const T& operator*() const& { return get(); }
-		T& operator*() & { return get(); }
+		const T& operator*() const& { return value_; }
+		T& operator*() & { return value_; }
 
 		/** Get pointer without null check */
 		const T* operator->() const& { return &value_; }
