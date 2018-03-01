@@ -12,7 +12,6 @@ namespace cql {
 	class CqlNullable {
 	public:
 		using CqlUnderlyingType = T;
-		static const bool CqlIsNullable = true;
 
 		/** Get underlying value without null check */
 		const T& get() const& { return value_; }

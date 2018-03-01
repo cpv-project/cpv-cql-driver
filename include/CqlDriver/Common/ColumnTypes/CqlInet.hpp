@@ -11,9 +11,9 @@ namespace cql {
 		using CqlUnderlyingType = seastar::net::inet_address;
 
 		/** Get the ip address */
-		CqlUnderlyingType get() const& { return value_; }
+		const CqlUnderlyingType& get() const& { return value_; }
 
-		/** Get the ip address */
+		/** Get the mutable ip address */
 		CqlUnderlyingType& get() & { return value_; }
 
 		/** Set the ip address */
