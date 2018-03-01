@@ -1,4 +1,3 @@
-#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 #include <CqlDriver/Common/ColumnTypes/CqlCounter.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
