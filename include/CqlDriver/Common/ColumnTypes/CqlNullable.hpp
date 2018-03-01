@@ -31,16 +31,16 @@ namespace cql {
 		bool isNull() const { return isNull_; }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) {
+		void encodeBody(seastar::sstring& data) {
 			if (!isNull_) {
-				value_.encode(data);
+				value_.encodeBody(data);
 			}
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			if (size >= 0) {
-				value_.decode(ptr, size);
+				value_.decodeBody(ptr, size);
 				isNull_ = false;
 			} else {
 				reset();

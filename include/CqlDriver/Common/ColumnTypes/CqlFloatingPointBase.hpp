@@ -46,12 +46,12 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) {
+		void encodeBody(seastar::sstring& data) {
 			data.append(reinterpret_cast<const char*>(&value_), sizeof(value_));
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			if (size == 0) {
 				value_ = 0; // empty
 			} else if (size != sizeof(value_)) {

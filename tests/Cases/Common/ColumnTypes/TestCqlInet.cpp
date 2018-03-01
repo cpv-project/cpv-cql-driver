@@ -16,47 +16,47 @@ TEST(TestCqlInet, getset) {
 	ASSERT_EQ(value.get(), seastar::net::inet_address("0.0.0.0"));
 }
 
-TEST(TestCqlInet, encode) {
+TEST(TestCqlInet, encodeBody) {
 	{
 		cql::CqlInet value("127.0.0.1");
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x7f\x00\x00\x01"));
 	}
 	{
 		cql::CqlInet value("0:0:FF:D:C:B:A:1");
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01"));
 	}}
 
-TEST(TestCqlInet, decode) {
+TEST(TestCqlInet, decodeBody) {
 	{
 		cql::CqlInet value;
 		auto data = makeTestString("\x7f\x00\x00\x01");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value, seastar::net::inet_address("127.0.0.1"));
 	}
 	{
 		cql::CqlInet value;
 		auto data = makeTestString(
 			"\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value, seastar::net::inet_address("0:0:FF:D:C:B:A:1"));
 	}
 	{
 		cql::CqlInet value("127.0.0.1");
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value, seastar::net::inet_address("0.0.0.0"));
 	}
 }
 
-TEST(TestCqlInet, decodeError) {
+TEST(TestCqlInet, decodeBodyError) {
 	cql::CqlInet value;
 	auto data = makeTestString("\x7f\x00\x01");
-	ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+	ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 }
 
 TEST(TestCqlInet, operations) {

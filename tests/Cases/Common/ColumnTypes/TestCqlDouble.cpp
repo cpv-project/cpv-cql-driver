@@ -26,10 +26,10 @@ TEST(TestCqlDouble, approximatelyEquals) {
 	ASSERT_FALSE(value.approximatelyEquals(10000.124));
 }
 
-TEST(TestCqlDouble, encode) {
+TEST(TestCqlDouble, encodeBody) {
 	cql::CqlDouble value(1.1);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 
 	double doubleValue = 0;
 	ASSERT_EQ(sizeof(doubleValue), data.size());
@@ -37,17 +37,17 @@ TEST(TestCqlDouble, encode) {
 	ASSERT_TRUE(value.approximatelyEquals(doubleValue));
 }
 
-TEST(TestCqlDouble, decode) {
+TEST(TestCqlDouble, decodeBody) {
 	{
 		cql::CqlDouble value(3.0);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_TRUE(value.approximatelyEquals(0));
 	}
 	{
 		cql::CqlDouble value;
 		auto data = makeTestString("\x9a\x99\x99\x99\x99\x99\xf1\x3f");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_TRUE(value.approximatelyEquals(1.1));
 	}
 }

@@ -27,7 +27,7 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encodeBody(seastar::sstring& data) const {
 			// store utc timestamp in database
 			std::chrono::milliseconds milliseconds = *this;
 			std::int64_t dbValue = milliseconds.count();
@@ -36,7 +36,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			std::int64_t dbValue = 0;
 			if (size == 0) {
 				reset(); // empty

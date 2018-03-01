@@ -13,22 +13,22 @@ TEST(TestCqlUuid, getset) {
 	ASSERT_EQ(uuid.str(), "12345678-ABCD-EFAA-8765-4321FFABCDEF");
 }
 
-TEST(TestCqlUuid, encode) {
+TEST(TestCqlUuid, encodeBody) {
 	{
 		cql::CqlUuid value("00112233-4455-6677-8899-aabbccddeeff");
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"));
 	}
 }
 
-TEST(TestCqlUuid, decode) {
+TEST(TestCqlUuid, decodeBody) {
 	cql::CqlUuid value;
 	{
 		auto data = makeTestString(
 			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.str(), "00112233-4455-6677-8899-AABBCCDDEEFF");
 	}
 }

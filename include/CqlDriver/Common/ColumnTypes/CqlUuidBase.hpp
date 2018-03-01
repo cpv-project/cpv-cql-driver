@@ -34,7 +34,7 @@ namespace cql {
 		seastar::sstring str() const { return uuidToStr(value_); }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) {
+		void encodeBody(seastar::sstring& data) {
 			auto highBitsBe = seastar::cpu_to_be(value_.first);
 			auto lowBitsBe = seastar::cpu_to_be(value_.second);
 			data.append(reinterpret_cast<const char*>(&highBitsBe), sizeof(highBitsBe));
@@ -42,7 +42,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			static const constexpr std::size_t length = sizeof(value_.first) + sizeof(value_.second);
 			if (size == 0) {
 				reset(); // empty

@@ -12,8 +12,8 @@ namespace cql {
 		using CqlIntegerBase::CqlUnderlyingType;
 		using CqlIntegerBase::CqlEncodeSize;
 		using CqlIntegerBase::reset;
-		using CqlIntegerBase::encode;
-		using CqlIntegerBase::decode;
+		using CqlIntegerBase::encodeBody;
+		using CqlIntegerBase::decodeBody;
 		using CqlIntegerBase::operator CqlUnderlyingType;
 		using CqlIntegerBase::operator bool;
 

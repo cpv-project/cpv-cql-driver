@@ -26,13 +26,13 @@ namespace cql {
 		void reset() { value_ = 0; }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encodeBody(seastar::sstring& data) const {
 			auto value = seastar::cpu_to_be(value_);
 			data.append(reinterpret_cast<const char*>(&value), sizeof(value));
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			if (size == 0) {
 				value_ = 0; // empty
 			} else if (size != sizeof(value_)) {

@@ -12,38 +12,38 @@ TEST(TestCqlSmallInt, getset) {
 	ASSERT_EQ(value.get(), -0x8000);
 }
 
-TEST(TestCqlSmallInt, encode) {
+TEST(TestCqlSmallInt, encodeBody) {
 	cql::CqlSmallInt value(0x1234);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34"));
 }
 
-TEST(TestCqlSmallInt, decode) {
+TEST(TestCqlSmallInt, decodeBody) {
 	{
 		cql::CqlSmallInt value(0);
 		auto data = makeTestString("\x12\x34");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0x1234);
 	}
 	{
 		cql::CqlSmallInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 }
 
-TEST(TestCqlSmallInt, decodeError) {
+TEST(TestCqlSmallInt, decodeBodyError) {
 	{
 		cql::CqlSmallInt value(0);
 		auto data = makeTestString("\x12");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 	{
 		cql::CqlSmallInt value(0);
 		auto data = makeTestString("\x12\x34\x00");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 }
 

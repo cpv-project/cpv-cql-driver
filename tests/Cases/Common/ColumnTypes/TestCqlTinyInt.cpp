@@ -12,33 +12,33 @@ TEST(TestCqlTinyInt, getset) {
 	ASSERT_EQ(value.get(), -0x80);
 }
 
-TEST(TestCqlTinyInt, encode) {
+TEST(TestCqlTinyInt, encodeBody) {
 	cql::CqlTinyInt value(0x12);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12"));
 }
 
-TEST(TestCqlTinyInt, decode) {
+TEST(TestCqlTinyInt, decodeBody) {
 	{
 		cql::CqlTinyInt value(0);
 		auto data = makeTestString("\x12");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0x12);
 	}
 	{
 		cql::CqlTinyInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 }
 
-TEST(TestCqlTinyInt, decodeError) {
+TEST(TestCqlTinyInt, decodeBodyError) {
 	{
 		cql::CqlTinyInt value(0);
 		auto data = makeTestString("\x12\x00");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 }
 

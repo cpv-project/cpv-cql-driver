@@ -12,32 +12,32 @@ TEST(TestCqlInt, getset) {
 	ASSERT_EQ(value.get(), -0x80000000);
 }
 
-TEST(TestCqlInt, encode) {
+TEST(TestCqlInt, encodeBody) {
 	cql::CqlInt value(0x12345678);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78"));
 }
 
-TEST(TestCqlInt, decode) {
+TEST(TestCqlInt, decodeBody) {
 	{
 		cql::CqlInt value(0);
 		auto data = makeTestString("\x12\x34\x56\x78");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0x12345678);
 	}
 	{
 		cql::CqlInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 }
 
-TEST(TestCqlInt, decodeError) {
+TEST(TestCqlInt, decodeBodyError) {
 	cql::CqlInt value(0);
 	auto data = makeTestString("\x12");
-	ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+	ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 }
 
 TEST(TestCqlInt, operations) {

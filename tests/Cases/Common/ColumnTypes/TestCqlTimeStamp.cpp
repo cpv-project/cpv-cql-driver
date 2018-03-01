@@ -24,42 +24,42 @@ TEST(TestCqlTimeStamp, getset) {
 	ASSERT_EQ(static_cast<std::chrono::milliseconds>(value).count(), 0);
 }
 
-TEST(TestCqlTimeStamp, encode) {
+TEST(TestCqlTimeStamp, encodeBody) {
 	{
 		cql::CqlTimeStamp value;
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00\x00\x00\x00\x00"));
 	}
 	{
 		cql::CqlTimeStamp value(std::chrono::seconds(90123));
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00\x05\x5f\x2a\xf8"));
 	}
 	{
 		cql::CqlTimeStamp value(std::chrono::seconds(-60));
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\xff\xff\xff\xff\xff\xff\x15\xa0"));
 	}
 }
 
-TEST(TestCqlTimeStamp, decode) {
+TEST(TestCqlTimeStamp, decodeBody) {
 	cql::CqlTimeStamp value;
 	{
 		auto data = makeTestString("\x00\x00\x00\x00\x00\x00\x00\x00");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(static_cast<std::chrono::milliseconds>(value).count(), 0);
 	}
 	{
 		auto data = makeTestString("\x00\x00\x00\x00\x05\x5f\x2a\xf8");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(static_cast<std::chrono::milliseconds>(value).count(), 90'123'000);
 	}
 	{
 		auto data = makeTestString("\xff\xff\xff\xff\xff\xff\x15\xa0");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(static_cast<std::chrono::milliseconds>(value).count(), -60'000);
 	}
 }

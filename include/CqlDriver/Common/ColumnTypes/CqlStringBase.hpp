@@ -64,12 +64,12 @@ namespace cql {
 		bool empty() const { return value_.empty(); }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encodeBody(seastar::sstring& data) const {
 			data.append(value_.data(), value_.size());
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			if (size >= 0) {
 				set(ptr, static_cast<std::size_t>(size));
 			}

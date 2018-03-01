@@ -12,38 +12,38 @@ TEST(TestCqlCounter, getset) {
 	ASSERT_EQ(value.get(), -0x8000'0000'0000'0000);
 }
 
-TEST(TestCqlCounter, encode) {
+TEST(TestCqlCounter, encodeBody) {
 	cql::CqlCounter value(0x1234'5678'abcd'dcba);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba"));
 }
 
-TEST(TestCqlCounter, decode) {
+TEST(TestCqlCounter, decodeBody) {
 	{
 		cql::CqlCounter value(0);
 		auto data = makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0x1234'5678'abcd'dcba);
 	}
 	{
 		cql::CqlCounter value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 }
 
-TEST(TestCqlCounter, decodeError) {
+TEST(TestCqlCounter, decodeBodyError) {
 	{
 		cql::CqlCounter value(0);
 		auto data = makeTestString("\x12");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 	{
 		cql::CqlCounter value(0);
 		auto data = makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba\x00");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 }
 

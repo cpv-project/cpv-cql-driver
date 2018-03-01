@@ -21,42 +21,42 @@ TEST(TestCqlDate, getset) {
 	ASSERT_EQ(std::mktime(&getTm), std::mktime(&nowTm));
 }
 
-TEST(TestCqlDate, encode) {
+TEST(TestCqlDate, encodeBody) {
 	{
 		auto value = cql::CqlDate::create(1970, 1, 1);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x80\x00\x00\x00"));
 	}
 	{
 		auto value = cql::CqlDate::create(1970, 1, 2);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x80\x00\x00\x01"));
 	}
 	{
 		auto value = cql::CqlDate::create(1969, 12, 31);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x7f\xff\xff\xff"));
 	}
 }
 
-TEST(TestCqlDate, decode) {
+TEST(TestCqlDate, decodeBody) {
 	cql::CqlDate value;
 	{
 		auto data = makeTestString("\x80\x00\x00\x00");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(cql::joinString("", value), "1970-01-01");
 	}
 	{
 		auto data = makeTestString("\x80\x00\x00\x01");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(cql::joinString("", value), "1970-01-02");
 	}
 	{
 		auto data = makeTestString("\x7f\xff\xff\xff");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(cql::joinString("", value), "1969-12-31");
 	}
 }

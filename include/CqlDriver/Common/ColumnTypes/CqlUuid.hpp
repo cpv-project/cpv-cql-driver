@@ -12,8 +12,8 @@ namespace cql {
 		using CqlUuidBase::reset;
 		using CqlUuidBase::empty;
 		using CqlUuidBase::str;
-		using CqlUuidBase::encode;
-		using CqlUuidBase::decode;
+		using CqlUuidBase::encodeBody;
+		using CqlUuidBase::decodeBody;
 		using CqlUuidBase::CqlUuidBase;
 		using CqlUuidBase::operator=;
 		using CqlUuidBase::operator CqlUnderlyingType;

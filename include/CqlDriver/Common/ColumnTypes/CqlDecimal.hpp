@@ -58,13 +58,13 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
-			value_.first.encode(data);
-			value_.second.encode(data);
+		void encodeBody(seastar::sstring& data) const {
+			value_.first.encodeBody(data);
+			value_.second.encodeBody(data);
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			if (size == 0) {
 				reset(); // empty;
 			} else if (size < CqlInt::CqlEncodeSize + 1) {
@@ -72,8 +72,8 @@ namespace cql {
 					"date length not enough, should be atleast", CqlInt::CqlEncodeSize + 1,
 					"but actual is", size);
 			} else {
-				value_.first.decode(ptr, CqlInt::CqlEncodeSize);
-				value_.second.decode(ptr + CqlInt::CqlEncodeSize, size - CqlInt::CqlEncodeSize);
+				value_.first.decodeBody(ptr, CqlInt::CqlEncodeSize);
+				value_.second.decodeBody(ptr + CqlInt::CqlEncodeSize, size - CqlInt::CqlEncodeSize);
 			}
 		}
 

@@ -24,42 +24,42 @@ TEST(TestCqlTime, getset) {
 	ASSERT_EQ(static_cast<std::chrono::nanoseconds>(value).count(), 0);
 }
 
-TEST(TestCqlTime, encode) {
+TEST(TestCqlTime, encodeBody) {
 	{
 		cql::CqlTime value(std::chrono::seconds(123));
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x1c\xa3\x5f\x0e\x00"));
 	}
 	{
 		cql::CqlTime value(std::chrono::milliseconds(12345));
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x02\xdf\xd1\xc0\x40"));
 	}
 	{
 		auto value = cql::CqlTime::create(1, 2, 3); // 3723s
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x03\x62\xd4\x17\xae\x00"));
 	}
 }
 
-TEST(TestCqlTime, decode) {
+TEST(TestCqlTime, decodeBody) {
 	cql::CqlTime value;
 	{
 		auto data = makeTestString("\x00\x00\x00\x1c\xa3\x5f\x0e\x00");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(static_cast<std::chrono::nanoseconds>(value).count(), 123'000'000'000);
 	}
 	{
 		auto data = makeTestString("\x00\x00\x00\x02\xdf\xd1\xc0\x40");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(static_cast<std::chrono::nanoseconds>(value).count(), 12'345'000'000);
 	}
 	{
 		auto data = makeTestString("\x00\x00\x03\x62\xd4\x17\xae\x00");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(static_cast<std::chrono::nanoseconds>(value).count(), 3723'000'000'000);
 	}
 }

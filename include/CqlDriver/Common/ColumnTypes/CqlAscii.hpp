@@ -17,8 +17,8 @@ namespace cql {
 		using CqlStringBase::data;
 		using CqlStringBase::size;
 		using CqlStringBase::empty;
-		using CqlStringBase::encode;
-		using CqlStringBase::decode;
+		using CqlStringBase::encodeBody;
+		using CqlStringBase::decodeBody;
 		using CqlStringBase::CqlStringBase;
 		using CqlStringBase::operator=;
 		using CqlStringBase::operator const CqlUnderlyingType&;

@@ -26,12 +26,12 @@ namespace cql {
 		void reset() { value_ = {}; }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encodeBody(seastar::sstring& data) const {
 			data.append(reinterpret_cast<const char*>(value_.data()), value_.size());
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			if (size == 0) {
 				reset(); // empty
 			} else if (size == sizeof(::in_addr)) {

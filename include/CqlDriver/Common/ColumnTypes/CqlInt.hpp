@@ -10,8 +10,8 @@ namespace cql {
 		using CqlIntegerBase::get;
 		using CqlIntegerBase::set;
 		using CqlIntegerBase::reset;
-		using CqlIntegerBase::encode;
-		using CqlIntegerBase::decode;
+		using CqlIntegerBase::encodeBody;
+		using CqlIntegerBase::decodeBody;
 		using CqlIntegerBase::CqlIntegerBase;
 		using CqlIntegerBase::operator=;
 		using CqlIntegerBase::operator CqlUnderlyingType;

@@ -27,7 +27,7 @@ namespace cql {
 		static const std::int32_t SecondsPerDay = 86400;
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encodeBody(seastar::sstring& data) const {
 			// store local date in database, not utc date
 			std::tm localTm = *this;
 			std::time_t localTime = ::timegm(&localTm);
@@ -37,7 +37,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decode(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, std::int32_t size) {
 			std::uint32_t dbValue = 0;
 			if (size == 0) {
 				reset(); // empty

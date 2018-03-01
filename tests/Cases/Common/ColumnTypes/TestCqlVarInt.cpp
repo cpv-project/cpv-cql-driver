@@ -12,107 +12,107 @@ TEST(TestCqlVarInt, getset) {
 	ASSERT_EQ(value.get(), -0x8000'0000'0000'0000);
 }
 
-TEST(TestCqlVarInt, encode) {
+TEST(TestCqlVarInt, encodeBody) {
 	{
 		cql::CqlVarInt value;
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00"));
 	}
 	{
 		cql::CqlVarInt value(127);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x7f"));
 	}
 	{
 		cql::CqlVarInt value(128);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x80"));
 	}
 	{
 		cql::CqlVarInt value(-1);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\xff"));
 	}
 	{
 		cql::CqlVarInt value(-128);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x80"));
 	}
 	{
 		cql::CqlVarInt value(-129);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\xff\x7f"));
 	}
 	{
 		cql::CqlVarInt value(0x1234'5678'abcd'dcba);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba"));
 	}
 }
 
-TEST(TestCqlVarInt, decode) {
+TEST(TestCqlVarInt, decodeBody) {
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\x00");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\x7f");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 127);
 	}
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\x00\x80");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 128);
 	}
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\xff");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), -1);
 	}
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\x80");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), -128);
 	}
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\xff\x7f");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), -129);
 	}
 	{
 		cql::CqlVarInt value;
 		auto data = makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0x1234'5678'abcd'dcba);
 	}
 	{
 		cql::CqlVarInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 }
 
-TEST(TestCqlVarInt, decodeError) {
+TEST(TestCqlVarInt, decodeBodyError) {
 	{
 		cql::CqlVarInt value(0);
 		auto data = makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba\x00");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 }
 

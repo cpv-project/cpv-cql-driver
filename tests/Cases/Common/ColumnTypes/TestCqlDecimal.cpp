@@ -46,55 +46,55 @@ TEST(TestCqlDecimal, strip) {
 	}
 }
 
-TEST(TestCqlDecimal, encode) {
+TEST(TestCqlDecimal, encodeBody) {
 	{
 		cql::CqlDecimal value;
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00\x00"));
 	}
 	{
 		cql::CqlDecimal value(3, 123);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x03\x7b"));
 	}
 	{
 		cql::CqlDecimal value(-3, -129);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\xff\xff\xff\xfd\xff\x7f"));
 	}
 }
 
-TEST(TestCqlDecimal, decode) {
+TEST(TestCqlDecimal, decodeBody) {
 	cql::CqlDecimal value;
 	{
 		auto data = makeTestString("\x00\x00\x00\x03\x7b");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), cql::DecimalDataType(3, 123));
 	}
 	{
 		auto data = makeTestString("\xff\xff\xff\xfd\xff\x7f");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), cql::DecimalDataType(-3, -129));
 	}
 	{
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), cql::DecimalDataType(0, 0));
 	}
 }
 
-TEST(TestCqlDecimal, decodeError) {
+TEST(TestCqlDecimal, decodeBodyError) {
 	cql::CqlDecimal value;
 	{
 		auto data = makeTestString("\x01");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 	{
 		auto data = makeTestString("\x00\x00\x00\x01");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 }
 

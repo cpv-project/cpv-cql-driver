@@ -26,17 +26,17 @@ TEST(TestCqlAscii, getset) {
 	ASSERT_TRUE(value.empty());
 }
 
-TEST(TestCqlAscii, encode) {
+TEST(TestCqlAscii, encodeBody) {
 	cql::CqlAscii value("abc\x00\x01");
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("abc\x00\x01"));
 }
 
-TEST(TestCqlAscii, decode) {
+TEST(TestCqlAscii, decodeBody) {
 	auto data = makeTestString("abc\x00\x01");
 	cql::CqlAscii value;
-	value.decode(data.data(), data.size());
+	value.decodeBody(data.data(), data.size());
 	ASSERT_TRUE(value == makeTestString("abc\x00\x01"));
 }
 

@@ -26,10 +26,10 @@ TEST(TestCqlFloat, approximatelyEquals) {
 	ASSERT_FALSE(value.approximatelyEquals(10000.124));
 }
 
-TEST(TestCqlFloat, encode) {
+TEST(TestCqlFloat, encodeBody) {
 	cql::CqlFloat value(1.1);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 
 	float floatValue = 0;
 	ASSERT_EQ(sizeof(floatValue), data.size());
@@ -37,17 +37,17 @@ TEST(TestCqlFloat, encode) {
 	ASSERT_TRUE(value.approximatelyEquals(floatValue));
 }
 
-TEST(TestCqlFloat, decode) {
+TEST(TestCqlFloat, decodeBody) {
 	{
 		cql::CqlFloat value(3.0);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_TRUE(value.approximatelyEquals(0));
 	}
 	{
 		cql::CqlFloat value;
 		auto data = makeTestString("\xcd\xcc\x8c\x3f");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_TRUE(value.approximatelyEquals(1.1));
 	}
 }

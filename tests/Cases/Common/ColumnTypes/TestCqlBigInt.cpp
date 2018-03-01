@@ -12,38 +12,38 @@ TEST(TestCqlBigInt, getset) {
 	ASSERT_EQ(value.get(), -0x8000'0000'0000'0000);
 }
 
-TEST(TestCqlBigInt, encode) {
+TEST(TestCqlBigInt, encodeBody) {
 	cql::CqlBigInt value(0x1234'5678'abcd'dcba);
 	seastar::sstring data;
-	value.encode(data);
+	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba"));
 }
 
-TEST(TestCqlBigInt, decode) {
+TEST(TestCqlBigInt, decodeBody) {
 	{
 		cql::CqlBigInt value(0);
 		auto data = makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0x1234'5678'abcd'dcba);
 	}
 	{
 		cql::CqlBigInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value.get(), 0);
 	}
 }
 
-TEST(TestCqlBigInt, decodeError) {
+TEST(TestCqlBigInt, decodeBodyError) {
 	{
 		cql::CqlBigInt value(0);
 		auto data = makeTestString("\x12");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 	{
 		cql::CqlBigInt value(0);
 		auto data = makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba\x00");
-		ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+		ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 	}
 }
 

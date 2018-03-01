@@ -23,55 +23,55 @@ TEST(TestCqlNullable, getset) {
 	ASSERT_EQ(value.get(), 321);
 }
 
-TEST(TestCqlNullable, encode) {
+TEST(TestCqlNullable, encodeBody) {
 	{
 		NullableInt value;
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(""));
 	}
 	{
 		NullableInt value(0);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00"));
 	}
 	{
 		NullableInt value(123);
 		seastar::sstring data;
-		value.encode(data);
+		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x7b"));
 	}
 }
 
-TEST(TestCqlNullable, decode) {
+TEST(TestCqlNullable, decodeBody) {
 	{
 		NullableInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), -1);
+		value.decodeBody(data.data(), -1);
 		ASSERT_TRUE(value.isNull());
 		ASSERT_EQ(value.get(), 0);
 	}
 	{
 		NullableInt value(123);
 		auto data = makeTestString("");
-		value.decode(data.data(), 0);
+		value.decodeBody(data.data(), 0);
 		ASSERT_FALSE(value.isNull());
 		ASSERT_EQ(value.get(), 0);
 	}
 	{
 		NullableInt value;
 		auto data = makeTestString("\x00\x00\x00\x7b");
-		value.decode(data.data(), data.size());
+		value.decodeBody(data.data(), data.size());
 		ASSERT_FALSE(value.isNull());
 		ASSERT_EQ(value.get(), 123);
 	}
 }
 
-TEST(TestCqlNullable, decodeError) {
+TEST(TestCqlNullable, decodeBodyError) {
 	NullableInt value;
 	auto data = makeTestString("\x00\x00\x7b");
-	ASSERT_THROWS(cql::CqlDecodeException, value.decode(data.data(), data.size()));
+	ASSERT_THROWS(cql::CqlDecodeException, value.decodeBody(data.data(), data.size()));
 }
 
 TEST(TestCqlNullable, operations) {

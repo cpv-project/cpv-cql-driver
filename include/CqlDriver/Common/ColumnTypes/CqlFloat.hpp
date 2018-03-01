@@ -11,8 +11,8 @@ namespace cql {
 		using CqlFloatingPointBase::set;
 		using CqlFloatingPointBase::reset;
 		using CqlFloatingPointBase::approximatelyEquals;
-		using CqlFloatingPointBase::encode;
-		using CqlFloatingPointBase::decode;
+		using CqlFloatingPointBase::encodeBody;
+		using CqlFloatingPointBase::decodeBody;
 		using CqlFloatingPointBase::CqlFloatingPointBase;
 		using CqlFloatingPointBase::operator=;
 		using CqlFloatingPointBase::operator CqlUnderlyingType;
