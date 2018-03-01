@@ -22,7 +22,9 @@ CqlSessionFactory [HighLevel, shared_ptr]
 	create(sessionConfiguration, nodeCollection)
 
 CqlSession [HighLevel, CqlObject]
-	...
+	query(statement, parameters...) -> CqlObject<CqlResultSet>
+	execute(statement, parameters...) -> void
+	batchExecute(statement, listOfParameters) -> void
 
 CqlConnectionPool [LowLevel, shared_ptr]
 	getConnection()
