@@ -1,4 +1,5 @@
 #pragma once
+#include "CqlColumnDefinitions.hpp"
 #include "CqlDecimalOperations.hpp"
 
 namespace cql {
@@ -64,7 +65,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			if (size == 0) {
 				reset(); // empty;
 			} else if (size < CqlInt::CqlEncodeSize + 1) {

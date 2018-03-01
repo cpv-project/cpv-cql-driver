@@ -1,6 +1,7 @@
 #pragma once
 #include <utility>
 #include <core/sstring.hh>
+#include "CqlColumnDefinitions.hpp"
 
 namespace cql {
 	/**
@@ -38,7 +39,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			if (size >= 0) {
 				value_.decodeBody(ptr, size);
 				isNull_ = false;

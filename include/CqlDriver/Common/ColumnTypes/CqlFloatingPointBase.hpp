@@ -4,6 +4,7 @@
 #include <limits>
 #include <core/sstring.hh>
 #include "../Exceptions/CqlDecodeException.hpp"
+#include "CqlColumnDefinitions.hpp"
 #include "CqlFloatingPointOperations.hpp"
 
 namespace cql {
@@ -51,7 +52,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			if (size == 0) {
 				value_ = 0; // empty
 			} else if (size != sizeof(value_)) {

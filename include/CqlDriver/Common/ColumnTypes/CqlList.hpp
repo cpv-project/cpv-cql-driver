@@ -3,6 +3,7 @@
 #include <vector>
 #include <core/sstring.hh>
 #include "../Exceptions/CqlDecodeException.hpp"
+#include "CqlColumnDefinitions.hpp"
 
 namespace cql {
 	template <class T>
@@ -33,7 +34,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			
 		}
 

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <core/byteorder.hh>
 #include "../Exceptions/CqlDecodeException.hpp"
+#include "CqlColumnDefinitions.hpp"
 #include "CqlUuidOperations.hpp"
 
 namespace cql {
@@ -42,7 +43,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			static const constexpr std::size_t length = sizeof(value_.first) + sizeof(value_.second);
 			if (size == 0) {
 				reset(); // empty

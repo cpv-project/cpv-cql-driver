@@ -3,6 +3,7 @@
 #include <core/sstring.hh>
 #include <net/inet_address.hh>
 #include "../Exceptions/CqlDecodeException.hpp"
+#include "CqlColumnDefinitions.hpp"
 
 namespace cql {
 	/** A 4 byte or 16 byte sequence denoting an IPv4 or IPv6 address */
@@ -31,7 +32,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			if (size == 0) {
 				reset(); // empty
 			} else if (size == sizeof(::in_addr)) {

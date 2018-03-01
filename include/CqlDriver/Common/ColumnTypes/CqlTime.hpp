@@ -1,5 +1,6 @@
 #pragma once
 #include <iomanip>
+#include "CqlColumnDefinitions.hpp"
 #include "CqlDateTimeBase.hpp"
 
 namespace cql {
@@ -46,7 +47,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, std::int32_t size) {
+		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			std::uint64_t dbValue = 0;
 			if (size == 0) {
 				reset(); // empty
