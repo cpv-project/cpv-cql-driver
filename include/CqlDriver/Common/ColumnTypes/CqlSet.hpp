@@ -3,7 +3,7 @@
 #include "CqlSetBase.hpp"
 
 namespace cql {
-	/** Set type uses std::unordered_map */
+	/** Set type uses std::unordered_set */
 	template <class T>
 	class CqlSet :
 		private CqlSetBase<std::unordered_set<T, typename CqlColumnTrait<T>::Hash>> {

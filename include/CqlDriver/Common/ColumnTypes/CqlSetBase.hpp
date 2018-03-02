@@ -69,7 +69,7 @@ namespace cql {
 			for (std::size_t index = 0; index < setSize; ++index) {
 				CqlValueType item;
 				CqlColumnTrait<CqlValueType>::decode(item, ptrStart, end);
-				value_.emplace(item);
+				value_.emplace(std::move(item));
 			}
 		}
 
