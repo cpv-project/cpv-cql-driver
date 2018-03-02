@@ -52,7 +52,7 @@ namespace cql {
 		/** Constructors */
 		CqlInet() : value_() { }
 		template <class... Args>
-		CqlInet(Args&&... args) : value_() {
+		explicit CqlInet(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);
 		}
 

@@ -62,7 +62,7 @@ namespace cql {
 		/** Constructors */
 		CqlUuidBase() : value_() { }
 		template <class... Args>
-		CqlUuidBase(Args&&... args) : value_() {
+		explicit CqlUuidBase(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);
 		}
 

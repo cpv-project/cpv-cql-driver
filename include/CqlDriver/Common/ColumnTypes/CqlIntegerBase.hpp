@@ -48,7 +48,8 @@ namespace cql {
 
 		/** Constructors */
 		CqlIntegerBase() : value_(0) { }
-		explicit CqlIntegerBase(IntType value) : value_(value) { }
+		// cppcheck-suppress noExplicitConstructor
+		CqlIntegerBase(IntType value) : value_(value) { }
 
 		/** Allow assign from integer */
 		void operator=(IntType value) {

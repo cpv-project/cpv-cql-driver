@@ -42,6 +42,7 @@ namespace cql {
 
 		/** Constructors */
 		CqlDateTimeBase() : value_(std::chrono::system_clock::from_time_t(0)) { }
+		// cppcheck-suppress noExplicitConstructor
 		template <class... Args>
 		CqlDateTimeBase(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);

@@ -51,7 +51,7 @@ namespace cql {
 		/** Constructor */
 		CqlNullable() : value_(), isNull_(true) { }
 		template <class... Args>
-		CqlNullable(Args&&... args) :
+		explicit CqlNullable(Args&&... args) :
 			value_(std::forward<Args>(args)...), isNull_(false) { }
 
 		/** Dereference without null check */

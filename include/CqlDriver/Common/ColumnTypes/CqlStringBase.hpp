@@ -78,6 +78,7 @@ namespace cql {
 
 		/** Constructor */
 		CqlStringBase() : value_() { }
+		// cppcheck-suppress noExplicitConstructor
 		template <class... Args>
 		CqlStringBase(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);

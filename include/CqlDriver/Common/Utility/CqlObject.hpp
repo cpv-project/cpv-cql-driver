@@ -15,7 +15,7 @@ namespace cql {
 	class CqlObject {
 	public:
 		/** Constructor */
-		CqlObject(std::unique_ptr<T>&& ptr) :
+		explicit CqlObject(std::unique_ptr<T>&& ptr) :
 			ptr_(std::move(ptr)),
 			deleter_([](std::unique_ptr<T>&& ptr) {
 				auto& freeList = getFreeList();
@@ -108,7 +108,7 @@ namespace cql {
 			object->reset(std::forward<Args>(args)...);
 			return object;
 		} else {
-			auto object = std::move(freeList.back());
+			CqlObject<T> object(std::move(freeList.back()));
 			freeList.pop_back();
 			object->reset(std::forward<Args>(args)...);
 			return object;

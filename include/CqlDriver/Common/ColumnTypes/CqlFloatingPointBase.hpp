@@ -66,7 +66,8 @@ namespace cql {
 
 		/** Constructor */
 		CqlFloatingPointBase() : value_(0) { }
-		explicit CqlFloatingPointBase(FloatType value) : value_(value) { }
+		// cppcheck-suppress noExplicitConstructor
+		CqlFloatingPointBase(FloatType value) : value_(value) { }
 
 		/** Allow assign from floating point */
 		void operator=(FloatType value) {
