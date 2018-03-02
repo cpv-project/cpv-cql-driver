@@ -46,10 +46,10 @@ namespace cql {
 		return T(op value.get()); \
 	}
 
-	DefineCqlIntegerUnaryOperation(+);
-	DefineCqlIntegerUnaryOperation(-);
-	DefineCqlIntegerUnaryOperation(~);
-	DefineCqlIntegerUnaryOperation(!);
+	DefineCqlIntegerUnaryOperation(+)
+	DefineCqlIntegerUnaryOperation(-)
+	DefineCqlIntegerUnaryOperation(~)
+	DefineCqlIntegerUnaryOperation(!)
 
 #undef DefineCqlIntegerUnaryOperation
 
@@ -66,8 +66,8 @@ namespace cql {
 		return T(value.get() op); \
 	}
 
-	DefineCqlIntegerPrefixOperation(++);
-	DefineCqlIntegerPrefixOperation(--);
+	DefineCqlIntegerPrefixOperation(++)
+	DefineCqlIntegerPrefixOperation(--)
 
 #undef DefineCqlIntegerPrefixOperation
 

@@ -38,8 +38,8 @@ namespace cql {
 		return b.get() op a; \
 	}
 
-	DefineCqlStringCompareOperation(==);
-	DefineCqlStringCompareOperation(!=);
+	DefineCqlStringCompareOperation(==)
+	DefineCqlStringCompareOperation(!=)
 
 #undef DefineCqlStringCompareOperation
 }

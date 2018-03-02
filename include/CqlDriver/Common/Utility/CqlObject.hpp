@@ -51,6 +51,10 @@ namespace cql {
 			static_assert(sizeof(ptr_) == sizeof(object.ptr_), "ensure unique_ptr<> have same layout");
 		}
 
+		/** Disallow copy */
+		CqlObject(const CqlObject&) = delete;
+		CqlObject& operator=(const CqlObject&) = delete;
+
 		/** Destructor */
 		~CqlObject() {
 			if (ptr_ != nullptr) {

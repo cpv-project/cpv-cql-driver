@@ -63,6 +63,10 @@ namespace cql {
 			return *this;
 		}
 
+		/** Disallow copy */
+		SocketHolder(const SocketHolder&) = delete;
+		SocketHolder& operator=(const SocketHolder&) = delete;
+
 		/** Destructor */
 		~SocketHolder() {
 			close();
