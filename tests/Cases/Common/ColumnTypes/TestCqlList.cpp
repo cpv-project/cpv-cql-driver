@@ -4,7 +4,7 @@
 
 TEST(TestCqlList, getset) {
 	cql::CqlList<cql::CqlBigInt> value;
-	value.set(std::vector<cql::CqlBigInt>({ cql::CqlBigInt(123) }));
+	value.set(std::vector<cql::CqlBigInt>({ 123 }));
 	ASSERT_EQ(value.get().size(), 1);
 	ASSERT_EQ(value.get().at(0), 123);
 

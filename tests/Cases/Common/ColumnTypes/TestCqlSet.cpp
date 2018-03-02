@@ -5,15 +5,15 @@
 TEST(TestCqlSet, getset) {
 	using SetType = std::unordered_set<cql::CqlBigInt, cql::CqlColumnTrait<cql::CqlBigInt>::Hash>;
 	cql::CqlSet<cql::CqlBigInt> value;
-	value.set(SetType({ cql::CqlBigInt(123) }));
+	value.set(SetType({ 123 }));
 	ASSERT_EQ(value.get().size(), 1);
-	ASSERT_EQ(value.get().count(cql::CqlBigInt(123)), 1);
+	ASSERT_EQ(value.get().count(123), 1);
 
 	value.set({ 1, 2, 3, 2, 3 });
 	ASSERT_EQ(value.get().size(), 3);
-	ASSERT_EQ(value.get().count(cql::CqlBigInt(1)), 1);
-	ASSERT_EQ(value.get().count(cql::CqlBigInt(2)), 1);
-	ASSERT_EQ(value.get().count(cql::CqlBigInt(3)), 1);
+	ASSERT_EQ(value.get().count(1), 1);
+	ASSERT_EQ(value.get().count(2), 1);
+	ASSERT_EQ(value.get().count(3), 1);
 }
 
 TEST(TestCqlSet, encodeBody) {
@@ -48,8 +48,8 @@ TEST(TestCqlSet, decodeBody) {
 			"\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x02");
 		value.decodeBody(data.data(), data.size());
 		ASSERT_EQ(value->size(), 2);
-		ASSERT_EQ(value->count(cql::CqlBigInt(1)), 1);
-		ASSERT_EQ(value->count(cql::CqlBigInt(2)), 1);
+		ASSERT_EQ(value->count(1), 1);
+		ASSERT_EQ(value->count(2), 1);
 	}
 }
 
@@ -85,14 +85,14 @@ TEST(TestCqlSet, operations) {
 		// dereference
 		cql::CqlSet<cql::CqlBigInt> value({ 123 });
 		ASSERT_EQ((*value).size(), 1);
-		ASSERT_EQ((*value).count(cql::CqlBigInt(123)), 1);
+		ASSERT_EQ((*value).count(123), 1);
 	}
 	{
 		// get pointer
 		cql::CqlSet<cql::CqlBigInt> value;
 		value->emplace(123);
 		ASSERT_EQ(value->size(), 1);
-		ASSERT_EQ(value->count(cql::CqlBigInt(123)), 1);
+		ASSERT_EQ(value->count(123), 1);
 	}
 }
 
