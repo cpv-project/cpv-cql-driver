@@ -21,6 +21,14 @@ TEST(TestCqlColumnTrait, isNullable) {
 		"test is nullable");
 }
 
+TEST(TestCqlColumnTrait, hash) {
+	cql::CqlInt valueA(123);
+	cql::CqlInt valueB(123);
+	auto hashA = cql::CqlColumnTrait<cql::CqlInt>::Hash()(valueA);
+	auto hashB = cql::CqlColumnTrait<cql::CqlInt>::Hash()(valueB);
+	ASSERT_EQ(hashA, hashB);
+}
+
 TEST(TestCqlColumnTrait, encodeInt) {
 	{
 		cql::CqlInt value;

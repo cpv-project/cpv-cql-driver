@@ -13,6 +13,13 @@ namespace cql {
 		using CqlUnderlyingType = typename T::CqlUnderlyingType;
 		using CqlIsNullable = std::false_type;
 
+		/** Hash function */
+		struct Hash : private std::hash<CqlUnderlyingType> {
+			std::size_t operator()(const T& value) const {
+				return std::hash<CqlUnderlyingType>::operator()(value.get());
+			}
+		};
+
 		/** Encode to binary data with size information */
 		static void encode(const T& value, seastar::sstring& data) {
 			ColumnEncodeDecodeSizeType bodySize;

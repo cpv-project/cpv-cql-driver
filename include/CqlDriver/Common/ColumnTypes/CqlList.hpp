@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "CqlListBase.hpp"
 
 namespace cql {

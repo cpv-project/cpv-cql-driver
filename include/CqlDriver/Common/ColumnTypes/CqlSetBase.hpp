@@ -8,43 +8,43 @@
 
 namespace cql {
 	/**
-	 * A [int] n indicating the number of elements in the list, followed by n elements.
+	 * A [int] n indicating the number of elements in the set, followed by n elements.
 	 * Each element is [bytes] representing the serialized value.
 	 */
-	template <class ListType>
-	class CqlListBase {
+	template <class SetType>
+	class CqlSetBase {
 	public:
-		using CqlUnderlyingType = ListType;
-		using CqlValueType = typename ListType::value_type;
+		using CqlUnderlyingType = SetType;
+		using CqlValueType = typename SetType::value_type;
 
-		/** Get the list value */
+		/** Get the set value */
 		const CqlUnderlyingType& get() const& { return value_; }
 
-		/** Get the mutable list value */
+		/** Get the mutable set value */
 		CqlUnderlyingType& get() & { return value_; }
 
-		/** Set the list value */
+		/** Set the set value */
 		void set(const CqlUnderlyingType& value) { value_ = value_; }
 
-		/** Set the list value */
+		/** Set the set value */
 		void set(CqlUnderlyingType&& value) { value_ = std::move(value); }
 
-		/** Set the list value by initializer list */
+		/** Set the set value by initializer list */
 		template <class U>
 		void set(std::initializer_list<U>&& items) {
-			value_.resize(items.size());
-			for (std::size_t i = 0; i < items.size(); ++i) {
-				value_[i].set(std::move(items.begin()[i]));
+			value_.clear();
+			for (auto&& item : items) {
+				value_.emplace(std::move(item));
 			}
 		}
 
 		/** Reset to initial state */
-		void reset() { value_.resize(0); }
+		void reset() { value_.clear(); }
 
 		/** Encode to binary data */
 		void encodeBody(seastar::sstring& data) const {
-			CqlInt listSize(value_.size());
-			listSize.encodeBody(data);
+			CqlInt setSize(value_.size());
+			setSize.encodeBody(data);
 			for (const auto& item : value_) {
 				CqlColumnTrait<CqlValueType>::encode(item, data);
 			}
@@ -54,30 +54,31 @@ namespace cql {
 		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			if (size < CqlInt::CqlEncodeSize) {
 				throw CqlDecodeException(CQL_CODEINFO,
-					"length of list size not enough, element type is:",
+					"length of set size not enough, element type is:",
 					typeid(CqlValueType).name());
 			}
-			CqlInt listSize;
-			listSize.decodeBody(ptr, CqlInt::CqlEncodeSize);
-			if (listSize < 0) {
+			CqlInt setSize;
+			setSize.decodeBody(ptr, CqlInt::CqlEncodeSize);
+			if (setSize < 0) {
 				throw CqlDecodeException(CQL_CODEINFO,
-					"list size can't be negative:", listSize);
+					"set size can't be negative:", setSize);
 			}
 			const char* ptrStart = ptr + CqlInt::CqlEncodeSize;
 			const char* end = ptr + size;
-			value_.resize(0);
-			for (std::size_t index = 0; index < listSize; ++index) {
-				value_.emplace_back();
-				CqlColumnTrait<CqlValueType>::decode(value_.back(), ptrStart, end);
+			value_.clear();
+			for (std::size_t index = 0; index < setSize; ++index) {
+				CqlValueType item;
+				CqlColumnTrait<CqlValueType>::decode(item, ptrStart, end);
+				value_.emplace(item);
 			}
 		}
 
 		/** Constructors */
-		CqlListBase() : value_() { }
-		explicit CqlListBase(const CqlUnderlyingType& value) : value_(value) { }
-		explicit CqlListBase(CqlUnderlyingType&& value) : value_(std::move(value)) { }
+		CqlSetBase() : value_() { }
+		explicit CqlSetBase(const CqlUnderlyingType& value) : value_(value) { }
+		explicit CqlSetBase(CqlUnderlyingType&& value) : value_(std::move(value)) { }
 		template <class U>
-		explicit CqlListBase(std::initializer_list<U>&& items) : value_() {
+		explicit CqlSetBase(std::initializer_list<U>&& items) : value_() {
 			set(std::move(items));
 		}
 

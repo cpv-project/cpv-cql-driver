@@ -8,9 +8,10 @@
 namespace cql {
 	/** Default hash function for map key */
 	template <class KeyType>
-	struct CqlProtocolMapBaseDefaultHash {
+	struct CqlProtocolMapBaseDefaultHash :
+		private std::hash<std::decay_t<decltype(std::declval<KeyType>().get())>> {
 		std::size_t operator()(const KeyType& key) const {
-			return std::hash<std::decay_t<decltype(key.get())>>()(key.get());
+			return std::hash<std::decay_t<decltype(key.get())>>::operator()(key.get());
 		}
 	};
 
