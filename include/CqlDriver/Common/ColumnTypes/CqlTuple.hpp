@@ -15,7 +15,7 @@ namespace cql {
 	public:
 		using CqlUnderlyingType = std::tuple<Types...>;
 		template <std::size_t Index>
-		using ElementType = typename std::tuple_element_t<Index, CqlUnderlyingType>;
+		using CqlElementType = typename std::tuple_element_t<Index, CqlUnderlyingType>;
 
 		/** Get the tuple value */
 		const CqlUnderlyingType& get() const& { return value_; }
@@ -25,11 +25,11 @@ namespace cql {
 
 		/** Get the nth element of tuple */
 		template <std::size_t Index>
-		const ElementType<Index>& get() const& { return std::get<Index>(value_); }
+		const CqlElementType<Index>& get() const& { return std::get<Index>(value_); }
 
 		/** Get the nth element of tuple */
 		template <std::size_t Index>
-		ElementType<Index>& get() & { return std::get<Index>(value_); }
+		CqlElementType<Index>& get() & { return std::get<Index>(value_); }
 
 		/** Set the tuple value */
 		void set(const CqlUnderlyingType& value) { value_ = value; }
@@ -102,7 +102,7 @@ namespace cql {
 		void encodeBodyImpl(seastar::sstring&) { }
 		template <std::size_t Index, std::enable_if_t<Index < sizeof...(Types), int> = 0>
 		void encodeBodyImpl(seastar::sstring& data) {
-			CqlColumnTrait<ElementType<Index>>::encode(std::get<Index>(value_), data);
+			CqlColumnTrait<CqlElementType<Index>>::encode(std::get<Index>(value_), data);
 			encodeBodyImpl<Index+1>(data);
 		}
 
@@ -111,7 +111,7 @@ namespace cql {
 		void decodeBodyImpl(const char*, const char*) { }
 		template <std::size_t Index, std::enable_if_t<Index < sizeof...(Types), int> = 0>
 		void decodeBodyImpl(const char* ptr, const char* end) {
-			CqlColumnTrait<ElementType<Index>>::decode(std::get<Index>(value_), ptr, end);
+			CqlColumnTrait<CqlElementType<Index>>::decode(std::get<Index>(value_), ptr, end);
 			decodeBodyImpl<Index+1>(ptr, end);
 		}
 
