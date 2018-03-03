@@ -6,10 +6,14 @@ namespace cql {
 	/** Map type uses std::unordered_map */
 	template <class TKey, class TValue>
 	class CqlMap :
-		private CqlMapBase<std::unordered_map<TKey, TValue, typename CqlColumnTrait<TKey>::Hash>> {
+		private CqlMapBase<
+			std::unordered_map<TKey, TValue, typename CqlColumnTrait<TKey>::Hash>> {
 	public:
-		using Base = CqlMapBase<std::unordered_map<TKey, TValue, typename CqlColumnTrait<TKey>::Hash>>;
+		using Base = CqlMapBase<
+			std::unordered_map<TKey, TValue, typename CqlColumnTrait<TKey>::Hash>>;
 		using Base::CqlUnderlyingType;
+		using Base::CqlKeyType;
+		using Base::CqlMappedType;
 		using Base::CqlValueType;
 		using Base::get;
 		using Base::set;
