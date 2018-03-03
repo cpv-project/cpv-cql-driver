@@ -12,7 +12,7 @@ namespace cql {
 		/** Get the stream id */
 		IdType getStreamId() const;
 
-		/** Get whether this object hold a valid and in use stream id */
+		/** Get whether this object holds a valid and in use stream id */
 		bool isValid() const;
 
 		/** Constructor */

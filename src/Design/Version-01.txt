@@ -22,9 +22,9 @@ CqlSessionFactory [HighLevel, shared_ptr]
 	create(sessionConfiguration, nodeCollection)
 
 CqlSession [HighLevel, CqlObject]
-	query(statement, parameters...) -> CqlObject<CqlResultSet>
-	execute(statement, parameters...) -> void
-	batchExecute(statement, listOfParameters) -> void
+	query(command) -> seastar::future<CqlObject<CqlResultSet>>
+	execute(command) -> seastar::future<>
+	execute(batchCommand) -> seastar::future<>
 
 CqlConnectionPool [LowLevel, shared_ptr]
 	getConnection()
@@ -60,6 +60,19 @@ auto factory = CqlSessionFactory.create(
 			.setPasswordAuthentication("abc", "123456")
 	}));
 auto session = factory.getSession();
+
+auto command = CqlCommand::create("use myks;");
+session.execute(command).then([] { });
+
+auto command = CqlCommand::create("select * from table where key = ?;")
+	.setParameters(cql::CqlInt(123));
+session.query(command).then([](auto result) { });
+
+auto command = CqlBatchCommand::create("insert into table (key, value) VALUES (?,?)")
+	.setConsistency(CqlConsistencyLevel::Quorum)
+	.addParameters(cql::CqlInt(123), cql::CqlText("abc"))
+	.addParameters(cql::CqlInt(321), cql::CqlText("asd"));
+session.execute(command).then([] { });
 
 ==========================================
 

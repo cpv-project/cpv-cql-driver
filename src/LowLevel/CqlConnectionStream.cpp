@@ -5,12 +5,12 @@ namespace cql {
 	/** Get the stream id */
 	CqlConnectionStream::IdType CqlConnectionStream::getStreamId() const {
 		if (!isValid_) {
-			throw CqlLogicException(CQL_CODEINFO, "can't get stream id from invalid stream");
+			throw CqlLogicException(CQL_CODEINFO, "can't get stream id from an invalid stream");
 		}
 		return streamId_;
 	}
 
-	/** Get whether this object hold a valid and in use stream id */
+	/** Get whether this object holds a valid and in use stream id */
 	bool CqlConnectionStream::isValid() const {
 		return isValid_;
 	}
