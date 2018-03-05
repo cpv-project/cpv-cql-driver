@@ -53,3 +53,23 @@ TEST(TestCqlObject, DownCasting) {
 	}
 }
 
+TEST(TestCqlObject, moveAssignment) {
+	auto record = seastar::make_shared<int>(0);
+	for (std::size_t i = 0; i < 3; ++i) {
+		ASSERT_EQ(*record, i);
+		{
+			auto a = cql::makeObject<Derived>(record);
+			cql::CqlObject<Base> b(cql::CqlObject<Derived>(nullptr));
+			cql::CqlObject<Derived> c(nullptr);
+			b = std::move(a);
+			b = std::move(b);
+			c = std::move(b);
+			c = std::move(c);
+			ASSERT_TRUE(a == nullptr);
+			ASSERT_TRUE(b == nullptr);
+			ASSERT_TRUE(c != nullptr);
+		}
+		ASSERT_EQ(*record, i+1);
+	}
+}
+
