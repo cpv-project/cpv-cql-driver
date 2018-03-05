@@ -2,13 +2,15 @@
 #include <cstdint>
 #include <utility>
 #include <chrono>
+#include <memory>
 #include <core/sstring.hh>
 #include <net/socket_defs.hh>
 
 namespace cql {
-	/**
-	 * The configuration of per database server node
-	 */
+	/** Defines members of CqlNodeConfiguration */
+	class CqlNodeConfigurationData;
+
+	/** The configuration of a single database server node */
 	class CqlNodeConfiguration {
 	public:
 		/** Set the hostname and the port of this node */
@@ -63,17 +65,7 @@ namespace cql {
 		CqlNodeConfiguration();
 
 	private:
-		std::pair<seastar::sstring, std::uint16_t> address_;
-		bool useSsl_;
-		bool useCompression_;
-		std::size_t maxStreams_;
-		std::size_t maxPendingMessages_;
-		seastar::sstring authenticatorClass_;
-		seastar::sstring authenticatorData_;
-		seastar::socket_address ipAddress_;
-		bool ipAddressIsResolved_;
-		bool ipAddressIsFixed_;
-		std::chrono::system_clock::time_point ipAddressUpdatedTime_;
+		std::shared_ptr<CqlNodeConfigurationData> data_;
 	};
 }
 

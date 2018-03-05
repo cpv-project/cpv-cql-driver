@@ -1,11 +1,13 @@
 #pragma once
 #include <cstdint>
 #include <chrono>
+#include <memory>
 
 namespace cql {
-	/**
-	 * The configuration of all sessions
-	 */
+	/** Defines members of CqlSessionConfiguration */
+	class CqlSessionConfigurationData;
+
+	/** The configuration of all sessions */
 	class CqlSessionConfiguration {
 	public:
 		/**
@@ -58,10 +60,7 @@ namespace cql {
 		CqlSessionConfiguration();
 
 	private:
-		std::size_t minPoolSize_;
-		std::size_t maxPoolSize_;
-		std::size_t maxWaitersAfterConnectionsExhausted_;
-		std::chrono::milliseconds dnsCacheTime_;
+		std::shared_ptr<CqlSessionConfigurationData> data_;
 	};
 }
 
