@@ -4,6 +4,13 @@
 #include <type_traits>
 
 namespace cql {
+	/** Class used to determinate the free list size of the specified type */
+	template <class T>
+	struct CqlObjectFreeListSize {
+		// Up to 32k per type
+		static const constexpr std::size_t value = 32768/sizeof(T);
+	};
+
 	/**
 	 * Reuseable object, back to free list automatically on destruction.
 	 * T should provide two functions:
@@ -19,7 +26,7 @@ namespace cql {
 			ptr_(std::move(ptr)),
 			deleter_([](std::unique_ptr<T>&& ptr) {
 				auto& freeList = getFreeList();
-				if (freeList.size() < getCapacity()) {
+				if (freeList.size() < CqlObjectFreeListSize<T>::value) {
 					ptr->freeResources();
 					freeList.emplace_back(std::move(ptr));
 				} else {
@@ -81,16 +88,6 @@ namespace cql {
 		static std::vector<std::unique_ptr<T>>& getFreeList() {
 			static thread_local std::vector<std::unique_ptr<T>> freeList;
 			return freeList;
-		}
-
-		/** Get the modifiable capacity value, defines how many objects can store in free list per thread */
-		static std::size_t& getCapacity() {
-#if defined(CQL_FREE_LIST_DEFAULT_CAPACITY)
-			static std::size_t capacity = CQL_FREE_LIST_DEFAULT_CAPACITY;
-#else
-			static std::size_t capacity = 128;
-#endif
-			return capacity;
 		}
 
 	private:
