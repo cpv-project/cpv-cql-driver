@@ -75,14 +75,14 @@ namespace cql {
 		const seastar::sstring& getParameters() const&;
 
 		/** Constructor */
-		CqlCommand(seastar::sstring&& query);
+		explicit CqlCommand(seastar::sstring&& query);
 
 		/** Constructor */
 		CqlCommand(const char* query, std::size_t size);
 
 		/** Constructor */
 		template <std::size_t Size>
-		CqlCommand(const char(&query)[Size]) : CqlCommand(query, Size-1) {
+		explicit CqlCommand(const char(&query)[Size]) : CqlCommand(query, Size-1) {
 			static_assert(Size > 0, "check size");
 		}
 
@@ -94,9 +94,9 @@ namespace cql {
 		seastar::sstring& getMutableParameters() &;
 
 		/** Encode implementation of addParameters */
-		void addParametersEncode(seastar::sstring&) { }
+		static void addParametersEncode(seastar::sstring&) { }
 		template <class Head, class... Rest>
-		void addParametersEncode(seastar::sstring& data, Head&& head, Rest&&... rest) {
+		static void addParametersEncode(seastar::sstring& data, Head&& head, Rest&&... rest) {
 			CqlColumnTrait<std::decay_t<Head>>::encode(std::forward<Head>(head), data);
 			addParametersEncode(data, std::forward<Rest>(rest)...);
 		}

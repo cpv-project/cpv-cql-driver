@@ -21,6 +21,7 @@ namespace cql {
 			parameterCount(),
 			parameters() { }
 
+		// cppcheck-suppress functionStatic
 		void freeResources() { }
 
 		void reset(const char* query, std::size_t size) {

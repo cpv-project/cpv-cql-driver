@@ -45,6 +45,7 @@ namespace cql {
 		virtual ~CqlMessageBase() = default;
 
 	protected:
+		// cppcheck-suppress functionStatic
 		/** For CqlObject support */
 		void freeResources();
 
