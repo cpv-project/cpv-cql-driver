@@ -162,6 +162,6 @@ namespace cql {
 
 	/** Constructor */
 	CqlNodeConfiguration::CqlNodeConfiguration() :
-		data_(std::make_shared<CqlNodeConfigurationData>()) { }
+		data_(seastar::make_shared<CqlNodeConfigurationData>()) { }
 }
 

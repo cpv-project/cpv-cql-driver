@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <utility>
 #include <chrono>
-#include <memory>
 #include <core/sstring.hh>
+#include <core/shared_ptr.hh>
 #include <net/socket_defs.hh>
 
 namespace cql {
@@ -65,7 +65,7 @@ namespace cql {
 		CqlNodeConfiguration();
 
 	private:
-		std::shared_ptr<CqlNodeConfigurationData> data_;
+		seastar::shared_ptr<CqlNodeConfigurationData> data_;
 	};
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <chrono>
-#include <memory>
+#include <core/shared_ptr.hh>
 
 namespace cql {
 	/** Defines members of CqlSessionConfiguration */
@@ -60,7 +60,7 @@ namespace cql {
 		CqlSessionConfiguration();
 
 	private:
-		std::shared_ptr<CqlSessionConfigurationData> data_;
+		seastar::shared_ptr<CqlSessionConfigurationData> data_;
 	};
 }
 

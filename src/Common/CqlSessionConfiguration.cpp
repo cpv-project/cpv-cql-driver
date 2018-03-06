@@ -62,6 +62,6 @@ namespace cql {
 
 	/** Constructor */
 	CqlSessionConfiguration::CqlSessionConfiguration() :
-		data_(std::make_shared<CqlSessionConfigurationData>()) { }
+		data_(seastar::make_shared<CqlSessionConfigurationData>()) { }
 }
 
