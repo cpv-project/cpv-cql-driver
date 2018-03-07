@@ -20,7 +20,13 @@ namespace {
 
 	struct A { int a; };
 	struct B { int b; };
-	struct C : A, B { int c; void freeResources() { } void reset() { } };
+	struct C : A, B {
+		int c;
+		// cppcheck-suppress functionStatic
+		void freeResources() { }
+		// cppcheck-suppress functionStatic
+		void reset() { }
+	};
 }
 
 TEST(TestCqlObject, Simple) {

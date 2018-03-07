@@ -20,7 +20,7 @@ namespace cql {
 				queryStr(),
 				parameterSets() { }
 
-			QueryData(seastar::sstring&& query) :
+			explicit QueryData(seastar::sstring&& query) :
 				queryCStr(nullptr, 0),
 				queryStr(std::move(query)),
 				parameterSets() { }
