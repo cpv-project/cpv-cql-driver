@@ -28,10 +28,14 @@ namespace cql {
 
 		CqlConsistencyLevel consistencyLevel;
 		std::vector<QueryData> queries;
+		std::pair<CqlConsistencyLevel, bool> serialConsistencyLevel;
+		std::pair<std::chrono::system_clock::time_point, bool> defaultTimeStamp;
 
 		CqlBatchCommandData() :
 			consistencyLevel(),
-			queries() { }
+			queries(),
+			serialConsistencyLevel(),
+			defaultTimeStamp() { }
 
 		// cppcheck-suppress functionStatic
 		void freeResources() { }
@@ -39,6 +43,8 @@ namespace cql {
 		void reset() {
 			consistencyLevel = CqlConsistencyLevel::Any;
 			queries.resize(0);
+			serialConsistencyLevel = { CqlConsistencyLevel::Serial, false };
+			defaultTimeStamp = { {}, false };
 		}
 	};
 
@@ -75,6 +81,20 @@ namespace cql {
 		return *this;
 	}
 
+	/** Set the serial consistency level of this query */
+	CqlBatchCommand& CqlBatchCommand::setSerialConsistencyLevel(
+		CqlConsistencyLevel consistencyLevel) & {
+		data_->serialConsistencyLevel = { consistencyLevel, true };
+		return *this;
+	}
+
+	/** Set the default timestamp of this query */
+	CqlBatchCommand& CqlBatchCommand::setDefaultTimeStamp(
+		std::chrono::system_clock::time_point timeStamp) & {
+		data_->defaultTimeStamp = { timeStamp, true };
+		return *this;
+	}
+
 	/** Get the consistency level of this batch */
 	CqlConsistencyLevel CqlBatchCommand::getConsistencyLevel() const {
 		return data_->consistencyLevel;
@@ -99,6 +119,18 @@ namespace cql {
 	const CqlBatchCommand::ParameterSetsType&
 		CqlBatchCommand::getParameterSets(std::size_t index) const& {
 		return data_->queries.at(index).parameterSets;
+	}
+
+	/** Get the serial consistency level of this query */
+	const std::pair<CqlConsistencyLevel, bool>&
+		CqlBatchCommand::getSerialConsistencyLevel() const& {
+		return data_->serialConsistencyLevel;
+	}
+
+	/** Get the default timestamp of this query */
+	const std::pair<std::chrono::system_clock::time_point, bool>&
+		CqlBatchCommand::getDefaultTimeStamp() const& {
+		return data_->defaultTimeStamp;
 	}
 
 	/** Constructor */

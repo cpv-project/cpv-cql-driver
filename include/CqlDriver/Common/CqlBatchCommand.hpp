@@ -101,6 +101,29 @@ namespace cql {
 			return std::move(addParameters(std::forward<Args>(parameters)...));
 		}
 
+		/**
+		 * Set the serial consistency level of this query.
+		 * Can only be either SERIAL or LOCAL_SERIAL.
+		 */
+		CqlBatchCommand& setSerialConsistencyLevel(CqlConsistencyLevel consistencyLevel) &;
+
+		/** Set the serial consistency level of this query */
+		CqlBatchCommand&& setSerialConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
+			return std::move(setSerialConsistencyLevel(consistencyLevel));
+		}
+
+		/**
+		 * Set the default timestamp of this query.
+		 * This will replace the server side assigned timestamp as default timestamp.
+		 * A timestamp in the query itself will still override this timestamp.
+		 */
+		CqlBatchCommand& setDefaultTimeStamp(std::chrono::system_clock::time_point timeStamp) &;
+
+		/** Set the default timestamp of this query */
+		CqlBatchCommand&& setDefaultTimeStamp(std::chrono::system_clock::time_point timeStamp) && {
+			return std::move(setDefaultTimeStamp(timeStamp));
+		}
+
 		/** Get the consistency level of this batch */
 		CqlConsistencyLevel getConsistencyLevel() const;
 
@@ -113,6 +136,18 @@ namespace cql {
 		/** Get the parameter sets by index */
 		using ParameterSetsType = std::vector<std::pair<std::size_t, seastar::sstring>>;
 		const ParameterSetsType& getParameterSets(std::size_t index) const&;
+
+		/**
+		 * Get the serial consistency level of this query,
+		 * the second value is false if is not set.
+		 */
+		const std::pair<CqlConsistencyLevel, bool>& getSerialConsistencyLevel() const&;
+
+		/**
+		 * Get the default timestamp of this query,
+		 * the second value is false if is not set.
+		 */
+		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimeStamp() const&;
 
 		/** Constructor */
 		CqlBatchCommand();

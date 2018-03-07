@@ -100,3 +100,37 @@ TEST(TestCqlBatchCommand, parametersError) {
 	}
 }
 
+TEST(TestCqlBatchCommand, serialConsistencyLevel) {
+	{
+		cql::CqlBatchCommand command;
+		ASSERT_EQ(command.getSerialConsistencyLevel().first, cql::CqlConsistencyLevel::Serial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().second, false);
+	}
+	{
+		auto command = cql::CqlBatchCommand()
+			.setSerialConsistencyLevel(cql::CqlConsistencyLevel::Serial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().first, cql::CqlConsistencyLevel::Serial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().second, true);
+	}
+	{
+		auto command = cql::CqlBatchCommand()
+			.setSerialConsistencyLevel(cql::CqlConsistencyLevel::LocalSerial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().first, cql::CqlConsistencyLevel::LocalSerial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().second, true);
+	}
+}
+
+TEST(TestCqlBatchCommand, defaultTimeStamp) {
+	{
+		cql::CqlBatchCommand command;
+		ASSERT_EQ(command.getDefaultTimeStamp().second, false);
+	}
+	{
+		auto now = std::chrono::system_clock::now();
+		auto command = cql::CqlBatchCommand()
+			.setDefaultTimeStamp(now);
+		ASSERT_EQ(command.getDefaultTimeStamp().first, now);
+		ASSERT_EQ(command.getDefaultTimeStamp().second, true);
+	}
+}
+
