@@ -3,6 +3,19 @@
 #include <CqlDriver/Common/ColumnTypes/CqlText.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
+TEST(TestCqlCommand, isValid) {
+	cql::CqlCommand a("use a");
+	cql::CqlCommand b("use b");
+	ASSERT_TRUE(a.isValid());
+	ASSERT_TRUE(b.isValid());
+	b = std::move(a);
+	ASSERT_FALSE(a.isValid());
+	ASSERT_TRUE(b.isValid());
+	a = std::move(b);
+	ASSERT_TRUE(a.isValid());
+	ASSERT_FALSE(b.isValid());
+}
+
 TEST(TestCqlCommand, query) {
 	{
 		cql::CqlCommand command("use a;");

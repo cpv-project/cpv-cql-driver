@@ -46,6 +46,11 @@ namespace cql {
 		}
 	};
 
+	/** Check whether this is a valid command (will be false if moved) */
+	bool CqlCommand::isValid() const {
+		return data_ != nullptr;
+	}
+
 	/** Set the consistency level of this query */
 	CqlCommand&& CqlCommand::setConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
 		data_->consistencyLevel = consistencyLevel;

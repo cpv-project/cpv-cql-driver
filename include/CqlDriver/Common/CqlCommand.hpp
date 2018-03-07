@@ -13,6 +13,9 @@ namespace cql {
 	/** Class represents a single cql command for query or execute */
 	class CqlCommand {
 	public:
+		/** Check whether this is a valid command (will be false if moved) */
+		bool isValid() const;
+
 		/**
 		 * Set the consistency level of this query
 		 * For more information see this page:
