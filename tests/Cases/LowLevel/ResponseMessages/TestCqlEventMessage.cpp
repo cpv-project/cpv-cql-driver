@@ -12,7 +12,7 @@ TEST(TestCqlEventMessage, decode) {
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
 		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Event);
-		cql::CqlObject<cql::CqlEventMessage> message(std::move(baseMessage));
+		auto message = std::move(baseMessage).cast<cql::CqlEventMessage>();
  		auto bodyData = makeTestString(
 			"\x00\x0d""SCHEMA_CHANGE"
 			"\x00\x07""CREATED"

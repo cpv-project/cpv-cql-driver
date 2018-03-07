@@ -18,21 +18,21 @@ namespace cql {
 			// RESULT > ERROR > EVENT > READY > SUPPORTED > AUTHENTICATE > AUTH_SUCCESS > AUTH_CHALLENGE
 			CqlMessageType type = header.getOpCode();
 			if (type == CqlMessageType::Result) {
-				return makeObject<CqlResultMessage>(std::move(header));
+				return makeObject<CqlResultMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::Error) {
-				return makeObject<CqlErrorMessage>(std::move(header));
+				return makeObject<CqlErrorMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::Event) {
-				return makeObject<CqlEventMessage>(std::move(header));
+				return makeObject<CqlEventMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::Ready) {
-				return makeObject<CqlReadyMessage>(std::move(header));
+				return makeObject<CqlReadyMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::Supported) {
-				return makeObject<CqlSupportedMessage>(std::move(header));
+				return makeObject<CqlSupportedMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::Authenticate) {
-				return makeObject<CqlAuthenticateMessage>(std::move(header));
+				return makeObject<CqlAuthenticateMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::AuthSuccess) {
-				return makeObject<CqlAuthSuccessMessage>(std::move(header));
+				return makeObject<CqlAuthSuccessMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else if (type == CqlMessageType::AuthChallenge) {
-				return makeObject<CqlAuthChallengeMessage>(std::move(header));
+				return makeObject<CqlAuthChallengeMessage>(std::move(header)).cast<CqlResponseMessageBase>();
 			} else {
 				throw CqlNotImplementedException(CQL_CODEINFO,
 					"unsupported message type:", static_cast<std::size_t>(type));

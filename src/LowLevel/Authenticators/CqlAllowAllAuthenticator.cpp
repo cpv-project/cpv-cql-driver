@@ -11,7 +11,7 @@ namespace cql {
 		return connection->waitNextMessage(stream).then([] (auto message) {
 			auto opCode = message->getHeader().getOpCode();
 			if (opCode == CqlMessageType::Authenticate) {
-				CqlObject<CqlAuthenticateMessage> authenticateMessage(std::move(message));
+				auto authenticateMessage = std::move(message).template cast<CqlAuthenticateMessage>();
 				return seastar::make_exception_future(CqlAuthenticateException(
 					CQL_CODEINFO, "server required authentication:",
 					authenticateMessage->getAuthenticatorClass().get()));

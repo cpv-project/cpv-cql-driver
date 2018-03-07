@@ -13,7 +13,7 @@ TEST(TestCqlResultMessage, decode) {
 			// Void
 			auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(cql::CqlMessageHeader(header));
 			ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Result);
-			cql::CqlObject<cql::CqlResultMessage> message(std::move(baseMessage));
+			auto message = std::move(baseMessage).cast<cql::CqlResultMessage>();
 			auto bodyData = makeTestString("\x00\x00\x00\x01");
 			seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
 			message->decodeBody(info, std::move(bodyBuffer));
@@ -23,7 +23,7 @@ TEST(TestCqlResultMessage, decode) {
 			// Rows
 			auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(cql::CqlMessageHeader(header));
 			ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Result);
-			cql::CqlObject<cql::CqlResultMessage> message(std::move(baseMessage));
+			auto message = std::move(baseMessage).cast<cql::CqlResultMessage>();
 			auto bodyData = makeTestString(
 				"\x00\x00\x00\x02"
 				"\x00\x00\x00\x04""\x00\x00\x00\x03" // no metadata, 3 columns
@@ -56,7 +56,7 @@ TEST(TestCqlResultMessage, decode) {
 			// SetKeySpace
 			auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(cql::CqlMessageHeader(header));
 			ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Result);
-			cql::CqlObject<cql::CqlResultMessage> message(std::move(baseMessage));
+			auto message = std::move(baseMessage).cast<cql::CqlResultMessage>();
 			auto bodyData = makeTestString(
 				"\x00\x00\x00\x03"
 				"\x00\x01""k");
@@ -69,7 +69,7 @@ TEST(TestCqlResultMessage, decode) {
 			// Prepared
 			auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(cql::CqlMessageHeader(header));
 			ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Result);
-			cql::CqlObject<cql::CqlResultMessage> message(std::move(baseMessage));
+			auto message = std::move(baseMessage).cast<cql::CqlResultMessage>();
 			auto bodyData = makeTestString(
 				"\x00\x00\x00\x04"
 				"\x00\x03""abc"
@@ -94,7 +94,7 @@ TEST(TestCqlResultMessage, decode) {
 			// SchemaChange
 			auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(cql::CqlMessageHeader(header));
 			ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Result);
-			cql::CqlObject<cql::CqlResultMessage> message(std::move(baseMessage));
+			auto message = std::move(baseMessage).cast<cql::CqlResultMessage>();
 			auto bodyData = makeTestString(
 				"\x00\x00\x00\x05"
 				"\x00\x07""CREATED"

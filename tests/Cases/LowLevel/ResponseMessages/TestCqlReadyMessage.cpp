@@ -12,7 +12,7 @@ TEST(TestCqlReadyMessage, decode) {
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
 		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Ready);
-		cql::CqlObject<cql::CqlReadyMessage> message(std::move(baseMessage));
+		auto message = std::move(baseMessage).cast<cql::CqlReadyMessage>();
  		auto bodyData = makeTestString("");
 		seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
 		message->decodeBody(info, std::move(bodyBuffer));

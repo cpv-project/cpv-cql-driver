@@ -49,6 +49,15 @@ namespace cql {
 			CqlObject<CqlRequestMessageBase>&& message,
 			const CqlConnectionStream& stream);
 
+		/** Send a message to the given stream and wait for success.  */
+		template <class T,
+			std::enable_if_t<std::is_base_of<CqlRequestMessageBase, T>::value, int> = 0>
+		seastar::future<> sendMessage(
+			CqlObject<T>&& message,
+			const CqlConnectionStream& stream) {
+			return sendMessage(std::move(message).template cast<CqlRequestMessageBase>(), stream);
+		}
+
 		/**
 		 * Wait for the next message from the given stream.
 		 * Only one waiter can register at a time for each stream.

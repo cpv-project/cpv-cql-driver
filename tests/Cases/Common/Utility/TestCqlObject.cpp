@@ -17,6 +17,10 @@ namespace {
 		void freeResources() { ++*record_; record_ = nullptr; }
 		void reset(const seastar::shared_ptr<int>& record) { record_ = record; }
 	};
+
+	struct A { int a; };
+	struct B { int b; };
+	struct C : A, B { int c; void freeResources() { } void reset() { } };
 }
 
 TEST(TestCqlObject, Simple) {
@@ -35,7 +39,7 @@ TEST(TestCqlObject, UpCasting) {
 	for (std::size_t i = 0; i < 3; ++i) {
 		ASSERT_EQ(*record, i);
 		{
-			cql::CqlObject<Base> base(cql::makeObject<Derived>(record));
+			auto base = cql::makeObject<Derived>(record).cast<Base>();
 		}
 		ASSERT_EQ(*record, i+1);
 	}
@@ -46,11 +50,19 @@ TEST(TestCqlObject, DownCasting) {
 	for (std::size_t i = 0; i < 3; ++i) {
 		ASSERT_EQ(*record, i);
 		{
-			cql::CqlObject<Base> base(cql::makeObject<Derived>(record));
-			cql::CqlObject<Derived> derived(std::move(base));
+			auto base = cql::makeObject<Derived>(record).cast<Base>();
+			auto derived = std::move(base).cast<Derived>();
 		}
 		ASSERT_EQ(*record, i+1);
 	}
+}
+
+TEST(TestCqlObject, InvalidCasting) {
+	cql::makeObject<C>().cast<A>();
+	ASSERT_THROWS_CONTAINS(
+		cql::CqlLogicException,
+		cql::makeObject<C>().cast<B>(),
+		"cast cause pointer address changed");
 }
 
 TEST(TestCqlObject, moveAssignment) {
@@ -59,11 +71,11 @@ TEST(TestCqlObject, moveAssignment) {
 		ASSERT_EQ(*record, i);
 		{
 			auto a = cql::makeObject<Derived>(record);
-			cql::CqlObject<Base> b(cql::CqlObject<Derived>(nullptr));
+			auto b = cql::CqlObject<Derived>(nullptr).cast<Base>();
 			cql::CqlObject<Derived> c(nullptr);
-			b = std::move(a);
+			b = std::move(a).cast<Base>();
 			b = std::move(b);
-			c = std::move(b);
+			c = std::move(b).cast<Derived>();
 			c = std::move(c);
 			ASSERT_TRUE(a == nullptr);
 			ASSERT_TRUE(b == nullptr);

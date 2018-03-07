@@ -12,7 +12,7 @@ TEST(TestCqlSupportedMessage, decode) {
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
 		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::Supported);
-		cql::CqlObject<cql::CqlSupportedMessage> message(std::move(baseMessage));
+		auto message = std::move(baseMessage).cast<cql::CqlSupportedMessage>();
  		auto bodyData = makeTestString(
 			"\x00\x02"
 			"\x00\x05""apple""\x00\x02""\x00\x04""dogA""\x00\x04""dogB"

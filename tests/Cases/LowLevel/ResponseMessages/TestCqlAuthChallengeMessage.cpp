@@ -12,7 +12,7 @@ TEST(TestCqlAuthChallengeMessage, decode) {
 
 		auto baseMessage = cql::CqlResponseMessageFactory::makeResponseMessage(std::move(header));
 		ASSERT_EQ(baseMessage->getHeader().getOpCode(), cql::CqlMessageType::AuthChallenge);
-		cql::CqlObject<cql::CqlAuthChallengeMessage> message(std::move(baseMessage));
+		auto message = std::move(baseMessage).cast<cql::CqlAuthChallengeMessage>();
  		auto bodyData = makeTestString("\x00\x00\x00\x03""abc");
 		seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
 		message->decodeBody(info, std::move(bodyBuffer));

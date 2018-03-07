@@ -20,7 +20,7 @@ namespace cql {
 				return seastar::make_exception_future(CqlAuthenticateException(
 					CQL_CODEINFO, "unexcepted authenticate response:", message->toString()));
 			}
-			CqlObject<CqlAuthenticateMessage> authenticateMessage(std::move(message));
+			auto authenticateMessage = std::move(message).template cast<CqlAuthenticateMessage>();
 			auto& authenticatorClass = authenticateMessage->getAuthenticatorClass().get();
 			if (authenticatorClass != CqlAuthenticatorClasses::PasswordAuthenticator) {
 				return seastar::make_exception_future(CqlAuthenticateException(

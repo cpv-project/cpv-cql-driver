@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
+#include <util/log.hh>
+#include "../Exceptions/CqlLogicException.hpp"
 
 namespace cql {
 	/** Class used to determinate the free list size of the specified type */
@@ -16,8 +18,8 @@ namespace cql {
 	 * T should provide two functions:
 	 * - freeResources: called at deallocate
 	 * - reset: called at allocate, with forwarded parameters
-	 * Move CqlObject<Derived> to CqlObject<Base> is valid (polymorphism is supported).
-	 * Move CqlObject<Base> to CqlObject<Derived> is also valid (use it carefully).
+	 * Cast CqlObject<Derived> to CqlObject<Base> is supported (polymorphism is supported).
+	 * Cast CqlObject<Base> to CqlObject<Derived> is also supported (use it carefully).
 	 * Incomplete type is supported (however it require the complete definition on construct).
 	 */
 	template <class T>
@@ -25,47 +27,35 @@ namespace cql {
 	public:
 		/** Constructor */
 		explicit CqlObject(std::unique_ptr<T>&& ptr) noexcept :
-			ptr_(ptr.release()),
-			deleter_([](void* ptr) {
+			CqlObject(ptr.release(), [](void* ptr) noexcept {
 				std::unique_ptr<T> tPtr(reinterpret_cast<T*>(ptr));
-				auto& freeList = getFreeList();
-				if (freeList.size() < CqlObjectFreeListSize<T>::value) {
-					tPtr->freeResources();
-					freeList.emplace_back(std::move(tPtr));
-				} else {
-					tPtr.reset(); // call the derived destructor
+				try {
+					auto& freeList = getFreeList();
+					if (freeList.size() < CqlObjectFreeListSize<T>::value) {
+						tPtr->freeResources();
+						freeList.emplace_back(std::move(tPtr));
+					} else {
+						tPtr.reset(); // call the derived destructor
+					}
+				} catch (...) {
+					std::cerr << std::current_exception() << std::endl;
 				}
 			}) { }
 
 		/** Move constructor */
 		CqlObject(CqlObject&& other) noexcept :
-			ptr_(other.ptr_),
-			deleter_(other.deleter_) {
-			other.ptr_ = nullptr;
-		}
-
-		/** Move constructor, T is base of U (up casting) */
-		template <class U, std::enable_if_t<std::is_base_of<T, U>::value, int> = 0>
-		CqlObject(CqlObject<U>&& other) noexcept :
-			ptr_(other.ptr_),
-			deleter_(other.deleter_) {
-			other.ptr_ = nullptr;
-		}
-
-		/**
-		 * Move constructor, U is base of T (down casting)
-		 * Use static_cast instead of dynamic_cast for performance, use it carefully
-		 */
-		template <class U, std::enable_if_t<std::is_base_of<U, T>::value, int> = 0>
-		CqlObject(CqlObject<U>&& other) noexcept :
-			ptr_(static_cast<T*>(other.ptr_)) ,
-			deleter_(other.deleter_) {
+			CqlObject(other.ptr_, other.deleter_) {
 			other.ptr_ = nullptr;
 		}
 
 		/** Move assignment */
 		CqlObject& operator=(CqlObject&& other) noexcept {
-			if (this != &other) {
+			if (this != static_cast<void*>(&other)) {
+				void* ptr = ptr_;
+				if (ptr != nullptr) {
+					ptr_ = nullptr;
+					deleter_(ptr);
+				}
 				ptr_ = other.ptr_;
 				deleter_ = other.deleter_;
 				other.ptr_ = nullptr;
@@ -73,29 +63,21 @@ namespace cql {
 			return *this;
 		}
 
-		/** Move assignment, T is base of U (up casting) */
-		template <class U, std::enable_if_t<std::is_base_of<T, U>::value, int> = 0>
-		CqlObject& operator=(CqlObject<U>&& other) noexcept {
-			if (this != static_cast<void*>(&other)) {
-				ptr_ = other.ptr_;
-				deleter_ = other.deleter_;
-				other.ptr_ = nullptr;
+		/** Cast to another type */
+		template <class U, std::enable_if_t<
+			std::is_base_of<T, U>::value ||
+			std::is_base_of<U, T>::value, int> = 0>
+		CqlObject<U> cast() && {
+			if (static_cast<U*>(reinterpret_cast<T*>(ptr_)) != ptr_) {
+				// store the original pointer would solve this problem
+				// but that will make CqlObject to be 3 pointer size
+				throw cql::CqlLogicException(CQL_CODEINFO,
+					"cast cause pointer address changed, from",
+					typeid(T).name(), "to", typeid(U).name());
 			}
-			return *this;
-		}
-
-		/**
-		 * Move assignment, U is base of T (down casting)
-		 * Use static_cast instead of dynamic_cast for performance, use it carefully
-		 */
-		template <class U, std::enable_if_t<std::is_base_of<U, T>::value, int> = 0>
-		CqlObject& operator=(CqlObject<U>&& other) noexcept {
-			if (this != static_cast<void*>(&other)) {
-				ptr_ = static_cast<T*>(other.ptr_);
-				deleter_ = other.deleter_;
-				other.ptr_ = nullptr;
-			}
-			return *this;
+			void* ptr = ptr_;
+			ptr_ = nullptr;
+			return CqlObject<U>(ptr, deleter_);
 		}
 
 		/** Disallow copy */
@@ -104,28 +86,26 @@ namespace cql {
 
 		/** Destructor */
 		~CqlObject() {
-			T* ptr = ptr_;
-			ptr_ = nullptr;
+			void* ptr = ptr_;
 			if (ptr != nullptr) {
-				// it may throws exception, then program abort
-				// for now I don't want to catch it
+				ptr_ = nullptr;
 				deleter_(ptr);
 			}
 		}
 
 		/** Dereference */
 		T& operator*() const& {
-			return *ptr_;
+			return *reinterpret_cast<T*>(ptr_);
 		}
 
 		/** Get pointer */
 		T* operator->() const& {
-			return ptr_;
+			return reinterpret_cast<T*>(ptr_);
 		}
 
 		/** Get pointer */
 		T* get() const& {
-			return ptr_;
+			return reinterpret_cast<T*>(ptr_);
 		}
 
 		/** Compare with nullptr */
@@ -139,9 +119,13 @@ namespace cql {
 		}
 
 	private:
+		/** Constructor */
+		CqlObject(void* ptr, void(*deleter)(void*) noexcept) noexcept :
+			ptr_(ptr), deleter_(deleter) { }
+
 		template <class> friend class CqlObject;
-		T* ptr_;
-		void(*deleter_)(void*);
+		void* ptr_;
+		void(*deleter_)(void*) noexcept;
 	};
 
 	/** Allocate object */
