@@ -21,31 +21,56 @@ namespace cql {
 		 * For more information see this page:
 		 * https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html
 		 */
-		CqlCommand&& setConsistencyLevel(CqlConsistencyLevel consistencyLevel) &&;
+		CqlCommand& setConsistencyLevel(CqlConsistencyLevel consistencyLevel) &;
+
+		/** Set the consistency level of this query */
+		CqlCommand&& setConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
+			return std::move(setConsistencyLevel(consistencyLevel));
+		}
 
 		/**
 		 * Set the page size of this query.
 		 * You may also want to set the page state if you want to query the next page.
 		 */
-		CqlCommand&& setPageSize(std::size_t pageSize) &&;
+		CqlCommand& setPageSize(std::size_t pageSize) &;
+
+		/** Set the page size of this query */
+		CqlCommand&& setPageSize(std::size_t pageSize) && {
+			return std::move(setPageSize(pageSize));
+		}
 
 		/**
 		 * Set the page state of this query.
 		 * For the first page this is unnecessary.
 		 * Please sure you called the setPageSize before this function.
 		 */
-		CqlCommand&& setPageState(seastar::sstring&& pageState) &&;
+		CqlCommand& setPageState(seastar::sstring&& pageState) &;
+
+		/**
+		 * Set the page state of this query.
+		 * For the first page this is unnecessary.
+		 * Please sure you called the setPageSize before this function.
+		 */
+		CqlCommand&& setPageState(seastar::sstring&& pageState) && {
+			return std::move(setPageState(std::move(pageState)));
+		}
 
 		/**
 		 * Add single query parameter bound by position.
 		 * The position is incremental, when this function is called.
 		 */
 		template <class T>
-		CqlCommand&& addParameter(T&& parameter) && {
+		CqlCommand& addParameter(T&& parameter) & {
 			CqlColumnTrait<std::decay_t<T>>::encode(
 				std::forward<T>(parameter), getMutableParameters());
 			++getMutableParameterCount();
-			return std::move(*this);
+			return *this;
+		}
+
+		/** Add single query parameter bound by position */
+		template <class T>
+		CqlCommand&& addParameter(T&& parameter) && {
+			return std::move(addParameter(std::forward<T>(parameter)));
 		}
 
 		/**
@@ -53,10 +78,16 @@ namespace cql {
 		 * The position is incremental, when this function is called.
 		 */
 		template <class... Args>
-		CqlCommand&& addParameters(Args&&... parameters) && {
+		CqlCommand& addParameters(Args&&... parameters) & {
 			addParametersEncode(getMutableParameters(), std::forward<Args>(parameters)...);
 			getMutableParameterCount() += sizeof...(Args);
-			return std::move(*this);
+			return *this;
+		}
+
+		/** Add multiple query parameters bound by position */
+		template <class... Args>
+		CqlCommand&& addParameters(Args&&... parameters) && {
+			return std::move(addParameters(std::forward<Args>(parameters)...));
 		}
 
 		/** Get the query string of this query */
@@ -85,7 +116,8 @@ namespace cql {
 
 		/** Constructor */
 		template <std::size_t Size>
-		explicit CqlCommand(const char(&query)[Size]) : CqlCommand(query, Size-1) {
+		explicit CqlCommand(const char(&query)[Size]) :
+			CqlCommand(query, Size-1) {
 			static_assert(Size > 0, "check size");
 		}
 

@@ -22,34 +22,66 @@ namespace cql {
 		 * For more information see this page:
 		 * https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html
 		 */
-		CqlBatchCommand&& setConsistencyLevel(CqlConsistencyLevel consistencyLevel) &&;
+		CqlBatchCommand& setConsistencyLevel(CqlConsistencyLevel consistencyLevel) &;
+
+		/** Set the consistency level of this batch */
+		CqlBatchCommand&& setConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
+			return std::move(setConsistencyLevel(consistencyLevel));
+		}
 
 		/** Add a new query to this batch */
-		CqlBatchCommand&& addQuery(seastar::sstring&& query) &&;
+		CqlBatchCommand& addQuery(seastar::sstring&& query) &;
 
 		/** Add a new query to this batch */
-		CqlBatchCommand&& addQuery(const char* query, std::size_t size) &&;
+		CqlBatchCommand&& addQuery(seastar::sstring&& query) && {
+			return std::move(addQuery(std::move(query)));
+		}
+
+		/** Add a new query to this batch */
+		CqlBatchCommand& addQuery(const char* query, std::size_t size) &;
+
+		/** Add a new query to this batch */
+		CqlBatchCommand&& addQuery(const char* query, std::size_t size) && {
+			return std::move(addQuery(query, size));
+		}
+
+		/** Add a new query to this batch */
+		template <std::size_t Size>
+		CqlBatchCommand& addQuery(const char(&query)[Size]) & {
+			static_assert(Size > 0, "check size");
+			return addQuery(static_cast<const char*>(query), Size-1);
+		}
 
 		/** Add a new query to this batch */
 		template <std::size_t Size>
 		CqlBatchCommand&& addQuery(const char(&query)[Size]) && {
-			static_assert(Size > 0, "check size");
-			return std::move(*this).addQuery(static_cast<const char*>(query), Size-1);
+			return std::move(addQuery<Size>(query));
 		}
 
 		/** Open a new parameter set explicitly of the last query */
-		CqlBatchCommand&& openParameterSet() &&;
+		CqlBatchCommand& openParameterSet() &;
+
+		/** Open a new parameter set explicitly of the last query */
+		CqlBatchCommand&& openParameterSet() && {
+			return std::move(openParameterSet());
+		}
 
 		/**
 		 * Add single query parameter bound by position to the last parameter set.
 		 * The position is incremental, when this function is called.
 		 */
 		template <class T>
-		CqlBatchCommand&& addParameter(T&& parameter) && {
+		CqlBatchCommand& addParameter(T&& parameter) & {
 			CqlColumnTrait<std::decay_t<T>>::encode(
 				std::forward<T>(parameter), getMutableParameters());
 			++getMutableParameterCount();
-			return std::move(*this);
+			return *this;
+		}
+
+		/** Add single query parameter bound by position to the last parameter set */
+		template <class T>
+		CqlBatchCommand&& addParameter(T&& parameter) && {
+			return std::move(addParameter(std::forward<T>(parameter)));
 		}
 
 		/**
@@ -57,10 +89,16 @@ namespace cql {
 		 * The position is incremental, when this function is called.
 		 */
 		template <class... Args>
-		CqlBatchCommand&& addParameters(Args&&... parameters) && {
+		CqlBatchCommand& addParameters(Args&&... parameters) & {
 			addParametersEncode(getMutableParameters(), std::forward<Args>(parameters)...);
 			getMutableParameterCount() += sizeof...(Args);
-			return std::move(*this);
+			return *this;
+		}
+
+		/** Add multiple query parameters bound by position to the last parameter set */
+		template <class... Args>
+		CqlBatchCommand&& addParameters(Args&&... parameters) && {
+			return std::move(addParameters(std::forward<Args>(parameters)...));
 		}
 
 		/** Get the consistency level of this batch */

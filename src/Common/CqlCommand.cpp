@@ -52,21 +52,21 @@ namespace cql {
 	}
 
 	/** Set the consistency level of this query */
-	CqlCommand&& CqlCommand::setConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
+	CqlCommand& CqlCommand::setConsistencyLevel(CqlConsistencyLevel consistencyLevel) & {
 		data_->consistencyLevel = consistencyLevel;
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Set the page size of this query */
-	CqlCommand&& CqlCommand::setPageSize(std::size_t pageSize) && {
+	CqlCommand& CqlCommand::setPageSize(std::size_t pageSize) & {
 		data_->pageSize = { pageSize, true };
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Set the page state of this query */
-	CqlCommand&& CqlCommand::setPageState(seastar::sstring&& pageState) && {
+	CqlCommand& CqlCommand::setPageState(seastar::sstring&& pageState) & {
 		data_->pageState = std::move(pageState);
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Get the query string of this query */

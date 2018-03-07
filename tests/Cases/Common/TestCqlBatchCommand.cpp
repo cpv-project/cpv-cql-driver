@@ -87,15 +87,16 @@ TEST(TestCqlBatchCommand, parameters) {
 
 TEST(TestCqlBatchCommand, parametersError) {
 	{
+		cql::CqlBatchCommand command;
 		ASSERT_THROWS_CONTAINS(
 			cql::CqlLogicException,
-			cql::CqlBatchCommand().addParameter(cql::CqlInt(1)),
+			command.addParameter(cql::CqlInt(1)),
 			"please call addQuery before addParameters");
 	}
 	{
 		cql::CqlBatchCommand command;
-		ASSERT_THROWS(std::out_of_range, cql::CqlBatchCommand().getQuery(0));
-		ASSERT_THROWS(std::out_of_range, cql::CqlBatchCommand().getParameterSets(0));
+		ASSERT_THROWS(std::out_of_range, command.getQuery(0));
+		ASSERT_THROWS(std::out_of_range, command.getParameterSets(0));
 	}
 }
 

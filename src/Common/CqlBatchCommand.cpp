@@ -48,31 +48,31 @@ namespace cql {
 	}
 
 	/** Set the consistency level of this batch */
-	CqlBatchCommand&& CqlBatchCommand::setConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
+	CqlBatchCommand& CqlBatchCommand::setConsistencyLevel(CqlConsistencyLevel consistencyLevel) & {
 		data_->consistencyLevel = consistencyLevel;
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Add a new query to this batch */
-	CqlBatchCommand&& CqlBatchCommand::addQuery(seastar::sstring&& query) && {
+	CqlBatchCommand& CqlBatchCommand::addQuery(seastar::sstring&& query) & {
 		data_->queries.emplace_back(std::move(query));
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Add a new query to this batch */
-	CqlBatchCommand&& CqlBatchCommand::addQuery(const char* query, std::size_t size) && {
+	CqlBatchCommand& CqlBatchCommand::addQuery(const char* query, std::size_t size) & {
 		data_->queries.emplace_back(query, size);
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Open a new parameter set explicitly of the last query */
-	CqlBatchCommand&& CqlBatchCommand::openParameterSet() && {
+	CqlBatchCommand& CqlBatchCommand::openParameterSet() & {
 		if (data_->queries.empty()) {
 			throw cql::CqlLogicException(CQL_CODEINFO,
 				"please call addQuery before openParameterSet");
 		}
 		data_->queries.back().parameterSets.emplace_back();
-		return std::move(*this);
+		return *this;
 	}
 
 	/** Get the consistency level of this batch */
