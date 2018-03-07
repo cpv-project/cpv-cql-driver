@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <utility>
+#include <chrono>
 #include <core/sstring.hh>
 #include "./Utility/CqlObject.hpp"
 #include "CqlCommonDefinitions.hpp"
@@ -90,6 +91,29 @@ namespace cql {
 			return std::move(addParameters(std::forward<Args>(parameters)...));
 		}
 
+		/**
+		 * Set the serial consistency level of this query.
+		 * Can only be either SERIAL or LOCAL_SERIAL.
+		 */
+		CqlCommand& setSerialConsistencyLevel(CqlConsistencyLevel consistencyLevel) &;
+
+		/** Set the serial consistency level of this query */
+		CqlCommand&& setSerialConsistencyLevel(CqlConsistencyLevel consistencyLevel) && {
+			return std::move(setSerialConsistencyLevel(consistencyLevel));
+		}
+
+		/**
+		 * Set the default timestamp of this query.
+		 * This will replace the server side assigned timestamp as default timestamp.
+		 * A timestamp in the query itself will still override this timestamp.
+		 */
+		CqlCommand& setDefaultTimeStamp(std::chrono::system_clock::time_point timeStamp) &;
+
+		/** Set the default timestamp of this query */
+		CqlCommand&& setDefaultTimeStamp(std::chrono::system_clock::time_point timeStamp) && {
+			return std::move(setDefaultTimeStamp(timeStamp));
+		}
+
 		/** Get the query string of this query */
 		std::pair<const char*, std::size_t> getQuery() const&;
 
@@ -97,7 +121,7 @@ namespace cql {
 		CqlConsistencyLevel getConsistencyLevel() const;
 
 		/** Get the page size of this query, the second value is false if is not set */
-		std::pair<std::size_t, bool> getPageSize() const;
+		const std::pair<std::size_t, bool>& getPageSize() const&;
 
 		/** Get the page state of this query */
 		const seastar::sstring& getPageState() const&;
@@ -107,6 +131,18 @@ namespace cql {
 
 		/** Get the encoded parameters of this query */
 		const seastar::sstring& getParameters() const&;
+
+		/**
+		 * Get the serial consistency level of this query,
+		 * the second value is false if is not set.
+		 */
+		const std::pair<CqlConsistencyLevel, bool>& getSerialConsistencyLevel() const&;
+
+		/**
+		 * Get the default timestamp of this query,
+		 * the second value is false if is not set.
+		 */
+		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimeStamp() const&;
 
 		/** Constructor */
 		explicit CqlCommand(seastar::sstring&& query);

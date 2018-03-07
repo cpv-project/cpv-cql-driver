@@ -11,6 +11,8 @@ namespace cql {
 		seastar::sstring pageState;
 		std::size_t parameterCount;
 		seastar::sstring parameters;
+		std::pair<CqlConsistencyLevel, bool> serialConsistencyLevel;
+		std::pair<std::chrono::system_clock::time_point, bool> defaultTimeStamp;
 
 		CqlCommandData() :
 			queryCStr(nullptr, 0),
@@ -19,7 +21,9 @@ namespace cql {
 			pageSize(),
 			pageState(),
 			parameterCount(),
-			parameters() { }
+			parameters(),
+			serialConsistencyLevel(),
+			defaultTimeStamp() { }
 
 		// cppcheck-suppress functionStatic
 		void freeResources() { }
@@ -43,6 +47,8 @@ namespace cql {
 			pageState.resize(0);
 			parameterCount = 0;
 			parameters.resize(0);
+			serialConsistencyLevel = { CqlConsistencyLevel::Serial, false };
+			defaultTimeStamp = { {}, false };
 		}
 	};
 
@@ -69,6 +75,20 @@ namespace cql {
 		return *this;
 	}
 
+	/** Set the serial consistency level of this query */
+	CqlCommand& CqlCommand::setSerialConsistencyLevel(
+		CqlConsistencyLevel consistencyLevel) & {
+		data_->serialConsistencyLevel = { consistencyLevel, true };
+		return *this;
+	}
+
+	/** Set the default timestamp of this query */
+	CqlCommand& CqlCommand::setDefaultTimeStamp(
+		std::chrono::system_clock::time_point timeStamp) & {
+		data_->defaultTimeStamp = { timeStamp, true };
+		return *this;
+	}
+
 	/** Get the query string of this query */
 	std::pair<const char*, std::size_t> CqlCommand::getQuery() const& {
 		if (data_->queryCStr.first != nullptr) {
@@ -84,7 +104,7 @@ namespace cql {
 	}
 
 	/** Get the page size of this query, the second value is false if is not set */
-	std::pair<std::size_t, bool> CqlCommand::getPageSize() const {
+	const std::pair<std::size_t, bool>& CqlCommand::getPageSize() const& {
 		return data_->pageSize;
 	}
 
@@ -101,6 +121,18 @@ namespace cql {
 	/** Get the encoded parameters of this query */
 	const seastar::sstring& CqlCommand::getParameters() const& {
 		return data_->parameters;
+	}
+
+	/** Get the serial consistency level of this query */
+	const std::pair<CqlConsistencyLevel, bool>&
+		CqlCommand::getSerialConsistencyLevel() const& {
+		return data_->serialConsistencyLevel;
+	}
+
+	/** Get the default timestamp of this query */
+	const std::pair<std::chrono::system_clock::time_point, bool>&
+		CqlCommand::getDefaultTimeStamp() const& {
+		return data_->defaultTimeStamp;
 	}
 
 	/** Constructor */

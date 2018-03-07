@@ -96,3 +96,37 @@ TEST(TestCqlCommand, parameters) {
 	}
 }
 
+TEST(TestCqlCommand, serialConsistencyLevel) {
+	{
+		cql::CqlCommand command("use a;");
+		ASSERT_EQ(command.getSerialConsistencyLevel().first, cql::CqlConsistencyLevel::Serial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().second, false);
+	}
+	{
+		auto command = cql::CqlCommand("use a;")
+			.setSerialConsistencyLevel(cql::CqlConsistencyLevel::Serial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().first, cql::CqlConsistencyLevel::Serial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().second, true);
+	}
+	{
+		auto command = cql::CqlCommand("use a;")
+			.setSerialConsistencyLevel(cql::CqlConsistencyLevel::LocalSerial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().first, cql::CqlConsistencyLevel::LocalSerial);
+		ASSERT_EQ(command.getSerialConsistencyLevel().second, true);
+	}
+}
+
+TEST(TestCqlCommand, defaultTimeStamp) {
+	{
+		cql::CqlCommand command("use a;");
+		ASSERT_EQ(command.getDefaultTimeStamp().second, false);
+	}
+	{
+		auto now = std::chrono::system_clock::now();
+		auto command = cql::CqlCommand("use a;")
+			.setDefaultTimeStamp(now);
+		ASSERT_EQ(command.getDefaultTimeStamp().first, now);
+		ASSERT_EQ(command.getDefaultTimeStamp().second, true);
+	}
+}
+
