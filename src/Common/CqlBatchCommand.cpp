@@ -121,6 +121,32 @@ namespace cql {
 		return data_->queries.at(index).parameterSets;
 	}
 
+	/** Get the mutable count of parameters of the last parameter set */
+	std::size_t& CqlBatchCommand::getParameterCountOfLastSet() & {
+		if (data_->queries.empty()) {
+			throw cql::CqlLogicException(CQL_CODEINFO,
+				"please call addQuery before addParameters");
+		}
+		auto& lastQuery = data_->queries.back();
+		if (lastQuery.parameterSets.empty()) {
+			lastQuery.parameterSets.emplace_back();
+		}
+		return lastQuery.parameterSets.back().first;
+	}
+
+	/** Get the mutable encoded parameters of the last parameter set */
+	seastar::sstring& CqlBatchCommand::getParametersOfLastSet() & {
+		if (data_->queries.empty()) {
+			throw cql::CqlLogicException(CQL_CODEINFO,
+				"please call addQuery before addParameters");
+		}
+		auto& lastQuery = data_->queries.back();
+		if (lastQuery.parameterSets.empty()) {
+			lastQuery.parameterSets.emplace_back();
+		}
+		return lastQuery.parameterSets.back().second;
+	}
+
 	/** Get the serial consistency level of this query */
 	const std::pair<CqlConsistencyLevel, bool>&
 		CqlBatchCommand::getSerialConsistencyLevel() const& {
@@ -136,31 +162,5 @@ namespace cql {
 	/** Constructor */
 	CqlBatchCommand::CqlBatchCommand() :
 		data_(makeObject<CqlBatchCommandData>()) { }
-
-	/** Get the mutable count of parameters of the last parameter set */
-	std::size_t& CqlBatchCommand::getMutableParameterCount() & {
-		if (data_->queries.empty()) {
-			throw cql::CqlLogicException(CQL_CODEINFO,
-				"please call addQuery before addParameters");
-		}
-		auto& lastQuery = data_->queries.back();
-		if (lastQuery.parameterSets.empty()) {
-			lastQuery.parameterSets.emplace_back();
-		}
-		return lastQuery.parameterSets.back().first;
-	}
-
-	/** Get the mutable encoded parameters of the last parameter set */
-	seastar::sstring& CqlBatchCommand::getMutableParameters() & {
-		if (data_->queries.empty()) {
-			throw cql::CqlLogicException(CQL_CODEINFO,
-				"please call addQuery before addParameters");
-		}
-		auto& lastQuery = data_->queries.back();
-		if (lastQuery.parameterSets.empty()) {
-			lastQuery.parameterSets.emplace_back();
-		}
-		return lastQuery.parameterSets.back().second;
-	}
 }
 

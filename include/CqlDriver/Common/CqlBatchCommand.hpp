@@ -73,8 +73,8 @@ namespace cql {
 		template <class T>
 		CqlBatchCommand& addParameter(T&& parameter) & {
 			CqlColumnTrait<std::decay_t<T>>::encode(
-				std::forward<T>(parameter), getMutableParameters());
-			++getMutableParameterCount();
+				std::forward<T>(parameter), getParametersOfLastSet());
+			++getParameterCountOfLastSet();
 			return *this;
 		}
 
@@ -90,8 +90,9 @@ namespace cql {
 		 */
 		template <class... Args>
 		CqlBatchCommand& addParameters(Args&&... parameters) & {
-			addParametersEncode(getMutableParameters(), std::forward<Args>(parameters)...);
-			getMutableParameterCount() += sizeof...(Args);
+			addParametersEncode(
+				getParametersOfLastSet(), std::forward<Args>(parameters)...);
+			getParameterCountOfLastSet() += sizeof...(Args);
 			return *this;
 		}
 
@@ -137,6 +138,12 @@ namespace cql {
 		using ParameterSetsType = std::vector<std::pair<std::size_t, seastar::sstring>>;
 		const ParameterSetsType& getParameterSets(std::size_t index) const&;
 
+		/** Get the mutable count of parameters of the last parameter set */
+		std::size_t& getParameterCountOfLastSet() &;
+
+		/** Get the mutable encoded parameters of the last parameter set */
+		seastar::sstring& getParametersOfLastSet() &;
+
 		/**
 		 * Get the serial consistency level of this query,
 		 * the second value is false if is not set.
@@ -153,12 +160,6 @@ namespace cql {
 		CqlBatchCommand();
 
 	private:
-		/** Get the mutable count of parameters of the last parameter set */
-		std::size_t& getMutableParameterCount() &;
-
-		/** Get the mutable encoded parameters of the last parameter set */
-		seastar::sstring& getMutableParameters() &;
-
 		/** Encode implementation of addParameters */
 		static void addParametersEncode(seastar::sstring&) { }
 		template <class Head, class... Rest>
