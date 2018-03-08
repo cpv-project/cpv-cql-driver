@@ -57,15 +57,15 @@ TEST(TestCqlCommand, pageSize) {
 	}
 }
 
-TEST(TestCqlCommand, pageState) {
+TEST(TestCqlCommand, pagingState) {
 	{
 		cql::CqlCommand command("use a;");
-		ASSERT_EQ(command.getPageState(), "");
+		ASSERT_EQ(command.getPagingState(), "");
 	}
 	{
 		auto command = cql::CqlCommand("use a;")
-			.setPageState("abc");
-		ASSERT_EQ(command.getPageState(), "abc");
+			.setPagingState("abc");
+		ASSERT_EQ(command.getPagingState(), "abc");
 	}
 }
 

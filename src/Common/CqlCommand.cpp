@@ -8,7 +8,7 @@ namespace cql {
 		seastar::sstring queryStr;
 		CqlConsistencyLevel consistencyLevel;
 		std::pair<std::size_t, bool> pageSize;
-		seastar::sstring pageState;
+		seastar::sstring pagingState;
 		std::size_t parameterCount;
 		seastar::sstring parameters;
 		std::pair<CqlConsistencyLevel, bool> serialConsistencyLevel;
@@ -19,7 +19,7 @@ namespace cql {
 			queryStr(),
 			consistencyLevel(),
 			pageSize(),
-			pageState(),
+			pagingState(),
 			parameterCount(),
 			parameters(),
 			serialConsistencyLevel(),
@@ -44,7 +44,7 @@ namespace cql {
 		void resetExceptQuery() {
 			consistencyLevel = CqlConsistencyLevel::Any;
 			pageSize = { 0, false };
-			pageState.resize(0);
+			pagingState.resize(0);
 			parameterCount = 0;
 			parameters.resize(0);
 			serialConsistencyLevel = { CqlConsistencyLevel::Serial, false };
@@ -70,8 +70,8 @@ namespace cql {
 	}
 
 	/** Set the page state of this query */
-	CqlCommand& CqlCommand::setPageState(seastar::sstring&& pageState) & {
-		data_->pageState = std::move(pageState);
+	CqlCommand& CqlCommand::setPagingState(seastar::sstring&& pagingState) & {
+		data_->pagingState = std::move(pagingState);
 		return *this;
 	}
 
@@ -109,17 +109,27 @@ namespace cql {
 	}
 
 	/** Get the page state of this query */
-	const seastar::sstring& CqlCommand::getPageState() const& {
-		return data_->pageState;
+	const seastar::sstring& CqlCommand::getPagingState() const& {
+		return data_->pagingState;
 	}
 
 	/** Get the count of parameters of this query */
-	std::size_t CqlCommand::getParameterCount() const {
+	std::size_t CqlCommand::getParameterCount() const& {
+		return data_->parameterCount;
+	}
+
+	/** Get the mutable count of parameters of this query */
+	std::size_t& CqlCommand::getParameterCount() & {
 		return data_->parameterCount;
 	}
 
 	/** Get the encoded parameters of this query */
 	const seastar::sstring& CqlCommand::getParameters() const& {
+		return data_->parameters;
+	}
+
+	/** Get the mutable encoded parameters of this query */
+	seastar::sstring& CqlCommand::getParameters() & {
 		return data_->parameters;
 	}
 
@@ -142,15 +152,5 @@ namespace cql {
 	/** Constructor */
 	CqlCommand::CqlCommand(const char* query, std::size_t size) :
 		data_(makeObject<CqlCommandData>(query, size)) { }
-
-	/** Get the mutable count of parameters of this query */
-	std::size_t& CqlCommand::getMutableParameterCount() & {
-		return data_->parameterCount;
-	}
-
-	/** Get the mutable encoded parameters of this query */
-	seastar::sstring& CqlCommand::getMutableParameters() & {
-		return data_->parameters;
-	}
 }
 

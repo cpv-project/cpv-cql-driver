@@ -41,19 +41,19 @@ namespace cql {
 		}
 
 		/**
-		 * Set the page state of this query.
+		 * Set the paging state of this query.
 		 * For the first page this is unnecessary.
 		 * Please sure you called the setPageSize before this function.
 		 */
-		CqlCommand& setPageState(seastar::sstring&& pageState) &;
+		CqlCommand& setPagingState(seastar::sstring&& pagingState) &;
 
 		/**
-		 * Set the page state of this query.
+		 * Set the paging state of this query.
 		 * For the first page this is unnecessary.
 		 * Please sure you called the setPageSize before this function.
 		 */
-		CqlCommand&& setPageState(seastar::sstring&& pageState) && {
-			return std::move(setPageState(std::move(pageState)));
+		CqlCommand&& setPagingState(seastar::sstring&& pagingState) && {
+			return std::move(setPagingState(std::move(pagingState)));
 		}
 
 		/**
@@ -63,8 +63,8 @@ namespace cql {
 		template <class T>
 		CqlCommand& addParameter(T&& parameter) & {
 			CqlColumnTrait<std::decay_t<T>>::encode(
-				std::forward<T>(parameter), getMutableParameters());
-			++getMutableParameterCount();
+				std::forward<T>(parameter), getParameters());
+			++getParameterCount();
 			return *this;
 		}
 
@@ -80,8 +80,8 @@ namespace cql {
 		 */
 		template <class... Args>
 		CqlCommand& addParameters(Args&&... parameters) & {
-			addParametersEncode(getMutableParameters(), std::forward<Args>(parameters)...);
-			getMutableParameterCount() += sizeof...(Args);
+			addParametersEncode(getParameters(), std::forward<Args>(parameters)...);
+			getParameterCount() += sizeof...(Args);
 			return *this;
 		}
 
@@ -123,14 +123,20 @@ namespace cql {
 		/** Get the page size of this query, the second value is false if is not set */
 		const std::pair<std::size_t, bool>& getPageSize() const&;
 
-		/** Get the page state of this query */
-		const seastar::sstring& getPageState() const&;
+		/** Get the paging state of this query */
+		const seastar::sstring& getPagingState() const&;
 
 		/** Get the count of parameters of this query */
-		std::size_t getParameterCount() const;
+		std::size_t getParameterCount() const&;
+
+		/** Get the mutable count of parameters of this query */
+		std::size_t& getParameterCount() &;
 
 		/** Get the encoded parameters of this query */
 		const seastar::sstring& getParameters() const&;
+
+		/** Get the mutable encoded parameters of this query */
+		seastar::sstring& getParameters() &;
 
 		/**
 		 * Get the serial consistency level of this query,
@@ -158,12 +164,6 @@ namespace cql {
 		}
 
 	private:
-		/** Get the mutable count of parameters of this query */
-		std::size_t& getMutableParameterCount() &;
-
-		/** Get the mutable encoded parameters of this query */
-		seastar::sstring& getMutableParameters() &;
-
 		/** Encode implementation of addParameters */
 		static void addParametersEncode(seastar::sstring&) { }
 		template <class Head, class... Rest>
