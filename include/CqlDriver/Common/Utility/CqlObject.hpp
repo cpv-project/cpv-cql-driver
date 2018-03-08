@@ -68,7 +68,7 @@ namespace cql {
 			std::is_base_of<T, U>::value ||
 			std::is_base_of<U, T>::value, int> = 0>
 		CqlObject<U> cast() && {
-			if (static_cast<U*>(reinterpret_cast<T*>(ptr_)) != ptr_) {
+			if (static_cast<U*>(reinterpret_cast<T*>(1)) != reinterpret_cast<U*>(1)) {
 				// store the original pointer would solve this problem
 				// but that will make CqlObject to be 3 pointer size
 				throw cql::CqlLogicException(CQL_CODEINFO,
