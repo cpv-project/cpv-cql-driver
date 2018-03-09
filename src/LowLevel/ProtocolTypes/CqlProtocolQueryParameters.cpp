@@ -113,7 +113,7 @@ namespace cql {
 				if (parameterSize.get() <= 0) {
 					continue;
 				}
-				if (end - ptr < parameterSize.get()) {
+				if (end < ptr || end - ptr < parameterSize.get()) {
 					throw CqlDecodeException(CQL_CODEINFO, "length not enough");
 				}
 				encodedParameters.append(ptr, parameterSize.get());
