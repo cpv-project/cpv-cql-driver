@@ -1,5 +1,5 @@
 #include <core/reactor.hh>
-#include <CqlDriver/Common/Utility/SocketHolder.hpp>
+#include <CQLDriver/Common/Utility/SocketHolder.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST_FUTURE(TestSocketHolder, all) {

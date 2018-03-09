@@ -17,6 +17,6 @@ cd ../../tests
 # run tests
 cd ../bin/tests
 echo "leak:lt__malloc" > "suppressions.txt"
-LSAN_OPTIONS="suppressions=suppressions.txt" ./CqlDriverTests
+LSAN_OPTIONS="suppressions=suppressions.txt" ./CQLDriverTests
 cd ../../tests
 

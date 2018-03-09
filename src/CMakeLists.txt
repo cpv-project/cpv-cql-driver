@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (CqlDriver)
+project (CQLDriver)
 
 FILE(GLOB_RECURSE Files ./*.cpp)
 FILE(GLOB_RECURSE PublicHeaders ../include/*.hpp)
@@ -31,7 +31,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto ${SEASTAR_LDFL
 set(PC_PATH "${CMAKE_BINARY_DIR}/cqldriver.pc")
 get_filename_component(TOP_PATH ${CMAKE_SOURCE_DIR} PATH)
 file(REMOVE ${PC_PATH})
-file(APPEND ${PC_PATH} "Name: CqlDriver\n")
+file(APPEND ${PC_PATH} "Name: CQLDriver\n")
 file(APPEND ${PC_PATH} "URL: https://github.com/cpv-project/cpv-cql-driver\n")
 file(APPEND ${PC_PATH} "Description: C++ database driver for cassandra and scylla\n")
 file(APPEND ${PC_PATH} "Version: 0.1\n")

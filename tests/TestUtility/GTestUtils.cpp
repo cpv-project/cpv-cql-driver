@@ -1,7 +1,7 @@
 #include <core/app-template.hh>
 #include <core/thread.hh>
 #include <core/sleep.hh>
-#include "GTestUtils.hpp"
+#include "./GTestUtils.hpp"
 
 namespace cql {
 	namespace Internal_Gtest {

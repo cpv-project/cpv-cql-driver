@@ -1,5 +1,5 @@
-#include <CqlDriver/Common/Utility/EnumUtils.hpp>
-#include <CqlDriver/Common/Utility/StringUtils.hpp>
+#include <CQLDriver/Common/Utility/EnumUtils.hpp>
+#include <CQLDriver/Common/Utility/StringUtils.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 namespace cql {

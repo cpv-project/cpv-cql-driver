@@ -1,8 +1,8 @@
-CqlSessionConfiguration [Common, byvalue]
+SessionConfiguration [Common, byvalue]
 	setMaxPoolSize()
 	setDnsCacheTime()
 
-CqlNodeConfiguration [Common, byvalue]
+NodeConfiguration [Common, byvalue]
 	setAddress(hostname, port)
 	setUseSsl()
 	setUseCompression()
@@ -11,26 +11,26 @@ CqlNodeConfiguration [Common, byvalue]
 	getIpAddress(ipAddress, dnsCacheTime)
 	updateIpAddress(ipAddress)
 
-CqlNodeCollection [Common, shared_ptr]
+NodeCollection [Common, shared_ptr]
 	chooseOneNode()
 	reportFailure(nodeConfiguration)
 	reportSuccess(nodeConfiguration)
 	create(initialNodes)
 
-CqlSessionFactory [HighLevel, shared_ptr]
+SessionFactory [HighLevel, shared_ptr]
 	getSession()
 	create(sessionConfiguration, nodeCollection)
 
-CqlSession [HighLevel, CqlObject]
-	query(command) -> seastar::future<CqlObject<CqlResultSet>>
+Session [HighLevel, Object]
+	query(command) -> seastar::future<Object<ResultSet>>
 	execute(command) -> seastar::future<>
 	execute(batchCommand) -> seastar::future<>
 
-CqlConnectionPool [LowLevel, shared_ptr]
+ConnectionPool [LowLevel, shared_ptr]
 	getConnection()
-	CqlConnectionPool(sessionConfiguration, nodeCollection)
+	ConnectionPool(sessionConfiguration, nodeCollection)
 
-CqlConnectionInfo [LowLevel, byvalue]
+ConnectionInfo [LowLevel, byvalue]
 	getVersion()
 	getHeaderSize()
 	getMaximumMessageBodySize()
@@ -38,22 +38,22 @@ CqlConnectionInfo [LowLevel, byvalue]
 	useVersion()
 	useCompressor(compressor)
 
-CqlConnection [LowLevel, shared_ptr]
-	CqlConnection(sessionConfiguration, nodeConfiguration)
+Connection [LowLevel, shared_ptr]
+	Connection(sessionConfiguration, nodeConfiguration)
 
 ==========================================
 
-auto factory = CqlSessionFactory.create(
-	CqlSessionConfiguration()
+auto factory = SessionFactory.create(
+	SessionConfiguration()
 		.setMaxPoolSize(100)
 		.setDnsCacheTime(std::chrono::milliseconds(15000)),
-	CqlNodeCollection.create({
-		CqlNodeConfiguration()
+	NodeCollection.create({
+		NodeConfiguration()
 			.setUseAddress("127.0.0.1")
 			.setUseSsl(true)
 			.setUseCompression(true)
 			.setPasswordAuthentication("abc", "123456"),
-		CqlNodeConfiguration()
+		NodeConfiguration()
 			.setUseAddress("127.0.0.1")
 			.setUseSsl(true)
 			.setUseCompression(true)
@@ -61,22 +61,22 @@ auto factory = CqlSessionFactory.create(
 	}));
 auto session = factory.getSession();
 
-auto command = CqlCommand::create("use myks;");
+auto command = Command::create("use myks;");
 session.execute(command).then([] { });
 
-auto command = CqlCommand::create("select * from table where key = ?;")
-	.setParameters(cql::CqlInt(123));
+auto command = Command::create("select * from table where key = ?;")
+	.setParameters(cql::Int(123));
 session.query(command).then([](auto result) { });
 
-auto command = CqlBatchCommand::create("insert into table (key, value) VALUES (?,?)")
-	.setConsistency(CqlConsistencyLevel::Quorum)
-	.addParameters(cql::CqlInt(123), cql::CqlText("abc"))
-	.addParameters(cql::CqlInt(321), cql::CqlText("asd"));
+auto command = BatchCommand::create("insert into table (key, value) VALUES (?,?)")
+	.setConsistency(ConsistencyLevel::Quorum)
+	.addParameters(cql::Int(123), cql::Text("abc"))
+	.addParameters(cql::Int(321), cql::Text("asd"));
 session.execute(command).then([] { });
 
 ==========================================
 
-CqlConnection
+Connection
 	sendMessage(message)
 		push message to queue
 		set promise to promises[streamId]
@@ -111,9 +111,9 @@ CqlConnection
 
 ==========================================
 
-CqlConnectionPool
+ConnectionPool
 	makeConnection()
-		select node from CqlNodeCollection
+		select node from NodeCollection
 		make connection from node
 		connections.emplace_back(connection)
 		return connection

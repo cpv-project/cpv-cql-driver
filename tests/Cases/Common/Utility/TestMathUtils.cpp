@@ -1,4 +1,4 @@
-#include <CqlDriver/Common/Utility/MathUtils.hpp>
+#include <CQLDriver/Common/Utility/MathUtils.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(MathUtils, powInteger) {

@@ -1,14 +1,14 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (CqlDriverTests)
+project (CQLDriverTests)
 
 FILE(GLOB_RECURSE Files ./*.cpp)
 FILE(GLOB_RECURSE PublicHeaders ../include/*.hpp)
 FILE(GLOB_RECURSE InternalHeaders ../src/*.hpp)
 add_executable(${PROJECT_NAME} ${Files} ${PublicHeaders} ${InternalHeaders})
 
-# set compile options, libCqlDriver should specific as a path for modification detect
+# set compile options, libCQLDriver should specific as a path for modification detect
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-set(LIBCQLDRIVER_PATH "${CMAKE_SOURCE_DIR}/../bin/debug/libCqlDriver.a")
+set(LIBCQLDRIVER_PATH "${CMAKE_SOURCE_DIR}/../bin/debug/libCQLDriver.a")
 add_subdirectory(../3rd-party/googletest googletest EXCLUDE_FROM_ALL)
 include_directories(../src ../tests)
 target_link_libraries(${PROJECT_NAME} gtest_main ${LIBCQLDRIVER_PATH})
