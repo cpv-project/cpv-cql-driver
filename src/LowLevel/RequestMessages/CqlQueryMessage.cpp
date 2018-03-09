@@ -1,16 +1,21 @@
 #include "CqlQueryMessage.hpp"
+#include "../ProtocolTypes/CqlProtocolInt.hpp"
 
 namespace cql {
 	/** For CqlObject */
 	void CqlQueryMessage::reset(CqlMessageHeader&& header) {
 		CqlRequestMessageBase::reset(std::move(header));
-		query_.reset();
 		queryParameters_.reset();
 	}
 
 	/** Get description of this message */
 	seastar::sstring CqlQueryMessage::toString() const {
-		return joinString("", "CqlQueryMessage(query: ", query_.get(), ")");
+		seastar::sstring query;
+		auto& command = queryParameters_.getCommand();
+		if (command.isValid()) {
+			query.append(command.getQuery().first, command.getQuery().second);
+		}
+		return joinString("", "CqlQueryMessage(query: ", query, ")");
 	}
 
 	/** Encode message body to binary data */
@@ -18,13 +23,18 @@ namespace cql {
 		// The body of the message must be: <query><query_parameters>
 		// where <query> is a [long string] represeting the query, and <query_parameters> must be:
 		// (check comments on CqlProtocolQueryParameters)
-		query_.encode(data);
+		auto& command = queryParameters_.getCommand();
+		if (!command.isValid()) {
+			throw CqlLogicException(CQL_CODEINFO, "invalid(moved) command");
+		}
+		auto query = command.getQuery();
+		CqlProtocolInt querySize(query.second);
+		querySize.encode(data);
+		data.append(query.first, query.second);
 		queryParameters_.encode(data);
 	}
 
 	/** Constructor */
-	CqlQueryMessage::CqlQueryMessage() :
-		query_(),
-		queryParameters_() { }
+	CqlQueryMessage::CqlQueryMessage() : queryParameters_() { }
 }
 

@@ -6,9 +6,11 @@ TEST(TestCqlExecuteMessage, encode) {
 	cql::CqlConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::CqlRequestMessageFactory::makeRequestMessage<cql::CqlExecuteMessage>();
-		seastar::sstring data;
 		message->getPreparedQueryId().set("asd", 3);
-		message->getQueryParameters().setConsistency(cql::CqlConsistencyLevel::One);
+		message->getQueryParameters().setCommand(
+			cql::CqlCommand("")
+				.setConsistencyLevel(cql::CqlConsistencyLevel::One));
+		seastar::sstring data;
 		message->getHeader().encodeHeaderPre(info, data);
 		message->encodeBody(info, data);
 		message->getHeader().encodeHeaderPost(info, data);

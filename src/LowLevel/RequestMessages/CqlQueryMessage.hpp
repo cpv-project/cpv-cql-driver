@@ -1,5 +1,4 @@
 #pragma once
-#include "../ProtocolTypes/CqlProtocolLongString.hpp"
 #include "../ProtocolTypes/CqlProtocolQueryParameters.hpp"
 #include "CqlRequestMessageBase.hpp"
 
@@ -21,10 +20,6 @@ namespace cql {
 		/** Encode message body to binary data */
 		void encodeBody(const CqlConnectionInfo& info, seastar::sstring& data) const override;
 
-		/** The CQL query string */
-		const CqlProtocolLongString& getQuery() const& { return query_; }
-		CqlProtocolLongString& getQuery() & { return query_; }
-
 		/** The query parameters */
 		const CqlProtocolQueryParameters& getQueryParameters() const& { return queryParameters_; }
 		CqlProtocolQueryParameters& getQueryParameters() & { return queryParameters_; }
@@ -33,7 +28,6 @@ namespace cql {
 		CqlQueryMessage();
 
 	private:
-		CqlProtocolLongString query_;
 		CqlProtocolQueryParameters queryParameters_;
 	};
 }

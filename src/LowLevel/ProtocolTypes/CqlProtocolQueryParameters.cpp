@@ -1,16 +1,21 @@
 #include <CqlDriver/Common/Exceptions/CqlLogicException.hpp>
+#include <CqlDriver/Common/Exceptions/CqlDecodeException.hpp>
 #include <CqlDriver/Common/Exceptions/CqlNotImplementedException.hpp>
 #include "CqlProtocolQueryParameters.hpp"
+#include "CqlProtocolConsistency.hpp"
+#include "CqlProtocolInt.hpp"
 #include "CqlProtocolShort.hpp"
+#include "CqlProtocolBytes.hpp"
+#include "CqlProtocolTimeStamp.hpp"
 
 namespace cql {
 	/** Reset to initial state */
 	void CqlProtocolQueryParameters::reset() {
-		consistency_.reset();
 		flags_.set(enumValue(CqlQueryParametersFlags::None));
+		command_ = cql::CqlCommand(nullptr);
 	}
 
-	/* Set whether to no receive metadata in result */
+	/* Set whether to not receive metadata in result */
 	void CqlProtocolQueryParameters::setSkipMetadata(bool value) {
 		if (value) {
 			flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::SkipMetadata));
@@ -19,132 +24,127 @@ namespace cql {
 		}
 	}
 
-	/** Set the named query parameters */
-	void CqlProtocolQueryParameters::setNameAndValues(const NameAndValuesType& nameAndValues) {
-		nameAndValues_.set(nameAndValues);
-		flags_.set(enumValue(
-			getFlags() | CqlQueryParametersFlags::WithValues |
-			CqlQueryParametersFlags::WithNamesForValue));
-	}
-
-	/** Set the named query parameters */
-	void CqlProtocolQueryParameters::setNameAndValues(NameAndValuesType&& nameAndValues) {
-		nameAndValues_.set(std::move(nameAndValues));
-		flags_.set(enumValue(
-			getFlags() | CqlQueryParametersFlags::WithValues |
-			CqlQueryParametersFlags::WithNamesForValue));
-	}
-
-	/** Set the unnamed query parameters */
-	void CqlProtocolQueryParameters::setValues(const std::vector<CqlProtocolValue>& values) {
-		values_.get() = values;
-		flags_.set(enumValue(
-			(getFlags() | CqlQueryParametersFlags::WithValues) &
-			(~CqlQueryParametersFlags::WithNamesForValue)));
-	}
-
-	/** Set the unnamed query parameters */
-	void CqlProtocolQueryParameters::setValues(std::vector<CqlProtocolValue>&& values) {
-		values_.get() = std::move(values);
-		flags_.set(enumValue(
-			(getFlags() | CqlQueryParametersFlags::WithValues) &
-			(~CqlQueryParametersFlags::WithNamesForValue)));
-	}
-
-	/** Set the page size of the result */
-	void CqlProtocolQueryParameters::setPageSize(std::size_t pageSize) {
-		pageSize_.set(static_cast<decltype(pageSize_.get())>(pageSize));
-		if (pageSize_.get() < 0 || pageSize_.get() != pageSize) {
-			throw CqlLogicException(CQL_CODEINFO, "page size overflow");
+	/** Set the command contains query and parameters */
+	void CqlProtocolQueryParameters::setCommand(CqlCommand&& command) {
+		if (!command.isValid()) {
+			throw CqlLogicException(CQL_CODEINFO, "can't set a invalid command to query parameters");
 		}
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPageSize));
-	}
-
-	/** Set the paging state */
-	void CqlProtocolQueryParameters::setPagingState(const seastar::sstring& pagingState) {
-		pagingState_.set(pagingState);
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPagingState));
-	}
-
-	/** Set the paging state */
-	void CqlProtocolQueryParameters::setPagingState(seastar::sstring&& pagingState) {
-		pagingState_.set(std::move(pagingState));
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithPagingState));
-	}
-
-	/** Set the consistency level for the serial phase of conditional update */
-	void CqlProtocolQueryParameters::setSerialConsistency(CqlConsistencyLevel serialConsistency) {
-		serialConsistency_.set(serialConsistency);
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithSerialConsistency));
-	}
-
-	/** Set the default timestamp */
-	void CqlProtocolQueryParameters::setDefaultTimestamp(std::uint64_t timestamp) {
-		defaultTimestamp_.set(timestamp);
-		flags_.set(enumValue(getFlags() | CqlQueryParametersFlags::WithDefaultTimestamp));
+		auto flags = getFlags();
+		flags &= CqlQueryParametersFlags::SkipMetadata;
+		if (command.getParameterCount() > 0) {
+			flags |= CqlQueryParametersFlags::WithValues;
+		}
+		if (command.getPageSize().second) {
+			flags |= CqlQueryParametersFlags::WithPageSize;
+			if (!command.getPagingState().empty()) {
+				flags |= CqlQueryParametersFlags::WithPagingState;
+			}
+		}
+		if (command.getSerialConsistencyLevel().second) {
+			flags |= CqlQueryParametersFlags::WithSerialConsistency;
+		}
+		if (command.getDefaultTimeStamp().second) {
+			flags |= CqlQueryParametersFlags::WithDefaultTimestamp;
+		}
+		flags_.set(enumValue(flags));
+		command_ = std::move(command);
 	}
 
 	/** Encode to binary data */
 	void CqlProtocolQueryParameters::encode(seastar::sstring& data) const {
-		auto flags = getFlags();
-		consistency_.encode(data);
+		if (!command_.isValid()) {
+			throw CqlLogicException(CQL_CODEINFO, "invalid(moved) command");
+		}
+		CqlProtocolConsistency consistency(command_.getConsistencyLevel());
+		consistency.encode(data);
 		flags_.encode(data);
+		auto flags = getFlags();
 		if (enumTrue(flags & CqlQueryParametersFlags::WithValues)) {
-			if (enumTrue(flags & CqlQueryParametersFlags::WithNamesForValue)) {
-				nameAndValues_.encode(data);
-			} else {
-				values_.encode(data);
+			CqlProtocolShort parameterCount(command_.getParameterCount());
+			if (parameterCount.get() != command_.getParameterCount()) {
+				throw CqlLogicException(CQL_CODEINFO, "too many parameters");
 			}
+			parameterCount.encode(data);
+			auto& parameters = command_.getParameters();
+			data.append(parameters.data(), parameters.size());
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithPageSize)) {
-			pageSize_.encode(data);
+			CqlProtocolInt pageSize(command_.getPageSize().first);
+			pageSize.encode(data);
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithPagingState)) {
-			pagingState_.encode(data);
+			auto& pagingState = command_.getPagingState();
+			CqlProtocolInt pagingStateSize(pagingState.size());
+			pagingStateSize.encode(data);
+			data.append(pagingState.data(), pagingState.size());
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithSerialConsistency)) {
-			serialConsistency_.encode(data);
+			CqlProtocolConsistency serialConsistency(
+				command_.getSerialConsistencyLevel().first);
+			serialConsistency.encode(data);
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithDefaultTimestamp)) {
-			defaultTimestamp_.encode(data);
+			CqlProtocolTimeStamp timeStamp(command_.getDefaultTimeStamp().first);
+			timeStamp.encode(data);
 		}
 	}
 
 	/** Decode from binary data */
 	void CqlProtocolQueryParameters::decode(const char*& ptr, const char* end) {
-		consistency_.decode(ptr, end);
+		command_ = cql::CqlCommand("");
+		CqlProtocolConsistency consistency;
+		consistency.decode(ptr, end);
+		command_.setConsistencyLevel(consistency.get());
 		flags_.decode(ptr, end);
 		auto flags = getFlags();
 		if (enumTrue(flags & CqlQueryParametersFlags::WithValues)) {
 			if (enumTrue(flags & CqlQueryParametersFlags::WithNamesForValue)) {
-				nameAndValues_.decode(ptr, end);
-			} else {
-				values_.decode(ptr, end);
+				throw CqlNotImplementedException(CQL_CODEINFO,
+					"decode named parameters is unsupported");
+			}
+			CqlProtocolShort parameterCount;
+			CqlProtocolInt parameterSize;
+			parameterCount.decode(ptr, end);
+			command_.getParameterCount() = parameterCount.get();
+			auto& encodedParameters = command_.getParameters();
+			for (std::size_t i = 0, j = parameterCount.get(); i < j; ++i) {
+				parameterSize.decode(ptr, end);
+				parameterSize.encode(encodedParameters);
+				if (parameterSize.get() <= 0) {
+					continue;
+				}
+				if (end - ptr < parameterSize.get()) {
+					throw CqlDecodeException(CQL_CODEINFO, "length not enough");
+				}
+				encodedParameters.append(ptr, parameterSize.get());
+				ptr += parameterSize.get();
 			}
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithPageSize)) {
-			pageSize_.decode(ptr, end);
+			CqlProtocolInt pageSize;
+			pageSize.decode(ptr, end);
+			command_.setPageSize(pageSize.get());
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithPagingState)) {
-			pagingState_.decode(ptr, end);
+			CqlProtocolBytes pagingState;
+			pagingState.decode(ptr, end);
+			command_.setPagingState(std::move(pagingState.get()));
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithSerialConsistency)) {
-			serialConsistency_.decode(ptr, end);
+			CqlProtocolConsistency serialConsistency;
+			serialConsistency.decode(ptr, end);
+			command_.setSerialConsistencyLevel(serialConsistency.get());
 		}
 		if (enumTrue(flags & CqlQueryParametersFlags::WithDefaultTimestamp)) {
-			defaultTimestamp_.decode(ptr, end);
+			CqlProtocolTimeStamp timeStamp;
+			timeStamp.decode(ptr, end);
+			command_.setDefaultTimeStamp(timeStamp.get());
 		}
 	}
 
 	/** Constructor */
 	CqlProtocolQueryParameters::CqlProtocolQueryParameters() :
-		consistency_(),
-		flags_(),
-		values_(),
-		nameAndValues_(),
-		pageSize_(),
-		pagingState_(),
-		serialConsistency_(),
-		defaultTimestamp_() { }
+		flags_(enumValue(CqlQueryParametersFlags::None)),
+		command_(nullptr) { }
 }
 

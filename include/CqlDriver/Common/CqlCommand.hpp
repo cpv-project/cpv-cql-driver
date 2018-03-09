@@ -163,6 +163,9 @@ namespace cql {
 			static_assert(Size > 0, "check size");
 		}
 
+		/** Constructor, build an empty(invalid) command */
+		explicit CqlCommand(std::nullptr_t);
+
 	private:
 		/** Encode implementation of addParameters */
 		static void addParametersEncode(seastar::sstring&) { }

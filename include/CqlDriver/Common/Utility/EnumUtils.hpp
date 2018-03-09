@@ -12,11 +12,27 @@ namespace cql {
 		return static_cast<T>(static_cast<t>(a) | static_cast<t>(b));
 	}
 
+	/** Bitwise or operation */
+	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	T& operator|=(T& a, T b) {
+		using t = std::underlying_type_t<T>;
+		a = static_cast<T>(static_cast<t>(a) | static_cast<t>(b));
+		return a;
+	}
+
 	/** Bitwise and operation */
 	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
 	T operator&(T a, T b) {
 		using t = std::underlying_type_t<T>;
 		return static_cast<T>(static_cast<t>(a) & static_cast<t>(b));
+	}
+
+	/** Bitwise and operation */
+	template <class T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	T& operator&=(T& a, T b) {
+		using t = std::underlying_type_t<T>;
+		a = static_cast<T>(static_cast<t>(a) & static_cast<t>(b));
+		return a;
 	}
 
 	/** Bitwise not operation */

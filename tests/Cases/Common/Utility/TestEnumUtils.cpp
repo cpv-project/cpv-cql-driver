@@ -30,12 +30,31 @@ TEST(TestEnumUtils, operators) {
 		ASSERT_EQ(static_cast<std::size_t>(value), 3);
 	}
 	{
+		auto value = cql::MyTestEnum::A;
+		value |= cql::MyTestEnum::B;
+		ASSERT_EQ(static_cast<std::size_t>(value), 3);
+	}
+	{
 		auto value = cql::MyTestEnum::A & (cql::MyTestEnum::A | cql::MyTestEnum::B);
+		ASSERT_EQ(static_cast<std::size_t>(value), 1);
+	}
+	{
+		auto value = cql::MyTestEnum::A | cql::MyTestEnum::B;
+		value &= cql::MyTestEnum::A;
 		ASSERT_EQ(static_cast<std::size_t>(value), 1);
 	}
 	{
 		auto value = ~cql::MyTestEnum::A & (cql::MyTestEnum::A | cql::MyTestEnum::B);
 		ASSERT_EQ(static_cast<std::size_t>(value), 2);
+	}
+	{
+		auto value = cql::MyTestEnum::A | cql::MyTestEnum::B;
+		value &= cql::MyTestEnum::B;
+		ASSERT_EQ(static_cast<std::size_t>(value), 2);
+	}
+	{
+		auto value = ~cql::MyTestEnum::A;
+		ASSERT_EQ(static_cast<std::size_t>(value), ~1);
 	}
 	{
 		auto value = cql::MyTestEnum::A;

@@ -152,5 +152,9 @@ namespace cql {
 	/** Constructor */
 	CqlCommand::CqlCommand(const char* query, std::size_t size) :
 		data_(makeObject<CqlCommandData>(query, size)) { }
+
+	/** Constructor, build an empty(invalid) command */
+	CqlCommand::CqlCommand(std::nullptr_t) :
+		data_(nullptr) { }
 }
 

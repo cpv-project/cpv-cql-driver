@@ -1,56 +1,33 @@
+#include <CqlDriver/Common/ColumnTypes/CqlInt.hpp>
+#include <CqlDriver/Common/ColumnTypes/CqlText.hpp>
 #include <LowLevel/ProtocolTypes/CqlProtocolQueryParameters.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestCqlProtocolQueryParameters, getset) {
-	{
-		cql::CqlProtocolQueryParameters value;
-		value.setConsistency(cql::CqlConsistencyLevel::One);
-		value.setSkipMetadata(true);
-		value.setValues({ cql::CqlProtocolValue("a"), cql::CqlProtocolValue("b") });
-		value.setPageSize(100);
-		value.setPagingState("state");
-		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::One);
-		ASSERT_EQ(value.getFlags(),
-			cql::CqlQueryParametersFlags::SkipMetadata |
-			cql::CqlQueryParametersFlags::WithValues |
-			cql::CqlQueryParametersFlags::WithPageSize |
-			cql::CqlQueryParametersFlags::WithPagingState);
-		ASSERT_EQ(value.getValues().size(), 2);
-		ASSERT_EQ(value.getValues().at(0).get(), "a");
-		ASSERT_EQ(value.getValues().at(1).get(), "b");
-		ASSERT_EQ(value.getPageSize(), 100);
-		ASSERT_EQ(value.getPagingState(), "state");
-	}
-	{
-		cql::CqlProtocolQueryParameters value;
-		value.setConsistency(cql::CqlConsistencyLevel::Two);
-		value.setSkipMetadata(false);
-		value.setNameAndValues({
-			{ cql::CqlProtocolString("q"), cql::CqlProtocolValue("a") },
-		});
-		value.setSerialConsistency(cql::CqlConsistencyLevel::LocalSerial);
-		value.setDefaultTimestamp(123);
-		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::Two);
-		ASSERT_EQ(value.getFlags(),
-			cql::CqlQueryParametersFlags::WithValues |
-			cql::CqlQueryParametersFlags::WithNamesForValue |
-			cql::CqlQueryParametersFlags::WithSerialConsistency |
-			cql::CqlQueryParametersFlags::WithDefaultTimestamp);
-		ASSERT_EQ(value.getNameAndValues().size(), 1);
-		ASSERT_EQ(value.getNameAndValues().at(cql::CqlProtocolString("q")).get(), "a");
-		ASSERT_EQ(value.getSerialConsistency(), cql::CqlConsistencyLevel::LocalSerial);
-		ASSERT_EQ(value.getDefaultTimestamp(), 123);
-	}
+	cql::CqlProtocolQueryParameters value;
+	value.setCommand(cql::CqlCommand("use a")
+		.setConsistencyLevel(cql::CqlConsistencyLevel::One)
+		.addParameters(cql::CqlInt(123))
+		.setPageSize(100)
+		.setPagingState("state"));
+	auto& command = value.getCommand();
+	ASSERT_EQ(command.getConsistencyLevel(), cql::CqlConsistencyLevel::One);
+	ASSERT_EQ(command.getParameterCount(), 1);
+	ASSERT_EQ(command.getParameters(), makeTestString("\x00\x00\x00\x04\x00\x00\x00\x7b"));
+	ASSERT_EQ(command.getPageSize().first, 100);
+	ASSERT_TRUE(command.getPageSize().second);
+	ASSERT_EQ(command.getPagingState(), "state");
 }
 
 TEST(TestCqlProtocolQueryParameters, encode) {
 	{
 		cql::CqlProtocolQueryParameters value;
-		value.setConsistency(cql::CqlConsistencyLevel::One);
 		value.setSkipMetadata(true);
-		value.setValues({ cql::CqlProtocolValue("a"), cql::CqlProtocolValue("b") });
-		value.setPageSize(100);
-		value.setPagingState("state");
+		value.setCommand(cql::CqlCommand("use a")
+			.setConsistencyLevel(cql::CqlConsistencyLevel::One)
+			.addParameters(cql::CqlText("a"), cql::CqlText("b"))
+			.setPageSize(100)
+			.setPagingState("state"));
 		seastar::sstring data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
@@ -64,20 +41,20 @@ TEST(TestCqlProtocolQueryParameters, encode) {
 	}
 	{
 		cql::CqlProtocolQueryParameters value;
-		value.setConsistency(cql::CqlConsistencyLevel::Two);
 		value.setSkipMetadata(false);
-		value.setNameAndValues({
-			{ cql::CqlProtocolString("q"), cql::CqlProtocolValue("a") },
-		});
-		value.setSerialConsistency(cql::CqlConsistencyLevel::LocalSerial);
-		value.setDefaultTimestamp(123);
+		value.setCommand(cql::CqlCommand("use a")
+			.setConsistencyLevel(cql::CqlConsistencyLevel::Two)
+			.addParameters(cql::CqlText("a"))
+			.setSerialConsistencyLevel(cql::CqlConsistencyLevel::LocalSerial)
+			.setDefaultTimeStamp(
+				std::chrono::system_clock::from_time_t(0) +
+				std::chrono::microseconds(123)));
 		seastar::sstring data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x02"
-			"\x71"
+			"\x31"
 			"\x00\x01"
-			"\x00\x01""q"
 			"\x00\x00\x00\x01""a"
 			"\x00\x09"
 			"\x00\x00\x00\x00\x00\x00\x00\x7b"));
@@ -99,24 +76,29 @@ TEST(TestCqlProtocolQueryParameters, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::One);
+		auto& command = value.getCommand();
+		ASSERT_TRUE(command.isValid());
+		ASSERT_EQ(command.getConsistencyLevel(), cql::CqlConsistencyLevel::One);
 		ASSERT_EQ(value.getFlags(),
 			cql::CqlQueryParametersFlags::SkipMetadata |
 			cql::CqlQueryParametersFlags::WithValues |
 			cql::CqlQueryParametersFlags::WithPageSize |
 			cql::CqlQueryParametersFlags::WithPagingState);
-		ASSERT_EQ(value.getValues().size(), 2);
-		ASSERT_EQ(value.getValues().at(0).get(), "a");
-		ASSERT_EQ(value.getValues().at(1).get(), "b");
-		ASSERT_EQ(value.getPageSize(), 100);
-		ASSERT_EQ(value.getPagingState(), "state");
+		ASSERT_EQ(command.getParameterCount(), 2);
+		ASSERT_EQ(command.getParameters(), makeTestString(
+			"\x00\x00\x00\x01""a"
+			"\x00\x00\x00\x01""b"));
+		ASSERT_EQ(command.getPageSize().first, 100);
+		ASSERT_TRUE(command.getPageSize().second);
+		ASSERT_EQ(command.getPagingState(), "state");
+		ASSERT_FALSE(command.getSerialConsistencyLevel().second);
+		ASSERT_FALSE(command.getDefaultTimeStamp().second);
 	}
 	{
 		auto data = makeTestString(
 			"\x00\x02"
-			"\x71"
+			"\x31"
 			"\x00\x01"
-			"\x00\x01""q"
 			"\x00\x00\x00\x01""a"
 			"\x00\x09"
 			"\x00\x00\x00\x00\x00\x00\x00\x7b");
@@ -124,16 +106,23 @@ TEST(TestCqlProtocolQueryParameters, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.getConsistency(), cql::CqlConsistencyLevel::Two);
+		auto& command = value.getCommand();
+		ASSERT_TRUE(command.isValid());
+		ASSERT_EQ(command.getConsistencyLevel(), cql::CqlConsistencyLevel::Two);
 		ASSERT_EQ(value.getFlags(),
 			cql::CqlQueryParametersFlags::WithValues |
-			cql::CqlQueryParametersFlags::WithNamesForValue |
 			cql::CqlQueryParametersFlags::WithSerialConsistency |
 			cql::CqlQueryParametersFlags::WithDefaultTimestamp);
-		ASSERT_EQ(value.getNameAndValues().size(), 1);
-		ASSERT_EQ(value.getNameAndValues().at(cql::CqlProtocolString("q")).get(), "a");
-		ASSERT_EQ(value.getSerialConsistency(), cql::CqlConsistencyLevel::LocalSerial);
-		ASSERT_EQ(value.getDefaultTimestamp(), 123);
+		ASSERT_EQ(command.getParameterCount(), 1);
+		ASSERT_EQ(command.getParameters(), makeTestString("\x00\x00\x00\x01""a"));
+		ASSERT_FALSE(command.getPageSize().second);
+		ASSERT_EQ(command.getPagingState(), "");
+		ASSERT_EQ(command.getSerialConsistencyLevel().first,
+			cql::CqlConsistencyLevel::LocalSerial);
+		ASSERT_TRUE(command.getSerialConsistencyLevel().second);
+		ASSERT_EQ(command.getDefaultTimeStamp().first,
+			std::chrono::system_clock::from_time_t(0) + std::chrono::microseconds(123));
+		ASSERT_TRUE(command.getDefaultTimeStamp().second);
 	}
 }
 
