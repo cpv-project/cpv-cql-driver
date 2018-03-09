@@ -162,5 +162,9 @@ namespace cql {
 	/** Constructor */
 	CqlBatchCommand::CqlBatchCommand() :
 		data_(makeObject<CqlBatchCommandData>()) { }
+
+	/** Constructor, build an empty(invalid) batch command */
+	CqlBatchCommand::CqlBatchCommand(std::nullptr_t) :
+		data_(nullptr) { }
 }
 

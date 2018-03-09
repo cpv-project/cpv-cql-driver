@@ -91,7 +91,7 @@ namespace cql {
 
 	/** Decode from binary data */
 	void CqlProtocolQueryParameters::decode(const char*& ptr, const char* end) {
-		command_ = cql::CqlCommand("");
+		command_ = CqlCommand("");
 		CqlProtocolConsistency consistency;
 		consistency.decode(ptr, end);
 		command_.setConsistencyLevel(consistency.get());

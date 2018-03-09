@@ -27,14 +27,17 @@ namespace cql {
 		if (!command.isValid()) {
 			throw CqlLogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
+		// <query>
 		auto query = command.getQuery();
 		CqlProtocolInt querySize(query.second);
 		querySize.encode(data);
 		data.append(query.first, query.second);
+		// <query_parameters>
 		queryParameters_.encode(data);
 	}
 
 	/** Constructor */
-	CqlQueryMessage::CqlQueryMessage() : queryParameters_() { }
+	CqlQueryMessage::CqlQueryMessage() :
+		queryParameters_() { }
 }
 

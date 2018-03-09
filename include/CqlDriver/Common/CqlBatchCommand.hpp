@@ -159,6 +159,9 @@ namespace cql {
 		/** Constructor */
 		CqlBatchCommand();
 
+		/** Constructor, build an empty(invalid) batch command */
+		explicit CqlBatchCommand(std::nullptr_t);
+
 	private:
 		/** Encode implementation of addParameters */
 		static void addParametersEncode(seastar::sstring&) { }

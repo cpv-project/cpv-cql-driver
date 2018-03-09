@@ -1,11 +1,8 @@
 #pragma once
 #include <CqlDriver/Common/CqlCommonDefinitions.hpp>
+#include <CqlDriver/Common/CqlBatchCommand.hpp>
 #include "../CqlLowLevelDefinitions.hpp"
-#include "CqlProtocolConsistency.hpp"
 #include "CqlProtocolByte.hpp"
-#include "CqlProtocolInt.hpp"
-#include "CqlProtocolLong.hpp"
-#include "CqlProtocolString.hpp"
 
 namespace cql {
 	/**
@@ -18,26 +15,14 @@ namespace cql {
 		/** Reset to initial state */
 		void reset();
 
-		/** The [consistency] level for the operation */
-		CqlConsistencyLevel getConsistency() const { return consistency_.get(); }
-		void setConsistency(CqlConsistencyLevel consistency) { consistency_.set(consistency); }
+		/** The batch command contains queries and parameters */
+		void setBatchCommand(CqlBatchCommand&& batchCommand);
+		const CqlBatchCommand& getBatchCommand() const& { return batchCommand_; }
 
-		/** Call setters below will alter flags to indicate which component is included */
-		CqlBatchParametersFlags getFlags() const { return static_cast<CqlBatchParametersFlags>(flags_.get()); }
-
-		/**
-		 * The [consistency] level for the serial phase of conditional updates,
-		 * can only be either SERIAL or LOCAL_SERIAL, the default is SERIAL.
-		 */
-		CqlConsistencyLevel getSerialConsistency() const { return serialConsistency_.get(); }
-		void setSerialConsistency(CqlConsistencyLevel serialConsistency);
-
-		/**
-		 * This will replace the server side assigned timestamp as default timestamp,
-		 * note that a timestamp in the query itself will still override this timestamp.
-		 */
-		std::uint64_t getDefaultTimestamp() const { return defaultTimestamp_.get(); }
-		void setDefaultTimestamp(std::uint64_t timestamp);
+		/** Get the flags that indicate which component is included */
+		CqlBatchParametersFlags getFlags() const {
+			return static_cast<CqlBatchParametersFlags>(flags_.get());
+		}
 
 		/** Encode and decode functions */
 		void encode(seastar::sstring& data) const;
@@ -47,10 +32,8 @@ namespace cql {
 		CqlProtocolBatchParameters();
 
 	private:
-		CqlProtocolConsistency consistency_;
 		CqlProtocolByte flags_;
-		CqlProtocolConsistency serialConsistency_;
-		CqlProtocolLong defaultTimestamp_;
+		CqlBatchCommand batchCommand_;
 	};
 }
 
