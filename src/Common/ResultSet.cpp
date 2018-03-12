@@ -30,5 +30,9 @@ namespace cql {
 	/** Constructor */
 	ResultSet::ResultSet(Object<ResultSetData>&& data) :
 		data_(std::move(data)) { }
+
+	/** Constructor, build an empty(invalid) result set */
+	ResultSet::ResultSet(std::nullptr_t) :
+		data_(nullptr) { }
 }
 

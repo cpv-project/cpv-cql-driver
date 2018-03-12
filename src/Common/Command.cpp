@@ -25,8 +25,7 @@ namespace cql {
 			serialConsistencyLevel(),
 			defaultTimestamp() { }
 
-		// cppcheck-suppress functionStatic
-		void freeResources() { }
+		static void freeResources() { }
 
 		void reset(const char* query, std::size_t size) {
 			queryCStr = { query, size };

@@ -37,8 +37,7 @@ namespace cql {
 			serialConsistencyLevel(),
 			defaultTimestamp() { }
 
-		// cppcheck-suppress functionStatic
-		void freeResources() { }
+		static void freeResources() { }
 
 		void reset() {
 			consistencyLevel = ConsistencyLevel::Any;

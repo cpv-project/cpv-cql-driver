@@ -45,9 +45,8 @@ namespace cql {
 		virtual ~MessageBase() = default;
 
 	protected:
-		// cppcheck-suppress functionStatic
 		/** For Object support */
-		void freeResources();
+		static void freeResources();
 
 		/** For Object support */
 		void reset(MessageHeader&& header);

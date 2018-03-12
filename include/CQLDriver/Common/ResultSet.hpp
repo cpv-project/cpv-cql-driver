@@ -20,6 +20,7 @@ namespace cql {
 		/** Get how many columns selected by the query that produced this result */
 		std::size_t getColumnsCount() const;
 
+		// cppcheck-suppress functionConst
 		/**
 		 * Get the pointer use to decode contents of rows.
 		 * Usually you should use fill instead of this function.
@@ -44,6 +45,9 @@ namespace cql {
 
 		/** Constructor */
 		explicit ResultSet(Object<ResultSetData>&& data);
+
+		/** Constructor, build an empty(invalid) result set */
+		explicit ResultSet(std::nullptr_t);
 
 	private:
 		/** Decode implementation of fill */

@@ -22,10 +22,8 @@ namespace {
 	struct B { int b; };
 	struct C : A, B {
 		int c;
-		// cppcheck-suppress functionStatic
-		void freeResources() { }
-		// cppcheck-suppress functionStatic
-		void reset() { }
+		static void freeResources() { }
+		static void reset() { }
 	};
 }
 

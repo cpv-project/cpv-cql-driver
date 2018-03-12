@@ -13,8 +13,7 @@ namespace cql {
 			sessionConfiguration(),
 			nodeCollection() { }
 
-		// cppcheck-suppress functionStatic
-		void freeResources() { }
+		static void freeResources() { }
 
 		void reset(
 			const seastar::shared_ptr<SessionConfiguration>& sessionConfigurationRef,
