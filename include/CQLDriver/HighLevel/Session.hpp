@@ -3,15 +3,11 @@
 #include "../Common/Utility/Object.hpp"
 #include "../Common/Command.hpp"
 #include "../Common/BatchCommand.hpp"
+#include "../Common/ResultSet.hpp"
 
 namespace cql {
 	/** Defines members of Session */
 	class SessionData;
-
-	/**
-	 * TODO: fill this class, move this class to other file
-	 */
-	class ResultSet { };
 
 	/** High level object that use to perform database operations */
 	class Session {
