@@ -70,6 +70,32 @@ TEST_FUTURE(TestConnection, waitForReadyPasswordAuthenticateFailed) {
 	});
 }
 
+TEST_FUTURE(TestConnection, waitForReadySetKeySpace) {
+	auto connection = seastar::make_lw_shared<cql::Connection>(
+		seastar::make_lw_shared<cql::SessionConfiguration>(
+			cql::SessionConfiguration()
+				.setDefaultKeySpace("system")),
+		seastar::make_lw_shared<cql::NodeConfiguration>(
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+	return connection->ready();
+}
+
+TEST_FUTURE(TestConnection, waitForReadySetKeySpaceNotExists) {
+	auto connection = seastar::make_lw_shared<cql::Connection>(
+		seastar::make_lw_shared<cql::SessionConfiguration>(
+			cql::SessionConfiguration()
+				.setDefaultKeySpace("notExistskeySpaceQWERT")),
+		seastar::make_lw_shared<cql::NodeConfiguration>(
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+	return connection->ready().then_wrapped([] (auto&& f) {
+		ASSERT_THROWS_CONTAINS(
+			cql::ConnectionInitializeException, f.get(),
+			"Keyspace 'notexistskeyspaceqwert' does not exist");
+	});
+}
+
 TEST(TestConnection, openStream) {
 	static const std::size_t testMaxStream = 5;
 	auto connection = seastar::make_lw_shared<cql::Connection>(

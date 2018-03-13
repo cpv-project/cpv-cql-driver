@@ -5,12 +5,15 @@
 #include <CQLDriver/Common/Exceptions/NetworkException.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include <CQLDriver/Common/Exceptions/ConnectionInitializeException.hpp>
+#include <CQLDriver/Common/Exceptions/ResponseErrorException.hpp>
 #include "./Connectors/ConnectorFactory.hpp"
 #include "./Authenticators/AuthenticatorFactory.hpp"
 #include "./RequestMessages/RequestMessageFactory.hpp"
 #include "./RequestMessages/OptionsMessage.hpp"
 #include "./RequestMessages/StartupMessage.hpp"
+#include "./RequestMessages/QueryMessage.hpp"
 #include "./ResponseMessages/ResponseMessageFactory.hpp"
+#include "./ResponseMessages/ResultMessage.hpp"
 #include "./Connection.hpp"
 
 namespace cql {
@@ -67,6 +70,33 @@ namespace cql {
 		}).then([self] {
 			// perform authentication
 			return self->authenticator_->authenticate(self, self->streamZero_);
+		}).then([self] {
+			// set default keyspace
+			const auto& defaultkeySpace = self->sessionConfiguration_->getDefaultKeySpace();
+			if (defaultkeySpace.empty()) {
+				return seastar::make_ready_future<>();
+			}
+			// send QUERY "use $keyspace;"
+			std::string query;
+			query.append("use ").append(defaultkeySpace).append(";");
+			auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
+			queryMessage->getQueryParameters().setCommand(Command(std::move(query)));
+			return self->sendMessage(std::move(queryMessage), self->streamZero_).then([self] {
+				// receive RESULT
+				return self->waitNextMessage(self->streamZero_);
+			}).then([self] (auto message) {
+				// check RESULT
+				if (message->getHeader().getOpCode() != MessageType::Result) {
+					return seastar::make_exception_future(ResponseErrorException(
+						CQL_CODEINFO, "unexcepted response to use keyspace query:", message->toString()));
+				}
+				auto resultMessage = std::move(message).template cast<ResultMessage>();
+				if (resultMessage->getKind() != ResultKind::SetKeySpace) {
+					return seastar::make_exception_future(LogicException(
+						CQL_CODEINFO, "unexcepted kind of set keyspace result:", message->toString()));
+				}
+				return seastar::make_ready_future<>();
+			});
 		}).then([self] {
 			// the connection is ready
 			self->isReady_ = true;
