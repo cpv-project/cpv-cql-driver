@@ -20,6 +20,10 @@ namespace cql {
 		/** Get how many columns selected by the query that produced this result */
 		std::size_t getColumnsCount() const;
 
+		/** Get the value used to retrieve the next page of results */
+		const seastar::sstring& getPagingState() const&;
+		seastar::sstring& getPagingState() &;
+
 		// cppcheck-suppress functionConst
 		/**
 		 * Get the pointer use to decode contents of rows.

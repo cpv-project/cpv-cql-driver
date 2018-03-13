@@ -17,6 +17,16 @@ namespace cql {
 		return data_->columnsCount;
 	}
 
+	/** Get the value used to retrieve the next page of results */
+	const seastar::sstring& ResultSet::getPagingState() const& {
+		return data_->pagingState;
+	}
+
+	/** Get the value used to retrieve the next page of results */
+	seastar::sstring& ResultSet::getPagingState() & {
+		return data_->pagingState;
+	}
+
 	/** Get the pointer use to decode contents of rows */
 	const char*& ResultSet::getDecodePtr() & {
 		return data_->decodePtr;

@@ -1,6 +1,7 @@
 #pragma once
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include <cstdint>
+#include <core/sstring.hh>
 #include <core/temporary_buffer.hh>
 
 namespace cql {
@@ -9,6 +10,7 @@ namespace cql {
 	public:
 		std::size_t rowsCount;
 		std::size_t columnsCount;
+		seastar::sstring pagingState;
 		seastar::temporary_buffer<char> buffer;
 		const char* decodePtr;
 		const char* decodeEnd;
@@ -16,6 +18,7 @@ namespace cql {
 		ResultSetData() :
 			rowsCount(0),
 			columnsCount(0),
+			pagingState(),
 			buffer(),
 			decodePtr(nullptr),
 			decodeEnd(nullptr) { }
@@ -29,19 +32,21 @@ namespace cql {
 		void reset(
 			std::size_t rowsCountVal,
 			std::size_t columnsCountVal,
+			seastar::sstring&& pagingStateRef,
 			seastar::temporary_buffer<char>&& bufferRef,
 			std::size_t decodeFromOffset,
 			std::size_t decodeToOffset) {
 			rowsCount = rowsCountVal;
 			columnsCount = columnsCountVal;
+			pagingState = std::move(pagingStateRef);
 			buffer = std::move(bufferRef);
-			const char* ptr = buffer.get();
+			const char* ptr = buffer.begin();
 			if (ptr == nullptr) {
 				throw LogicException(CQL_CODEINFO, "invalid buffer");
 			}
 			decodePtr = ptr + decodeFromOffset;
 			decodeEnd = ptr + decodeToOffset;
-			if (decodeEnd > ptr + buffer.size()) {
+			if (decodeEnd > buffer.end()) {
 				freeResources();
 				throw LogicException(CQL_CODEINFO, "invalid to offset");
 			} else if (decodePtr > decodeEnd) {

@@ -47,6 +47,7 @@ namespace cql {
 			resultSet_ = ResultSet(makeObject<ResultSetData>(
 				rowsCount,
 				columnsCount,
+				std::move(rowsMetadata_.getPagingState()),
 				std::move(buffer),
 				fromOffset,
 				toOffset
