@@ -56,6 +56,7 @@ namespace cql {
 		}
 		// create new connection if all existing connections is occupied until max pool size is reached
 		if (allConnections_.size() < sessionConfiguration_->getMaxPoolSize()) {
+			dropIdleConnectionTimer();
 			return makeConnection();
 		}
 		// wait until some connection is available
@@ -66,6 +67,7 @@ namespace cql {
 				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
 				ConnectionNotAvailableException(CQL_CODEINFO, "no connections available"));
 		} else {
+			dropIdleConnectionTimer();
 			findIdleConnectionTimer();
 		}
 		return future;
@@ -94,7 +96,8 @@ namespace cql {
 		nodeCollection_(nodeCollection),
 		allConnections_(),
 		waiters_(sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()),
-		findIdleConnectionTimerIsRunning_(false) { }
+		findIdleConnectionTimerIsRunning_(false),
+		dropIdleConnectionTimerIsRunning_(false) { }
 
 	/** Make a new ready-to-use connection and return it with an idle stream */
 	seastar::future<seastar::lw_shared_ptr<Connection>, ConnectionStream>
@@ -140,6 +143,7 @@ namespace cql {
 
 	/** Timer used to find idle connection and feed waiters */
 	void ConnectionPool::findIdleConnectionTimer() {
+		static const std::size_t SleepInterval = 1;
 		if (findIdleConnectionTimerIsRunning_) {
 			return;
 		}
@@ -147,7 +151,8 @@ namespace cql {
 		auto self = shared_from_this();
 		seastar::do_with(std::move(self), [] (auto& self) {
 			return seastar::repeat([&self] {
-				return seastar::sleep(std::chrono::milliseconds(1)).then([&self] {
+				return seastar::sleep(std::chrono::milliseconds(SleepInterval)).then([&self] {
+					// feed waiters
 					while (!self->waiters_.empty()) {
 						auto result = self->tryGetConnection();
 						if (result.first.get() != nullptr) {
@@ -157,6 +162,7 @@ namespace cql {
 							break;
 						}
 					}
+					// stop timer if no waiters
 					return self->waiters_.empty() ?
 						seastar::stop_iteration::yes :
 						seastar::stop_iteration::no;
@@ -169,7 +175,45 @@ namespace cql {
 
 	/** Timer used to drop idle connections */
 	void ConnectionPool::dropIdleConnectionTimer() {
-		throw NotImplementedException(CQL_CODEINFO, "not implemented");
+		// NOTICE:
+		// this may cause all live connections point to the same node for a while,
+		// someday I should find a better mechanism to do this.
+		static const std::size_t SleepInterval = 500;
+		if (dropIdleConnectionTimerIsRunning_) {
+			return;
+		}
+		dropIdleConnectionTimerIsRunning_ = true;
+		auto self = shared_from_this();
+		seastar::do_with(std::move(self), [] (auto& self) {
+			return seastar::repeat([&self] {
+				return seastar::sleep(std::chrono::milliseconds(SleepInterval)).then([&self] {
+					auto existCount = self->allConnections_.size();
+					auto minCount = self->sessionConfiguration_->getMinPoolSize();
+					if (existCount <= minCount) {
+						// can't drop any connection more
+						return seastar::stop_iteration::yes;
+					}
+					self->allConnections_.erase(std::remove_if(
+						self->allConnections_.begin(),
+						self->allConnections_.end(),
+						[&existCount, &minCount] (const auto& connection) {
+							// drop connections that is not used at all, until reach min pool size
+							if (existCount > minCount && connection->isAllStreamsFree()) {
+								--existCount;
+								return true;
+							}
+							return false;
+						}),
+						self->allConnections_.end());
+					// stop timer if can't drop any connection more
+					return existCount <= minCount ?
+						seastar::stop_iteration::yes :
+						seastar::stop_iteration::no;
+				});
+			}).finally([&self] {
+				self->dropIdleConnectionTimerIsRunning_ = false;
+			});
+		});
 	}
 }
 

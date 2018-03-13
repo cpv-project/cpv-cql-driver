@@ -50,6 +50,7 @@ namespace cql {
 		seastar::queue<seastar::promise<
 			seastar::lw_shared_ptr<Connection>, ConnectionStream>> waiters_;
 		bool findIdleConnectionTimerIsRunning_;
+		bool dropIdleConnectionTimerIsRunning_;
 	};
 }
 

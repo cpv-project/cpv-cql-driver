@@ -125,6 +125,12 @@ namespace cql {
 		return freeStreamIds_->size();
 	}
 
+	/** Check whether all streams are free */
+	bool Connection::isAllStreamsFree() const {
+		// except stream zero
+		return freeStreamIds_->size() + 1 >= nodeConfiguration_->getMaxStreams();
+	}
+
 	/** Send a message to the given stream and wait for success */
 	seastar::future<> Connection::sendMessage(
 		Object<RequestMessageBase>&& message,

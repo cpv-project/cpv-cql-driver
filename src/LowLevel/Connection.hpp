@@ -47,6 +47,9 @@ namespace cql {
 		/** Get how many free streams available */
 		std::size_t getFreeStreamsCount() const;
 
+		/** Check whether all streams are free */
+		bool isAllStreamsFree() const;
+
 		/** Send a message to the given stream and wait for success.  */
 		seastar::future<> sendMessage(
 			Object<RequestMessageBase>&& message,
