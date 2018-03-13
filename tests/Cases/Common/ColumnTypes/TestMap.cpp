@@ -20,13 +20,13 @@ TEST(TestMap, getset) {
 TEST(TestMap, encodeBody) {
 	{
 		cql::Map<cql::Text, cql::BigInt> value;
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00"));
 	}
 	{
 		cql::Map<cql::Text, cql::BigInt> value({ { "abc", 123 } });
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x01"
@@ -90,8 +90,8 @@ TEST(TestMap, decodeBodyError) {
 TEST(TestMap, operations) {
 	{
 		// construct with rvalue initializer list
-		seastar::sstring keyA("a");
-		seastar::sstring keyB("b");
+		std::string keyA("a");
+		std::string keyB("b");
 		cql::Map<cql::Text, cql::BigInt> value({ { keyA, 1 }, { std::move(keyB), 2 } });
 		ASSERT_EQ(keyA, "a");
 		ASSERT_EQ(keyB, "");

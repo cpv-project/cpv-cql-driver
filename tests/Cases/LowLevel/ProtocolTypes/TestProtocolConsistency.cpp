@@ -14,7 +14,7 @@ TEST(TestProtocolConsistency, getset) {
 
 TEST(TestProtocolConsistency, encode) {
 	cql::ProtocolConsistency value(cql::ConsistencyLevel::Three);
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("\x00\x03"));
 }

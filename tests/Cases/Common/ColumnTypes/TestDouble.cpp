@@ -28,7 +28,7 @@ TEST(TestDouble, approximatelyEquals) {
 
 TEST(TestDouble, encodeBody) {
 	cql::Double value(1.1);
-	seastar::sstring data;
+	std::string data;
 	value.encodeBody(data);
 
 	double doubleValue = 0;

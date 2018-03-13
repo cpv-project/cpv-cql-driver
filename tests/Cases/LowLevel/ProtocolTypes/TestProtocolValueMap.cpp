@@ -23,7 +23,7 @@ TEST(TestProtocolValueMap, encode) {
 		{ cql::ProtocolString("apple"), cql::ProtocolValue("dog") },
 		{ cql::ProtocolString("orange"), cql::ProtocolValue("cat") }
 	});
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	auto encodedA = makeTestString(
 		"\x00\x02"

@@ -18,12 +18,12 @@ namespace cql {
 	}
 
 	/** Get the value used to retrieve the next page of results */
-	const seastar::sstring& ResultSet::getPagingState() const& {
+	const std::string& ResultSet::getPagingState() const& {
 		return data_->pagingState;
 	}
 
 	/** Get the value used to retrieve the next page of results */
-	seastar::sstring& ResultSet::getPagingState() & {
+	std::string& ResultSet::getPagingState() & {
 		return data_->pagingState;
 	}
 

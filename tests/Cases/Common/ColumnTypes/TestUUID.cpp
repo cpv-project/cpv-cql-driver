@@ -16,7 +16,7 @@ TEST(TestUUID, getset) {
 TEST(TestUUID, encodeBody) {
 	{
 		cql::UUID value("00112233-4455-6677-8899-aabbccddeeff");
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"));

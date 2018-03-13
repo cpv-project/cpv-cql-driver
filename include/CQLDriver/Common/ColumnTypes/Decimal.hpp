@@ -59,7 +59,7 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			value_.first.encodeBody(data);
 			value_.second.encodeBody(data);
 		}

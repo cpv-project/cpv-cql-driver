@@ -15,13 +15,13 @@ TEST(TestProtocolInetAddr, getset) {
 TEST(TestProtocolInetAddr, encode) {
 	{
 		cql::ProtocolInetAddr value(seastar::net::inet_address("127.0.0.1"));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x04\x7f\x00\x00\x01"));
 	}
 	{
 		cql::ProtocolInetAddr value(seastar::net::inet_address("0:0:FF:D:C:B:A:1"));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x10\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01"));
@@ -66,7 +66,7 @@ TEST(TestProtocolInetAddr, decodeError) {
 	}
 	{
 		cql::ProtocolInetAddr value;
-		seastar::sstring data;
+		std::string data;
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::DecodeException, value.decode(ptr, end));

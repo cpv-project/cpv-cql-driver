@@ -14,7 +14,7 @@ TEST(TestProtocolShortBytes, getset) {
 
 TEST(TestProtocolShortBytes, encode) {
 	cql::ProtocolShortBytes value("abc");
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("\x00\x03""abc"));
 

@@ -29,7 +29,7 @@ TEST(TestProtocolResultColumn, encode) {
 		value.setTable("asdfg");
 		value.setName("q");
 		value.setType(cql::ProtocolColumnOption(cql::ColumnType::Int));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data, true);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x03""abc"
@@ -41,7 +41,7 @@ TEST(TestProtocolResultColumn, encode) {
 		cql::ProtocolResultColumn value;
 		value.setName("w");
 		value.setType(cql::ProtocolColumnOption(cql::ColumnType::Ascii));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data, false);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x01""w"

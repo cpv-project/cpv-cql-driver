@@ -19,7 +19,7 @@ TEST(TestBlob, getset) {
 
 	value = cql::Blob("qwert");
 	ASSERT_EQ(value.get(), "qwert");
-	ASSERT_EQ(value.get(), seastar::sstring(value.data(), value.size()));
+	ASSERT_EQ(value.get(), std::string(value.data(), value.size()));
 	ASSERT_FALSE(value.empty());
 	value.reset();
 	ASSERT_EQ(value.get(), "");
@@ -28,7 +28,7 @@ TEST(TestBlob, getset) {
 
 TEST(TestBlob, encodeBody) {
 	cql::Blob value("abc\x00\x01");
-	seastar::sstring data;
+	std::string data;
 	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("abc\x00\x01"));
 }
@@ -44,14 +44,14 @@ TEST(TestBlob, operations) {
 	{
 		// assign and cast
 		cql::Blob value;
-		value = seastar::sstring("aaa");
-		seastar::sstring str = value;
+		value = std::string("aaa");
+		std::string str = value;
 		ASSERT_EQ(str, "aaa");
 	}
 	{
 		// cast (contains \x00)
 		cql::Blob value("abc\x00\x01");
-		seastar::sstring str = value;
+		std::string str = value;
 		ASSERT_EQ(str, makeTestString("abc\x00\x01"));
 	}
 	{
@@ -68,24 +68,24 @@ TEST(TestBlob, operations) {
 	{
 		// equal to
 		cql::Blob value("abc");
-		ASSERT_TRUE(value == seastar::sstring("abc"));
-		ASSERT_FALSE(value == seastar::sstring("cba"));
+		ASSERT_TRUE(value == std::string("abc"));
+		ASSERT_FALSE(value == std::string("cba"));
 		ASSERT_TRUE(value == "abc");
 		ASSERT_FALSE(value == "cba");
-		ASSERT_TRUE(seastar::sstring("abc") == value);
-		ASSERT_FALSE(seastar::sstring("cba") == value);
+		ASSERT_TRUE(std::string("abc") == value);
+		ASSERT_FALSE(std::string("cba") == value);
 		ASSERT_TRUE("abc" == value);
 		ASSERT_FALSE("cba" == value);
 	}
 	{
 		// not equal to
 		cql::Blob value("abc");
-		ASSERT_TRUE(value != seastar::sstring("cba"));
-		ASSERT_FALSE(value != seastar::sstring("abc"));
+		ASSERT_TRUE(value != std::string("cba"));
+		ASSERT_FALSE(value != std::string("abc"));
 		ASSERT_TRUE(value != "cba");
 		ASSERT_FALSE(value != "abc");
-		ASSERT_TRUE(seastar::sstring("cba") != value);
-		ASSERT_FALSE(seastar::sstring("abc") != value);
+		ASSERT_TRUE(std::string("cba") != value);
+		ASSERT_FALSE(std::string("abc") != value);
 		ASSERT_TRUE("cba" != value);
 		ASSERT_FALSE("abc" != value);
 	}

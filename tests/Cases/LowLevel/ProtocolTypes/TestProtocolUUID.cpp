@@ -23,14 +23,14 @@ TEST(TestProtocolUUID, getset) {
 TEST(TestProtocolUUID, encode) {
 	{
 		cql::ProtocolUUID value("00112233-4455-6677-8899-aabbccddeeff");
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"));
 	}
 	{
 		cql::ProtocolUUID value("12345678-ABCD-EFAA-8765-4321FFABCDEF");
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x12\x34\x56\x78\xab\xcd\xef\xaa\x87\x65\x43\x21\xff\xab\xcd\xef"));

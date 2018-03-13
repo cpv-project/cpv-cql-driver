@@ -20,7 +20,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring ResultMessage::toString() const {
+	std::string ResultMessage::toString() const {
 		return joinString("",
 			"ResultMessage(kind: ", getKind(),
 			", columnsCount: ", rowsMetadata_.getColumnsCount(),

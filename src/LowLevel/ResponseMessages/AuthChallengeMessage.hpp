@@ -15,7 +15,7 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Decode message body from binary data */
 		void decodeBody(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;

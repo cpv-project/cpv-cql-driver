@@ -19,13 +19,13 @@ TEST(TestSet, getset) {
 TEST(TestSet, encodeBody) {
 	{
 		cql::Set<cql::BigInt> value;
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00"));
 	}
 	{
 		cql::Set<cql::BigInt> value({ 1 });
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x01"

@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <core/sstring.hh>
+#include <cstring>
 #include <core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 
@@ -19,7 +19,7 @@ namespace cql {
 		void reset() { value_ = 0; }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encode(std::string& data) const {
 			auto value = seastar::cpu_to_be(value_);
 			data.append(reinterpret_cast<const char*>(&value), sizeof(value));
 		}

@@ -13,7 +13,7 @@ namespace cql {
 
 	/** Set the keyspace name and table name of all the columns belong to */
 	void ProtocolResultPreparedMetadata::setGlobalKeySpaceAndTable(
-		const seastar::sstring& keySpace, const seastar::sstring& table) {
+		const std::string& keySpace, const std::string& table) {
 		globalKeySpace_.set(keySpace);
 		globalTable_.set(table);
 		flags_.set(enumValue(getFlags() | ResultPreparedMetadataFlags::GlobalTableSpec));
@@ -21,14 +21,14 @@ namespace cql {
 
 	/** Set the keyspace name and table name of all the columns belong to */
 	void ProtocolResultPreparedMetadata::setGlobalKeySpaceAndTable(
-		seastar::sstring&& keySpace, seastar::sstring&& table) {
+		std::string&& keySpace, std::string&& table) {
 		globalKeySpace_.set(std::move(keySpace));
 		globalTable_.set(std::move(table));
 		flags_.set(enumValue(getFlags() | ResultPreparedMetadataFlags::GlobalTableSpec));
 	}
 
 	/** Encode to binary data */
-	void ProtocolResultPreparedMetadata::encode(seastar::sstring& data) const {
+	void ProtocolResultPreparedMetadata::encode(std::string& data) const {
 		ProtocolInt columnsCount(columns_.size());
 		ProtocolInt partitionKeyIndexesCount(partitionKeyIndexes_.size());
 		if (columnsCount.get() < 0 ||

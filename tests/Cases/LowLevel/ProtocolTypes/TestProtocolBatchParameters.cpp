@@ -38,7 +38,7 @@ TEST(TestProtocolBatchParameters, encode) {
 		value.setBatchCommand(
 			cql::BatchCommand()
 				.setConsistency(cql::ConsistencyLevel::One));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x01"
@@ -53,7 +53,7 @@ TEST(TestProtocolBatchParameters, encode) {
 				.setDefaultTimestamp(
 					std::chrono::system_clock::from_time_t(0) +
 					std::chrono::microseconds(123)));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x02"

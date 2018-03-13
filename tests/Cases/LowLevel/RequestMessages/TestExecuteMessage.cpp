@@ -10,7 +10,7 @@ TEST(TestExecuteMessage, encode) {
 		message->getQueryParameters().setCommand(
 			cql::Command("")
 				.setConsistency(cql::ConsistencyLevel::One));
-		seastar::sstring data;
+		std::string data;
 		message->getHeader().encodeHeaderPre(info, data);
 		message->encodeBody(info, data);
 		message->getHeader().encodeHeaderPost(info, data);

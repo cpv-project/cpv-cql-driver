@@ -8,12 +8,12 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring PrepareMessage::toString() const {
+	std::string PrepareMessage::toString() const {
 		return joinString("", "PrepareMessage(query: ", query_.get(), ")");
 	}
 
 	/** Encode message body to binary data */
-	void PrepareMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void PrepareMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// The body of the message must be: <query>
 		// where <query> is a [long string] representing the CQL query.
 		query_.encode(data);

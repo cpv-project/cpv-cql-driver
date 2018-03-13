@@ -28,7 +28,7 @@ TEST(TestProtocolQueryParameters, encode) {
 			.addParameters(cql::Text("a"), cql::Text("b"))
 			.setPageSize(100)
 			.setPagingState("state"));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x01"
@@ -49,7 +49,7 @@ TEST(TestProtocolQueryParameters, encode) {
 			.setDefaultTimestamp(
 				std::chrono::system_clock::from_time_t(0) +
 				std::chrono::microseconds(123)));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x02"

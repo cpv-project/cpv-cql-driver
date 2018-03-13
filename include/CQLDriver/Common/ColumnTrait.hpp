@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <type_traits>
 #include <core/byteorder.hh>
 #include "./ColumnTypes/Nullable.hpp"
@@ -21,7 +22,7 @@ namespace cql {
 		};
 
 		/** Encode to binary data with size information */
-		static void encode(const T& value, seastar::sstring& data) {
+		static void encode(const T& value, std::string& data) {
 			ColumnEncodeDecodeSizeType bodySize;
 			std::size_t prevSize = data.size() + sizeof(bodySize);
 			data.resize(prevSize);
@@ -64,7 +65,7 @@ namespace cql {
 		using IsNullable = std::true_type;
 
 		/** Encode to binary data with size information */
-		static void encode(const Nullable<T>& value, seastar::sstring& data) {
+		static void encode(const Nullable<T>& value, std::string& data) {
 			static const ColumnEncodeDecodeSizeType nullSize(
 				seastar::cpu_to_be(static_cast<ColumnEncodeDecodeSizeType>(-1)));
 			if (value.isNull()) {

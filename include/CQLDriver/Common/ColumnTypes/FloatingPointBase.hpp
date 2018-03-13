@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <cmath>
 #include <limits>
-#include <core/sstring.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "./ColumnDefinitions.hpp"
 #include "./FloatingPointOperations.hpp"
@@ -47,7 +47,7 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) {
+		void encodeBody(std::string& data) {
 			data.append(reinterpret_cast<const char*>(&value_), sizeof(value_));
 		}
 

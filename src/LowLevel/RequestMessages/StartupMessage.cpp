@@ -15,12 +15,12 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring StartupMessage::toString() const {
+	std::string StartupMessage::toString() const {
 		return "StartupMessage()";
 	}
 
 	/** Encode message body to binary data */
-	void StartupMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void StartupMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// The body is a [string map] of options, possible options are
 		// - "CQL_VERSION", the version of CQL to use, the only version supported is "3.0.0"
 		// - "COMPRESSION", the compression algorithm to use for frames, this is optional

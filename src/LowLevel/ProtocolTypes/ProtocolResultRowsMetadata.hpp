@@ -28,16 +28,16 @@ namespace cql {
 		void setColumnsCount(std::size_t columnsCount) { columnsCount_.set(columnsCount); }
 
 		/** The value used to retrieve the next page of results */
-		const seastar::sstring& getPagingState() const& { return pagingState_.get(); }
-		seastar::sstring& getPagingState() & { return pagingState_.get(); }
-		void setPagingState(const seastar::sstring& pagingState);
-		void setPagingState(seastar::sstring&& pagingState);
+		const std::string& getPagingState() const& { return pagingState_.get(); }
+		std::string& getPagingState() & { return pagingState_.get(); }
+		void setPagingState(const std::string& pagingState);
+		void setPagingState(std::string&& pagingState);
 
 		/** The keyspace name and table name of all the columns belong to */
-		const seastar::sstring& getGlobalKeySpace() const& { return globalKeySpace_.get(); }
-		const seastar::sstring& getGlobalTable() const& { return globalTable_.get(); }
-		void setGlobalKeySpaceAndTable(const seastar::sstring& keySpace, const seastar::sstring& table);
-		void setGlobalKeySpaceAndTable(seastar::sstring&& keySpace, seastar::sstring&& table);
+		const std::string& getGlobalKeySpace() const& { return globalKeySpace_.get(); }
+		const std::string& getGlobalTable() const& { return globalTable_.get(); }
+		void setGlobalKeySpaceAndTable(const std::string& keySpace, const std::string& table);
+		void setGlobalKeySpaceAndTable(std::string&& keySpace, std::string&& table);
 
 		/** The columns selected by the query that produced this result */
 		const std::vector<ProtocolResultColumn>& getColumns() const& { return columns_; }
@@ -46,7 +46,7 @@ namespace cql {
 		void setColumns(std::vector<ProtocolResultColumn>&& columns);
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructor */

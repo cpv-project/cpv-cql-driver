@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <utility>
+#include <string>
 #include <chrono>
-#include <core/sstring.hh>
 
 namespace cql {
 	using UUIDDataType = std::pair<std::uint64_t, std::uint64_t>;
@@ -11,10 +11,10 @@ namespace cql {
 	static const std::uint8_t RandomUUIDVersion = 4;
 
 	/** Set the uuid by it's string representation */
-	UUIDDataType strToUUID(const seastar::sstring& str);
+	UUIDDataType strToUUID(const std::string& str);
 
 	/** Get the string representation of uuid */
-	seastar::sstring uuidToStr(const UUIDDataType& uuid);
+	std::string uuidToStr(const UUIDDataType& uuid);
 
 	/** Make a empty uuid */
 	UUIDDataType makeEmptyUUID();

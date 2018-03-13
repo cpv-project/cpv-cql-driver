@@ -13,7 +13,7 @@ TEST(TestInt, getset) {
 
 TEST(TestInt, encodeBody) {
 	cql::Int value(0x12345678);
-	seastar::sstring data;
+	std::string data;
 	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78"));
 }

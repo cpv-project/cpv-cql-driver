@@ -8,7 +8,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring AuthSuccessMessage::toString() const {
+	std::string AuthSuccessMessage::toString() const {
 		return "AuthSuccessMessage()";
 	}
 

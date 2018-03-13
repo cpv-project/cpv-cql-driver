@@ -21,22 +21,22 @@ namespace cql {
 		void reset();
 
 		/** The keyspace name the column belongs to */
-		const seastar::sstring& getKeySpace() const& { return keySpace_.get(); }
-		seastar::sstring& getKeySpace() & { return keySpace_.get(); }
-		void setKeySpace(const seastar::sstring& keySpace) { keySpace_.set(keySpace); }
-		void setKeySpace(seastar::sstring&& keySpace) { keySpace_.set(std::move(keySpace)); }
+		const std::string& getKeySpace() const& { return keySpace_.get(); }
+		std::string& getKeySpace() & { return keySpace_.get(); }
+		void setKeySpace(const std::string& keySpace) { keySpace_.set(keySpace); }
+		void setKeySpace(std::string&& keySpace) { keySpace_.set(std::move(keySpace)); }
 
 		/** The table name the column belongs to */
-		const seastar::sstring& getTable() const& { return table_.get(); }
-		seastar::sstring& getTable() & { return table_.get(); }
-		void setTable(const seastar::sstring& table) { table_.set(table); }
-		void setTable(seastar::sstring&& table) { table_.set(std::move(table)); }
+		const std::string& getTable() const& { return table_.get(); }
+		std::string& getTable() & { return table_.get(); }
+		void setTable(const std::string& table) { table_.set(table); }
+		void setTable(std::string&& table) { table_.set(std::move(table)); }
 
 		/** The name of the column */
-		const seastar::sstring& getName() const& { return name_.get(); }
-		seastar::sstring& getName() & { return name_.get(); }
-		void setName(const seastar::sstring& name) { name_.set(name); }
-		void setName(seastar::sstring&& name) { name_.set(std::move(name)); }
+		const std::string& getName() const& { return name_.get(); }
+		std::string& getName() & { return name_.get(); }
+		void setName(const std::string& name) { name_.set(name); }
+		void setName(std::string&& name) { name_.set(std::move(name)); }
 
 		/** The type of the column */
 		const ProtocolColumnOption& getType() const& { return type_; }
@@ -45,7 +45,7 @@ namespace cql {
 		void setType(ProtocolColumnOption&& type) { type_ = std::move(type); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data, bool containsTableSpec) const;
+		void encode(std::string& data, bool containsTableSpec) const;
 		void decode(const char*& ptr, const char* end, bool containsTableSpec);
 
 		/** Constructor */

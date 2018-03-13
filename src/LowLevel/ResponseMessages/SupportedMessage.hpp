@@ -18,7 +18,7 @@ namespace cql {
 		void decodeBody(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** The supported STARTUP options */
 		const ProtocolStringMultiMap& getOptions() const& { return options_; }

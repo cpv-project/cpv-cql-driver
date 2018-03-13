@@ -14,7 +14,7 @@ TEST(TestProtocolInt, getset) {
 
 TEST(TestProtocolInt, encode) {
 	cql::ProtocolInt value(0x12345678);
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78"));
 }

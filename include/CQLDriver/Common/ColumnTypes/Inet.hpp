@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <core/sstring.hh>
+#include <cstring>
 #include <net/inet_address.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "./ColumnDefinitions.hpp"
@@ -21,13 +21,13 @@ namespace cql {
 		void set(const UnderlyingType& value) { value_ = value; }
 
 		/** Set the ip address by it's string representation */
-		void set(const seastar::sstring& value) { value_ = UnderlyingType(value); }
+		void set(const std::string& value) { value_ = UnderlyingType(value); }
 
 		/** Reset to initial state */
 		void reset() { value_ = {}; }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			data.append(reinterpret_cast<const char*>(value_.data()), value_.size());
 		}
 

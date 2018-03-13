@@ -23,13 +23,13 @@ namespace cql {
 			ipAddressIsFixed(false),
 			ipAddressUpdatedTime() { }
 
-		std::pair<seastar::sstring, std::uint16_t> address;
+		std::pair<std::string, std::uint16_t> address;
 		bool useSSL;
 		bool useCompression;
 		std::size_t maxStreams;
 		std::size_t maxPendingMessages;
-		seastar::sstring authenticatorClass;
-		seastar::sstring authenticatorData;
+		std::string authenticatorClass;
+		std::string authenticatorData;
 		seastar::socket_address ipAddress;
 		bool ipAddressIsResolved;
 		bool ipAddressIsFixed;
@@ -38,7 +38,7 @@ namespace cql {
 
 	/** Set the hostname and the port of this node */
 	NodeConfiguration& NodeConfiguration::setAddress(
-		seastar::sstring&& hostname, std::uint16_t port) {
+		std::string&& hostname, std::uint16_t port) {
 		data_->address = std::make_pair(hostname, port);
 		try {
 			seastar::net::inet_address inetAddress(hostname);
@@ -92,7 +92,7 @@ namespace cql {
 
 	/** Set to use password authentication for this node */
 	NodeConfiguration& NodeConfiguration::setPasswordAuthentication(
-		seastar::sstring&& username, seastar::sstring&& password) {
+		std::string&& username, std::string&& password) {
 		data_->authenticatorClass = AuthenticatorClasses::PasswordAuthenticator;
 		data_->authenticatorData.resize(0);
 		data_->authenticatorData.append("\x00", 1);
@@ -103,7 +103,7 @@ namespace cql {
 	}
 
 	/** Get the hostname and the port of this node */
-	const std::pair<seastar::sstring, std::uint16_t>& NodeConfiguration::getAddress() const& {
+	const std::pair<std::string, std::uint16_t>& NodeConfiguration::getAddress() const& {
 		return data_->address;
 	}
 
@@ -128,12 +128,12 @@ namespace cql {
 	}
 
 	/** Get the full authentication class name */
-	const seastar::sstring& NodeConfiguration::getAuthenticatorClass() const& {
+	const std::string& NodeConfiguration::getAuthenticatorClass() const& {
 		return data_->authenticatorClass;
 	}
 
 	/** Get the authentication data, the format depends on the class */
-	const seastar::sstring& NodeConfiguration::getAuthenticatorData() const& {
+	const std::string& NodeConfiguration::getAuthenticatorData() const& {
 		return data_->authenticatorData;
 	}
 	

@@ -9,8 +9,8 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring QueryMessage::toString() const {
-		seastar::sstring query;
+	std::string QueryMessage::toString() const {
+		std::string query;
 		auto& command = queryParameters_.getCommand();
 		if (command.isValid()) {
 			query.append(command.getQuery().first, command.getQuery().second);
@@ -19,7 +19,7 @@ namespace cql {
 	}
 
 	/** Encode message body to binary data */
-	void QueryMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void QueryMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// The body of the message must be: <query><query_parameters>
 		// where <query> is a [long string] represeting the query, and <query_parameters> must be:
 		// (check comments on ProtocolQueryParameters)

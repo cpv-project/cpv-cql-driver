@@ -6,13 +6,13 @@ namespace cql {
 	/** Base class of string types */
 	class StringBase {
 	public:
-		using UnderlyingType = seastar::sstring;
+		using UnderlyingType = std::string;
 
 		/** Get the value of string */
-		const seastar::sstring& get() const& { return value_; }
+		const std::string& get() const& { return value_; }
 
 		/** Get the mutable value of string */
-		seastar::sstring& get() & { return value_; }
+		std::string& get() & { return value_; }
 
 		/** Set the value of string */
 		void set(const char* str, const std::size_t size) {
@@ -28,12 +28,12 @@ namespace cql {
 		}
 
 		/** Set the value of string */
-		void set(const seastar::sstring& value) {
+		void set(const std::string& value) {
 			value_ = value;
 		}
 
 		/** Set the value of string */
-		void set(seastar::sstring&& value) {
+		void set(std::string&& value) {
 			value_ = std::move(value);
 		}
 
@@ -65,7 +65,7 @@ namespace cql {
 		bool empty() const { return value_.empty(); }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			data.append(value_.data(), value_.size());
 		}
 
@@ -91,25 +91,25 @@ namespace cql {
 		}
 
 		/** Allow cast to string implicitly */
-		operator const seastar::sstring&() const& { return value_; }
-		operator seastar::sstring&() & { return value_; }
+		operator const std::string&() const& { return value_; }
+		operator std::string&() & { return value_; }
 
 		/** Dereference operation */
-		const seastar::sstring& operator*() const& { return value_; }
-		seastar::sstring& operator*() & { return value_; }
+		const std::string& operator*() const& { return value_; }
+		std::string& operator*() & { return value_; }
 
 		/** Get pointer operation */
-		const seastar::sstring* operator->() const& { return &value_; }
-		seastar::sstring* operator->() & { return &value_; }
+		const std::string* operator->() const& { return &value_; }
+		std::string* operator->() & { return &value_; }
 
 	protected:
-		seastar::sstring value_;
+		std::string value_;
 	};
 
 	/** Write the string content to stream */
 	template <class T,
 		std::enable_if_t<std::is_same<
-			typename T::UnderlyingType, seastar::sstring>::value, int> = 0>
+			typename T::UnderlyingType, std::string>::value, int> = 0>
 	std::ostream& operator<<(std::ostream& stream, const T& value) {
 		stream << value.get();
 		return stream;

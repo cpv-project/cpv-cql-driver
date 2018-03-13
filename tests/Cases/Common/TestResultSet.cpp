@@ -25,7 +25,7 @@ TEST(TestResultSet, getters) {
 	ASSERT_EQ(resultSet.getRowsCount(), 123);
 	ASSERT_EQ(resultSet.getColumnsCount(), 321);
 	ASSERT_EQ(resultSet.getPagingState(), "state");
-	ASSERT_EQ(seastar::sstring(resultSet.getDecodePtr(), resultSet.getDecodeEnd()), "bc");
+	ASSERT_EQ(std::string(resultSet.getDecodePtr(), resultSet.getDecodeEnd()), "bc");
 }
 
 TEST(TestResultSet, fill) {

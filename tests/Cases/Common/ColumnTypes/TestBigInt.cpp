@@ -13,7 +13,7 @@ TEST(TestBigInt, getset) {
 
 TEST(TestBigInt, encodeBody) {
 	cql::BigInt value(0x1234'5678'abcd'dcba);
-	seastar::sstring data;
+	std::string data;
 	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34\x56\x78\xab\xcd\xdc\xba"));
 }

@@ -8,7 +8,7 @@ TEST(TestBatchMessage, encode) {
 	cql::ConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::RequestMessageFactory::makeRequestMessage<cql::BatchMessage>();
-		seastar::sstring data;
+		std::string data;
 		message->setType(cql::BatchType::UnLogged);
 		message->getBatchParameters().setBatchCommand(
 			cql::BatchCommand()
@@ -31,7 +31,7 @@ TEST(TestBatchMessage, encode) {
 	}
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::RequestMessageFactory::makeRequestMessage<cql::BatchMessage>();
-		seastar::sstring data;
+		std::string data;
 		message->setType(cql::BatchType::Logged);
 		message->getBatchParameters().setBatchCommand(
 			cql::BatchCommand()

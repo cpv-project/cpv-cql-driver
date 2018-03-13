@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdint>
 #include <initializer_list>
-#include <core/sstring.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "../ColumnTrait.hpp"
 #include "./Int.hpp"
@@ -42,7 +41,7 @@ namespace cql {
 		void reset() { value_.clear(); }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			Int setSize(value_.size());
 			setSize.encodeBody(data);
 			for (const auto& item : value_) {

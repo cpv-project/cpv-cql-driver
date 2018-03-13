@@ -88,7 +88,7 @@ namespace cql {
 
 	private:
 		/** Close the connection */
-		void close(const seastar::sstring& errorMessage);
+		void close(const std::string& errorMessage);
 
 	private:
 		seastar::lw_shared_ptr<SessionConfiguration> sessionConfiguration_;
@@ -104,7 +104,7 @@ namespace cql {
 		ConnectionStream streamZero_;
 
 		seastar::future<> sendingFuture_;
-		seastar::sstring sendingBuffer_;
+		std::string sendingBuffer_;
 
 		std::vector<std::pair<bool, seastar::promise<Object<ResponseMessageBase>>>> receivingPromiseMap_;
 		std::vector<seastar::queue<Object<ResponseMessageBase>>> receivedMessageQueueMap_;

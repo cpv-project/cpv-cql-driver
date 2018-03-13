@@ -2,7 +2,7 @@
 
 namespace cql {
 	/** Get description of this message */
-	seastar::sstring ReadyMessage::toString() const {
+	std::string ReadyMessage::toString() const {
 		return "ReadyMessage()";
 	}
 

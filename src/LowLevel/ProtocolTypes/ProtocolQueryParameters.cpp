@@ -51,7 +51,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolQueryParameters::encode(seastar::sstring& data) const {
+	void ProtocolQueryParameters::encode(std::string& data) const {
 		if (!command_.isValid()) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}

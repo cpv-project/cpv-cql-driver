@@ -15,13 +15,13 @@ TEST(TestProtocolLong, getset) {
 TEST(TestProtocolLong, encode) {
 	{
 		cql::ProtocolLong value(0x7fff0000aaaaeeee);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x7f\xff\x00\x00\xaa\xaa\xee\xee"));
 	}
 	{
 		cql::ProtocolLong value(-3);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\xff\xff\xff\xff\xff\xff\xff\xfd"));
 	}
@@ -49,7 +49,7 @@ TEST(TestProtocolLong, decode) {
 
 TEST(TestProtocolLong, decodeError) {
 	cql::ProtocolLong value(0);
-	seastar::sstring data("\x12");
+	std::string data("\x12");
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	ASSERT_THROWS(cql::DecodeException, value.decode(ptr, end));

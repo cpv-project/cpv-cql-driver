@@ -2,12 +2,12 @@
 
 namespace cql {
 	/** Get description of this message */
-	seastar::sstring OptionsMessage::toString() const {
+	std::string OptionsMessage::toString() const {
 		return "OptionsMessage()";
 	}
 
 	/** Encode message body to binary data */
-	void OptionsMessage::encodeBody(const ConnectionInfo&, seastar::sstring&) const {
+	void OptionsMessage::encodeBody(const ConnectionInfo&, std::string&) const {
 		// The body of an OPTIONS message should be empty
 	}
 }

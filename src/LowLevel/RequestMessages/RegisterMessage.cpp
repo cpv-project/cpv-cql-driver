@@ -8,12 +8,12 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring RegisterMessage::toString() const {
+	std::string RegisterMessage::toString() const {
 		return "RegisterMessage()";
 	}
 
 	/** Encode message body to binary data */
-	void RegisterMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void RegisterMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// The body of the message is a [string list] representing the event types to register for.
 		// See section 4.2.6 for the list of valid event types.
 		events_.encode(data);

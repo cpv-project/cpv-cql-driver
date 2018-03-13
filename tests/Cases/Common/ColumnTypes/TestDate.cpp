@@ -24,19 +24,19 @@ TEST(TestDate, getset) {
 TEST(TestDate, encodeBody) {
 	{
 		auto value = cql::Date::create(1970, 1, 1);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x80\x00\x00\x00"));
 	}
 	{
 		auto value = cql::Date::create(1970, 1, 2);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x80\x00\x00\x01"));
 	}
 	{
 		auto value = cql::Date::create(1969, 12, 31);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x7f\xff\xff\xff"));
 	}

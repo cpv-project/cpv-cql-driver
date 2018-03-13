@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <utility>
 #include <vector>
-#include <core/sstring.hh>
 #include "./Utility/Object.hpp"
 #include "./CommonDefinitions.hpp"
 #include "./ColumnTrait.hpp"
@@ -30,10 +29,10 @@ namespace cql {
 		}
 
 		/** Add a new query to this batch */
-		BatchCommand& addQuery(seastar::sstring&& query) &;
+		BatchCommand& addQuery(std::string&& query) &;
 
 		/** Add a new query to this batch */
-		BatchCommand&& addQuery(seastar::sstring&& query) && {
+		BatchCommand&& addQuery(std::string&& query) && {
 			return std::move(addQuery(std::move(query)));
 		}
 
@@ -135,14 +134,14 @@ namespace cql {
 		std::pair<const char*, std::size_t> getQuery(std::size_t index) const&;
 
 		/** Get the parameter sets by index */
-		using ParameterSetsType = std::vector<std::pair<std::size_t, seastar::sstring>>;
+		using ParameterSetsType = std::vector<std::pair<std::size_t, std::string>>;
 		const ParameterSetsType& getParameterSets(std::size_t index) const&;
 
 		/** Get the mutable count of parameters of the last parameter set */
 		std::size_t& getParameterCountOfLastSet() &;
 
 		/** Get the mutable encoded parameters of the last parameter set */
-		seastar::sstring& getParametersOfLastSet() &;
+		std::string& getParametersOfLastSet() &;
 
 		/**
 		 * Get the serial consistency level of this query,
@@ -164,9 +163,9 @@ namespace cql {
 
 	private:
 		/** Encode implementation of addParameters */
-		static void addParametersEncode(seastar::sstring&) { }
+		static void addParametersEncode(std::string&) { }
 		template <class Head, class... Rest>
-		static void addParametersEncode(seastar::sstring& data, Head&& head, Rest&&... rest) {
+		static void addParametersEncode(std::string& data, Head&& head, Rest&&... rest) {
 			ColumnTrait<std::decay_t<Head>>::encode(std::forward<Head>(head), data);
 			addParametersEncode(data, std::forward<Rest>(rest)...);
 		}

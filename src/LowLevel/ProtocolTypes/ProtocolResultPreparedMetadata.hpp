@@ -38,10 +38,10 @@ namespace cql {
 		}
 
 		/** The keyspace name and table name of all the columns belong to */
-		const seastar::sstring& getGlobalKeySpace() const& { return globalKeySpace_.get(); }
-		const seastar::sstring& getGlobalTable() const& { return globalTable_.get(); }
-		void setGlobalKeySpaceAndTable(const seastar::sstring& keySpace, const seastar::sstring& table);
-		void setGlobalKeySpaceAndTable(seastar::sstring&& keySpace, seastar::sstring&& table);
+		const std::string& getGlobalKeySpace() const& { return globalKeySpace_.get(); }
+		const std::string& getGlobalTable() const& { return globalTable_.get(); }
+		void setGlobalKeySpaceAndTable(const std::string& keySpace, const std::string& table);
+		void setGlobalKeySpaceAndTable(std::string&& keySpace, std::string&& table);
 
 		/** The columns selected by the query that produced this result */
 		const std::vector<ProtocolResultColumn>& getColumns() const& { return columns_; }
@@ -50,7 +50,7 @@ namespace cql {
 		void setColumns(std::vector<ProtocolResultColumn>&& columns) { columns_ = std::move(columns); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructor */

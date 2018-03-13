@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <vector>
 #include <limits>
-#include <core/sstring.hh>
 #include <core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/EncodeException.hpp>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
@@ -29,7 +29,7 @@ namespace cql {
 		void reset() { value_.clear(); }
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encode(std::string& data) const {
 			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {
 				throw EncodeException(CQL_CODEINFO, "length too long");
 			}

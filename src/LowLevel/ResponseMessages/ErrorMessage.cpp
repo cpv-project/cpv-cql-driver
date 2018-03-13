@@ -10,7 +10,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring ErrorMessage::toString() const {
+	std::string ErrorMessage::toString() const {
 		return joinString("",
 			"ErrorMessage(errorCode: ", getErrorCode(),
 			", errorCodeInt: ", errorCode_.get(),

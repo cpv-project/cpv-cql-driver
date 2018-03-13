@@ -17,10 +17,10 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Encode message body to binary data */
-		void encodeBody(const ConnectionInfo& info, seastar::sstring& data) const override;
+		void encodeBody(const ConnectionInfo& info, std::string& data) const override;
 
 		/** The type of batch, can be either "Logged", "UnLogged", or "Counter" */
 		BatchType getType() const;
@@ -31,8 +31,8 @@ namespace cql {
 		ProtocolBatchParameters& getBatchParameters() & { return batchParameters_; }
 
 		/** The prepared query id of the query at the specificed index */
-		const seastar::sstring& getPreparedQueryId(std::size_t index) const&;
-		seastar::sstring& getPreparedQueryId(std::size_t index) &;
+		const std::string& getPreparedQueryId(std::size_t index) const&;
+		std::string& getPreparedQueryId(std::size_t index) &;
 
 		/** Constructor */
 		BatchMessage();
@@ -40,7 +40,7 @@ namespace cql {
 	private:
 		ProtocolByte type_;
 		ProtocolBatchParameters batchParameters_;
-		std::vector<seastar::sstring> preparedQueryIds_;
+		std::vector<std::string> preparedQueryIds_;
 	};
 }
 

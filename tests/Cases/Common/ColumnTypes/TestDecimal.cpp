@@ -48,19 +48,19 @@ TEST(TestDecimal, strip) {
 TEST(TestDecimal, encodeBody) {
 	{
 		cql::Decimal value;
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00\x00"));
 	}
 	{
 		cql::Decimal value(3, 123);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x03\x7b"));
 	}
 	{
 		cql::Decimal value(-3, -129);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\xff\xff\xff\xfd\xff\x7f"));
 	}

@@ -13,7 +13,7 @@ TEST(TestSmallInt, getset) {
 
 TEST(TestSmallInt, encodeBody) {
 	cql::SmallInt value(0x1234);
-	seastar::sstring data;
+	std::string data;
 	value.encodeBody(data);
 	ASSERT_EQ(data, makeTestString("\x12\x34"));
 }

@@ -28,7 +28,7 @@ TEST(TestFloat, approximatelyEquals) {
 
 TEST(TestFloat, encodeBody) {
 	cql::Float value(1.1);
-	seastar::sstring data;
+	std::string data;
 	value.encodeBody(data);
 
 	float floatValue = 0;

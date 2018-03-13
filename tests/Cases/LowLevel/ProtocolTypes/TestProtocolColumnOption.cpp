@@ -97,7 +97,7 @@ TEST(TestProtocolColumnOption, encode) {
 	{
 		// Ascii
 		cql::ProtocolColumnOption value(cql::ColumnType::Ascii);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x00\x01"));
 	}
@@ -106,7 +106,7 @@ TEST(TestProtocolColumnOption, encode) {
 		cql::ProtocolColumnOption value(
 			cql::ProtocolColumnOptionCustomPayload(
 				cql::ProtocolString("abc")));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x03""abc"));
 	}
@@ -117,7 +117,7 @@ TEST(TestProtocolColumnOption, encode) {
 				cql::ProtocolColumnOption(
 					cql::ProtocolColumnOptionSetPayload(
 						cql::ProtocolColumnOption(cql::ColumnType::Int)))));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x00\x20\x00\x22\x00\x09"));
 	}
@@ -127,7 +127,7 @@ TEST(TestProtocolColumnOption, encode) {
 			cql::ProtocolColumnOptionMapPayload(
 				cql::ProtocolColumnOption(cql::ColumnType::Int),
 				cql::ProtocolColumnOption(cql::ColumnType::VarChar)));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x00\x21\x00\x09\x00\x0d"));
 	}
@@ -136,7 +136,7 @@ TEST(TestProtocolColumnOption, encode) {
 		cql::ProtocolColumnOption value(
 			cql::ProtocolColumnOptionSetPayload(
 				cql::ProtocolColumnOption(cql::ColumnType::Time)));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x00\x22\x00\x12"));
 	}
@@ -156,7 +156,7 @@ TEST(TestProtocolColumnOption, encode) {
 						cql::ProtocolColumnOption(cql::ColumnType::VarChar)
 					}
 				}));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x30"
@@ -174,7 +174,7 @@ TEST(TestProtocolColumnOption, encode) {
 				cql::ProtocolColumnOption(cql::ColumnType::Ascii),
 				cql::ProtocolColumnOption(cql::ColumnType::Int),
 			}));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x00\x31\x00\x02\x00\x01\x00\x09"));
 	}

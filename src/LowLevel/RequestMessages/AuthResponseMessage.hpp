@@ -16,10 +16,10 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Encode message body to binary data */
-		void encodeBody(const ConnectionInfo& info, seastar::sstring& data) const override;
+		void encodeBody(const ConnectionInfo& info, std::string& data) const override;
 
 		/** The detail of what this token contains depends on the actual authenticator used */
 		const ProtocolBytes& getToken() const& { return token_; }

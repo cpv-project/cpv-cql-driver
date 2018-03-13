@@ -19,11 +19,11 @@ TEST(TestMessageHeader, encode) {
 	header.setFlags(cql::MessageHeaderFlags::Compression);
 	header.setStreamId(123);
 	header.setOpCode(cql::MessageType::Startup, cql::MessageDirection::Request);
-	seastar::sstring data;
+	std::string data;
 	header.encodeHeaderPre(info, data);
 	data.append("asdfg", 5);
 	header.encodeHeaderPost(info, data);
-	ASSERT_EQ(data, seastar::sstring("\x04\x01\x00\x7b\x01\x00\x00\x00\x05""asdfg", 9+5));
+	ASSERT_EQ(data, std::string("\x04\x01\x00\x7b\x01\x00\x00\x00\x05""asdfg", 9+5));
 }
 
 TEST(TestMessageHeader, decode) {

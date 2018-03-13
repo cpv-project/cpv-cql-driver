@@ -39,7 +39,7 @@ namespace cql {
 	}
 
 	/** Set the uuid by it's string representation */
-	UUIDDataType strToUUID(const seastar::sstring& str) {
+	UUIDDataType strToUUID(const std::string& str) {
 		// example: 00112233-4455-6677-8899-aabbccddeeff
 		if (str.size() != 36) {
 			throw cql::FormatException(CQL_CODEINFO,
@@ -68,9 +68,9 @@ namespace cql {
 	}
 
 	/** Get the string representation of uuid */
-	seastar::sstring uuidToStr(const UUIDDataType& uuid) {
+	std::string uuidToStr(const UUIDDataType& uuid) {
 		// example: 00112233-4455-6677-8899-aabbccddeeff
-		seastar::sstring result;
+		std::string result;
 		dumpIntToHex(static_cast<std::uint32_t>(uuid.first >> 32), result);
 		result.append("-", 1);
 		dumpIntToHex(static_cast<std::uint16_t>((uuid.first >> 16) & 0xffff), result);

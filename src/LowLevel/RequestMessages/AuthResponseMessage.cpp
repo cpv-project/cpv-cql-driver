@@ -8,12 +8,12 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring AuthResponseMessage::toString() const {
+	std::string AuthResponseMessage::toString() const {
 		return "AuthResponseMessage()";
 	}
 
 	/** Encode message body to binary data */
-	void AuthResponseMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void AuthResponseMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// the body of this message is a single [bytes] token.
 		// the detals of what this token contains (and when it can be null/empty, if ever)
 		// depends on the actual authenticator used.

@@ -60,7 +60,7 @@ TEST(TestProtocolResultPreparedMetadata, encode) {
 		value.getColumns().at(1).setTable("T");
 		value.getColumns().at(1).setName("b");
 		value.getColumns().at(1).setType(cql::ProtocolColumnOption(cql::ColumnType::Ascii));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x00"
@@ -78,7 +78,7 @@ TEST(TestProtocolResultPreparedMetadata, encode) {
 		value.getColumns().at(0).setType(cql::ProtocolColumnOption(cql::ColumnType::Int));
 		value.getColumns().at(1).setName("b");
 		value.getColumns().at(1).setType(cql::ProtocolColumnOption(cql::ColumnType::Ascii));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x01"

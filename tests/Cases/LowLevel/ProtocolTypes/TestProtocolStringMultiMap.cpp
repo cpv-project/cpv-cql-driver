@@ -50,7 +50,7 @@ TEST(TestProtocolStringMultiMap, encode) {
 			})
 		}
 	});
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	auto encodedA = makeTestString(
 		"\x00\x02"

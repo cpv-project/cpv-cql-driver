@@ -1,6 +1,6 @@
 #pragma once
 #include <utility>
-#include <core/sstring.hh>
+#include <string>
 #include "./ColumnDefinitions.hpp"
 
 namespace cql {
@@ -32,7 +32,7 @@ namespace cql {
 		bool isNull() const { return isNull_; }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) {
+		void encodeBody(std::string& data) {
 			if (!isNull_) {
 				value_.encodeBody(data);
 			}

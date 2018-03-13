@@ -36,7 +36,7 @@ TEST(TestProtocolResultRowsMetadata, encode) {
 		cql::ProtocolResultRowsMetadata value;
 		value.setColumnsCount(123);
 		value.setPagingState("abc");
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x06"
@@ -51,7 +51,7 @@ TEST(TestProtocolResultRowsMetadata, encode) {
 		value.getColumns().at(0).setType(cql::ProtocolColumnOption(cql::ColumnType::Int));
 		value.getColumns().at(1).setName("b");
 		value.getColumns().at(1).setType(cql::ProtocolColumnOption(cql::ColumnType::Ascii));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x01"
@@ -68,7 +68,7 @@ TEST(TestProtocolResultRowsMetadata, encode) {
 		value.getColumns().at(0).setTable("t");
 		value.getColumns().at(0).setName("a");
 		value.getColumns().at(0).setType(cql::ProtocolColumnOption(cql::ColumnType::Int));
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x00"

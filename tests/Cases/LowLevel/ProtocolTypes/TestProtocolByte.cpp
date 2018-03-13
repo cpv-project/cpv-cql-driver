@@ -14,14 +14,14 @@ TEST(TestProtocolByte, getset) {
 
 TEST(TestProtocolByte, encode) {
 	cql::ProtocolByte value(123);
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
-	ASSERT_EQ(data, seastar::sstring("\x7b"));
+	ASSERT_EQ(data, std::string("\x7b"));
 }
 
 TEST(TestProtocolByte, decode) {
 	cql::ProtocolByte value(0);
-	seastar::sstring data("\x7b");
+	std::string data("\x7b");
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	value.decode(ptr, end);
@@ -31,7 +31,7 @@ TEST(TestProtocolByte, decode) {
 
 TEST(TestProtocolByte, decodeError) {
 	cql::ProtocolByte value(0);
-	seastar::sstring data;
+	std::string data;
 	auto ptr = data.c_str();
 	auto end = ptr + data.size();
 	ASSERT_THROWS(cql::DecodeException, value.decode(ptr, end));

@@ -8,7 +8,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring SupportedMessage::toString() const {
+	std::string SupportedMessage::toString() const {
 		return "SupportedMessage()";
 	}
 

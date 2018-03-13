@@ -27,19 +27,19 @@ TEST(TestTime, getset) {
 TEST(TestTime, encodeBody) {
 	{
 		cql::Time value(std::chrono::seconds(123));
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x1c\xa3\x5f\x0e\x00"));
 	}
 	{
 		cql::Time value(std::chrono::milliseconds(12345));
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x02\xdf\xd1\xc0\x40"));
 	}
 	{
 		auto value = cql::Time::create(1, 2, 3); // 3723s
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x03\x62\xd4\x17\xae\x00"));
 	}

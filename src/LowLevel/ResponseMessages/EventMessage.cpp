@@ -9,7 +9,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring EventMessage::toString() const {
+	std::string EventMessage::toString() const {
 		return "EventMessage()";
 	}
 

@@ -26,7 +26,7 @@ TEST(TestProtocolValue, getset) {
 
 TEST(TestProtocolValue, encode) {
 	cql::ProtocolValue value("abc");
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("\x00\x00\x00\x03""abc"));
 

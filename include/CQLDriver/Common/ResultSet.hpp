@@ -21,8 +21,8 @@ namespace cql {
 		std::size_t getColumnsCount() const;
 
 		/** Get the value used to retrieve the next page of results */
-		const seastar::sstring& getPagingState() const&;
-		seastar::sstring& getPagingState() &;
+		const std::string& getPagingState() const&;
+		std::string& getPagingState() &;
 
 		// cppcheck-suppress functionConst
 		/**

@@ -105,7 +105,7 @@ TEST_FUTURE(TestConnection, prepareQuery) {
 				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
 	auto stream = connection->openStream();
 	return seastar::do_with(
-		std::move(connection), std::move(stream), seastar::sstring(),
+		std::move(connection), std::move(stream), std::string(),
 		[] (auto& connection, auto& stream, auto& queryId) {
 		return connection->ready().then([&connection, &stream] {
 			// send PREPARE

@@ -28,7 +28,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolBatchParameters::encode(seastar::sstring& data) const {
+	void ProtocolBatchParameters::encode(std::string& data) const {
 		if (!batchCommand_.isValid()) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}

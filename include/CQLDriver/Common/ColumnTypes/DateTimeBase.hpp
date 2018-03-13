@@ -1,6 +1,6 @@
 #pragma once
 #include <chrono>
-#include <core/sstring.hh>
+#include <cstring>
 #include <core/byteorder.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "./DateTimeOperations.hpp"

@@ -20,13 +20,13 @@ TEST(TestCommand, query) {
 	{
 		cql::Command command("use a;");
 		ASSERT_EQ(
-			seastar::sstring(command.getQuery().first, command.getQuery().second),
+			std::string(command.getQuery().first, command.getQuery().second),
 			"use a;");
 	}
 	{
-		cql::Command command(seastar::sstring("use b;"));
+		cql::Command command(std::string("use b;"));
 		ASSERT_EQ(
-			seastar::sstring(command.getQuery().first, command.getQuery().second),
+			std::string(command.getQuery().first, command.getQuery().second),
 			"use b;");
 	}
 }

@@ -38,7 +38,7 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			// store local time in database, not utc time
 			std::chrono::nanoseconds nanoSeconds = *this;
 			std::uint64_t dbValue = nanoSeconds.count();

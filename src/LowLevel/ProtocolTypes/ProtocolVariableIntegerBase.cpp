@@ -20,7 +20,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolVariableIntegerBase::encode(seastar::sstring& data) const {
+	void ProtocolVariableIntegerBase::encode(std::string& data) const {
 		std::uint64_t valueBe = seastar::cpu_to_be(value_);
 		const char* ptr = reinterpret_cast<const char*>(&valueBe);
 		const char* end = ptr + sizeof(valueBe);

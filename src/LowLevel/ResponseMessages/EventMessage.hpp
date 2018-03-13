@@ -15,7 +15,7 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Decode message body from binary data */
 		void decodeBody(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;
@@ -25,15 +25,15 @@ namespace cql {
 		ProtocolString& getType() & { return type_; }
 
 		/** The event data, depends on the event type */
-		const seastar::sstring& getData() const& { return data_; }
-		seastar::sstring& getData() & { return data_; }
+		const std::string& getData() const& { return data_; }
+		std::string& getData() & { return data_; }
 
 		/** Constructor */
 		EventMessage();
 
 	private:
 		ProtocolString type_;
-		seastar::sstring data_;
+		std::string data_;
 	};
 }
 

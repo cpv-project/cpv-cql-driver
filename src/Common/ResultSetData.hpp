@@ -1,7 +1,6 @@
 #pragma once
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include <cstdint>
-#include <core/sstring.hh>
 #include <core/temporary_buffer.hh>
 
 namespace cql {
@@ -10,7 +9,7 @@ namespace cql {
 	public:
 		std::size_t rowsCount;
 		std::size_t columnsCount;
-		seastar::sstring pagingState;
+		std::string pagingState;
 		seastar::temporary_buffer<char> buffer;
 		const char* decodePtr;
 		const char* decodeEnd;
@@ -32,7 +31,7 @@ namespace cql {
 		void reset(
 			std::size_t rowsCountVal,
 			std::size_t columnsCountVal,
-			seastar::sstring&& pagingStateRef,
+			std::string&& pagingStateRef,
 			seastar::temporary_buffer<char>&& bufferRef,
 			std::size_t decodeFromOffset,
 			std::size_t decodeToOffset) {

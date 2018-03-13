@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <core/sstring.hh>
+#include <cstring>
 #include <core/byteorder.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "./ColumnDefinitions.hpp"
@@ -27,7 +27,7 @@ namespace cql {
 		void reset() { value_ = 0; }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			auto value = seastar::cpu_to_be(value_);
 			data.append(reinterpret_cast<const char*>(&value), sizeof(value));
 		}

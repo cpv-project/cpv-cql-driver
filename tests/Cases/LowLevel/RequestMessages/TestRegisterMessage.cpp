@@ -6,7 +6,7 @@ TEST(TestRegisterMessage, encode) {
 	cql::ConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::RequestMessageFactory::makeRequestMessage<cql::RegisterMessage>();
-		seastar::sstring data;
+		std::string data;
 		message->getEvents().set({ cql::ProtocolString("TOPOLOGY_CHANGE") });
 		message->getHeader().encodeHeaderPre(info, data);
 		message->encodeBody(info, data);

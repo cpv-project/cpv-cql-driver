@@ -14,7 +14,7 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Decode message body from binary data */
 		void decodeBody(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;
@@ -28,8 +28,8 @@ namespace cql {
 		ProtocolString& getErrorMessage() & { return errorMessage_; }
 
 		/** The extra contents, depends on error code */
-		const seastar::sstring& getExtraContents() const& { return extraContents_; }
-		seastar::sstring& getExtraContents() & { return extraContents_; }
+		const std::string& getExtraContents() const& { return extraContents_; }
+		std::string& getExtraContents() & { return extraContents_; }
 
 		/** Constructor */
 		ErrorMessage();
@@ -37,7 +37,7 @@ namespace cql {
 	private:
 		ProtocolInt errorCode_;
 		ProtocolString errorMessage_;
-		seastar::sstring extraContents_;
+		std::string extraContents_;
 	};
 }
 

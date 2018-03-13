@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <utility>
 #include <vector>
-#include <core/sstring.hh>
 #include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "./ProtocolString.hpp"
 
@@ -55,7 +54,7 @@ namespace cql {
 		void setTuplePayload(const ProtocolColumnOptionTuplePayload& payload);
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
@@ -77,7 +76,7 @@ namespace cql {
 
 	private:
 		ColumnType type_;
-		seastar::sstring payload_;
+		std::string payload_;
 	};
 
 	/**
@@ -92,7 +91,7 @@ namespace cql {
 		void set(ProtocolString&& value) { value_ = std::move(value); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
@@ -116,7 +115,7 @@ namespace cql {
 		void setElementType(ProtocolColumnOption&& elementType) { elementType_ = std::move(elementType); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
@@ -145,7 +144,7 @@ namespace cql {
 		void setValueType(ProtocolColumnOption&& valueType) { valueType_ = std::move(valueType); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
@@ -173,7 +172,7 @@ namespace cql {
 		void setElementType(ProtocolColumnOption&& elementType) { elementType_ = std::move(elementType); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
@@ -214,7 +213,7 @@ namespace cql {
 		FieldsType& getFields() & { return fields_; }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
@@ -247,7 +246,7 @@ namespace cql {
 		TypesType& getTypes() & { return types_; }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */

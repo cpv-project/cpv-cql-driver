@@ -6,7 +6,7 @@ namespace cql {
 	class RequestMessageBase : public MessageBase {
 	public:
 		/** Encode message body to binary data */
-		virtual void encodeBody(const ConnectionInfo& info, seastar::sstring& data) const = 0;
+		virtual void encodeBody(const ConnectionInfo& info, std::string& data) const = 0;
 	};
 }
 

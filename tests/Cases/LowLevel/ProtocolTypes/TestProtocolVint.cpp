@@ -15,25 +15,25 @@ TEST(TestProtocolVint, getset) {
 TEST(TestProtocolVint, encode) {
 	{
 		cql::ProtocolVint value(0x7fff0000aaaaeeee);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\xff\xff\xfe\x00\x01\x55\x55\xdd\xdc"));
 	}
 	{
 		cql::ProtocolVint value(3);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x06"));
 	}
 	{
 		cql::ProtocolVint value(-3);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\x05"));
 	}
 	{
 		cql::ProtocolVint value(-0x7f238a);
-		seastar::sstring data;
+		std::string data;
 		value.encode(data);
 		ASSERT_EQ(data, makeTestString("\xe0\xfe\x47\x13"));
 	}
@@ -78,7 +78,7 @@ TEST(TestProtocolVint, decode) {
 TEST(TestProtocolVint, decodeError) {
 	{
 		cql::ProtocolVint value(0);
-		seastar::sstring data;
+		std::string data;
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::DecodeException, value.decode(ptr, end));

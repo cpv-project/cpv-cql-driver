@@ -7,8 +7,8 @@ namespace cql {
 	public:
 		struct QueryData {
 			std::pair<const char*, std::size_t> queryCStr;
-			seastar::sstring queryStr;
-			std::vector<std::pair<std::size_t, seastar::sstring>> parameterSets;
+			std::string queryStr;
+			std::vector<std::pair<std::size_t, std::string>> parameterSets;
 
 			QueryData() :
 				queryCStr(),
@@ -20,7 +20,7 @@ namespace cql {
 				queryStr(),
 				parameterSets() { }
 
-			explicit QueryData(seastar::sstring&& query) :
+			explicit QueryData(std::string&& query) :
 				queryCStr(nullptr, 0),
 				queryStr(std::move(query)),
 				parameterSets() { }
@@ -59,7 +59,7 @@ namespace cql {
 	}
 
 	/** Add a new query to this batch */
-	BatchCommand& BatchCommand::addQuery(seastar::sstring&& query) & {
+	BatchCommand& BatchCommand::addQuery(std::string&& query) & {
 		data_->queries.emplace_back(std::move(query));
 		return *this;
 	}
@@ -134,7 +134,7 @@ namespace cql {
 	}
 
 	/** Get the mutable encoded parameters of the last parameter set */
-	seastar::sstring& BatchCommand::getParametersOfLastSet() & {
+	std::string& BatchCommand::getParametersOfLastSet() & {
 		if (data_->queries.empty()) {
 			throw cql::LogicException(CQL_CODEINFO,
 				"please call addQuery before addParameters");

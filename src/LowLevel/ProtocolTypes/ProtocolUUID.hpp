@@ -19,18 +19,18 @@ namespace cql {
 		void reset() { value_ = {}; }
 
 		/** Get the string representation of uuid */
-		seastar::sstring str() const { return uuidToStr(value_); }
+		std::string str() const { return uuidToStr(value_); }
 
 		/** Set the uuid by it's string representation */
-		void set(const seastar::sstring& str) { value_ = strToUUID(str); }
+		void set(const std::string& str) { value_ = strToUUID(str); }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */
 		ProtocolUUID();
-		explicit ProtocolUUID(const seastar::sstring& str);
+		explicit ProtocolUUID(const std::string& str);
 		explicit ProtocolUUID(const UUIDDataType& value);
 
 	private:

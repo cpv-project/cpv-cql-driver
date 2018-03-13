@@ -23,7 +23,7 @@ TEST(TestProtocolColumnOptionList, encode) {
 		cql::ProtocolColumnOption(cql::ColumnType::Ascii),
 		cql::ProtocolColumnOption(cql::ColumnType::Int)
 	});
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("\x00\x02\x00\x01\x00\x09"));
 }

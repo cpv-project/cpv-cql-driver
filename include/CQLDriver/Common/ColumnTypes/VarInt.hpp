@@ -34,7 +34,7 @@ namespace cql {
 		using IntegerBase::operator bool;
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) const {
+		void encodeBody(std::string& data) const {
 			auto value = seastar::cpu_to_be(value_);
 			const std::uint8_t* valuePtr = reinterpret_cast<const uint8_t*>(&value);
 			std::size_t valueSize = sizeof(value);

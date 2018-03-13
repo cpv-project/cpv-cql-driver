@@ -18,13 +18,13 @@ TEST(TestInet, getset) {
 TEST(TestInet, encodeBody) {
 	{
 		cql::Inet value("127.0.0.1");
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x7f\x00\x00\x01"));
 	}
 	{
 		cql::Inet value("0:0:FF:D:C:B:A:1");
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x00\x00\xff\x00\x0d\x00\x0c\x00\x0b\x00\x0a\x00\x01"));
@@ -75,7 +75,7 @@ TEST(TestInet, operations) {
 		// get pointer
 		cql::Inet value("127.0.0.1");
 		ASSERT_EQ(
-			seastar::sstring(reinterpret_cast<const char*>(value->data()), value->size()),
+			std::string(reinterpret_cast<const char*>(value->data()), value->size()),
 			makeTestString("\x7f\x00\x00\x01"));
 	}
 	{

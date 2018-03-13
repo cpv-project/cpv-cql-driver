@@ -14,13 +14,13 @@ TEST(TestBoolean, getset) {
 TEST(TestBoolean, encodeBody) {
 	{
 		cql::Boolean value(true);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x01"));
 	}
 	{
 		cql::Boolean value(false);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00"));
 	}

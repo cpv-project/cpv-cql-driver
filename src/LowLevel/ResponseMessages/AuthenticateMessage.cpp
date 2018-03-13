@@ -8,7 +8,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring AuthenticateMessage::toString() const {
+	std::string AuthenticateMessage::toString() const {
 		return joinString("",
 			"AuthenticateMessage(authenticatorClass: ", authenticatorClass_.get(), ")");
 	}

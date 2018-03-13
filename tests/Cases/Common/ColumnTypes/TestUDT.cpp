@@ -35,7 +35,7 @@ TEST(TestUDT, getset) {
 TEST(TestUDT, encodeBody) {
 	{
 		UDTType value(123, "abc");
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x04\x00\x00\x00\x7b"

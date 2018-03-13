@@ -1,7 +1,6 @@
 #pragma once
 #include <tuple>
 #include <utility>
-#include <core/sstring.hh>
 #include "../ColumnTrait.hpp"
 
 namespace cql {
@@ -54,7 +53,7 @@ namespace cql {
 		void reset() { resetImpl<0>(); }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) {
+		void encodeBody(std::string& data) {
 			encodeBodyImpl<0>(data);
 		}
 
@@ -99,9 +98,9 @@ namespace cql {
 
 		/** Encode to binary data, the implementation */
 		template <std::size_t Index, std::enable_if_t<Index >= sizeof...(Types), int> = 0>
-		void encodeBodyImpl(seastar::sstring&) { }
+		void encodeBodyImpl(std::string&) { }
 		template <std::size_t Index, std::enable_if_t<Index < sizeof...(Types), int> = 0>
-		void encodeBodyImpl(seastar::sstring& data) {
+		void encodeBodyImpl(std::string& data) {
 			ColumnTrait<ElementType<Index>>::encode(std::get<Index>(value_), data);
 			encodeBodyImpl<Index+1>(data);
 		}

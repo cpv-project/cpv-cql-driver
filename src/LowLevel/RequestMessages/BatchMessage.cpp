@@ -13,12 +13,12 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring BatchMessage::toString() const {
+	std::string BatchMessage::toString() const {
 		return joinString("", "BatchMessage(type: ", getType(), ")");
 	}
 
 	/** Encode message body to binary data */
-	void BatchMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void BatchMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// The body of the message must be:
 		// <type>
 		// <query_list> which is:
@@ -122,8 +122,8 @@ namespace cql {
 	}
 
 	/** Get the prepared query id of the query at the specificed index */
-	const seastar::sstring& BatchMessage::getPreparedQueryId(std::size_t index) const& {
-		thread_local static seastar::sstring empty;
+	const std::string& BatchMessage::getPreparedQueryId(std::size_t index) const& {
+		thread_local static std::string empty;
 		if (index < preparedQueryIds_.size()) {
 			return preparedQueryIds_[index];
 		} else {
@@ -132,7 +132,7 @@ namespace cql {
 	}
 
 	/** Get the prepared query id of the query at the specificed index */
-	seastar::sstring& BatchMessage::getPreparedQueryId(std::size_t index) & {
+	std::string& BatchMessage::getPreparedQueryId(std::size_t index) & {
 		if (index < preparedQueryIds_.size()) {
 			return preparedQueryIds_[index];
 		} else {

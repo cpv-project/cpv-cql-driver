@@ -1,11 +1,12 @@
 #include <cstdint>
+#include <cstring>
 #include <core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 #include "./ProtocolUUID.hpp"
 
 namespace cql {
 	/** Encode to binary data */
-	void ProtocolUUID::encode(seastar::sstring& data) const {
+	void ProtocolUUID::encode(std::string& data) const {
 		auto highBitsBe = seastar::cpu_to_be(value_.first);
 		auto lowBitsBe = seastar::cpu_to_be(value_.second);
 		data.append(reinterpret_cast<const char*>(&highBitsBe), sizeof(highBitsBe));
@@ -27,7 +28,7 @@ namespace cql {
 
 	/** Constructors */
 	ProtocolUUID::ProtocolUUID() : value_() { }
-	ProtocolUUID::ProtocolUUID(const seastar::sstring& str) : value_() { set(str); }
+	ProtocolUUID::ProtocolUUID(const std::string& str) : value_() { set(str); }
 	ProtocolUUID::ProtocolUUID(const UUIDDataType& value) : value_(value) { }
 }
 

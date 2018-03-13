@@ -13,7 +13,7 @@ namespace cql {
 		using ResponseMessageBase::reset;
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Decode message body from binary data */
 		void decodeBody(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;

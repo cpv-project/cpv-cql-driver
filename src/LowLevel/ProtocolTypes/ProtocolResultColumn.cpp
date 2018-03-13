@@ -10,7 +10,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolResultColumn::encode(seastar::sstring& data, bool containsTableSpec) const {
+	void ProtocolResultColumn::encode(std::string& data, bool containsTableSpec) const {
 		if (containsTableSpec) {
 			keySpace_.encode(data);
 			table_.encode(data);

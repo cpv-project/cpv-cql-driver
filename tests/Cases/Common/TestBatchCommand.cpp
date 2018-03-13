@@ -39,10 +39,10 @@ TEST(TestBatchCommand, query) {
 			.addQuery("insert into b (k, c, v) values (100, 0, 'asd');");
 		ASSERT_EQ(command.getQueryCount(), 2);
 		ASSERT_EQ(
-			seastar::sstring(command.getQuery(0).first, command.getQuery(0).second),
+			std::string(command.getQuery(0).first, command.getQuery(0).second),
 			"insert into a (k, v) values (123, 'abc');");
 		ASSERT_EQ(
-			seastar::sstring(command.getQuery(1).first, command.getQuery(1).second),
+			std::string(command.getQuery(1).first, command.getQuery(1).second),
 			"insert into b (k, c, v) values (100, 0, 'asd');");
 	}
 }
@@ -62,7 +62,7 @@ TEST(TestBatchCommand, parameters) {
 				.addParameter(cql::Text("qwert"));
 	ASSERT_EQ(command.getQueryCount(), 2);
 	ASSERT_EQ(
-		seastar::sstring(command.getQuery(0).first, command.getQuery(0).second),
+		std::string(command.getQuery(0).first, command.getQuery(0).second),
 		"insert into a (k, v) values (?, ?);");
 	ASSERT_EQ(command.getParameterSets(0).size(), 1);
 	ASSERT_EQ(command.getParameterSets(0).at(0).first, 2);
@@ -70,7 +70,7 @@ TEST(TestBatchCommand, parameters) {
 		"\x00\x00\x00\x04\x00\x00\x00\x7b"
 		"\x00\x00\x00\x03""abc"));
 	ASSERT_EQ(
-		seastar::sstring(command.getQuery(1).first, command.getQuery(1).second),
+		std::string(command.getQuery(1).first, command.getQuery(1).second),
 		"insert into b (k, c, v) values (?, ?, ?);");
 	ASSERT_EQ(command.getParameterSets(1).size(), 2);
 	ASSERT_EQ(command.getParameterSets(1).at(0).first, 3);

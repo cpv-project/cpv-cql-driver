@@ -32,7 +32,7 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encode(std::string& data) const {
 			address_.encode(data);
 			port_.encode(data);
 		}

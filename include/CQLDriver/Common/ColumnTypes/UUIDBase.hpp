@@ -23,7 +23,7 @@ namespace cql {
 		void set(const UUIDDataType& value) { value_ = value; }
 
 		/** Set the uuid value by it's string representation */
-		void set(const seastar::sstring& str) { value_ = strToUUID(str); }
+		void set(const std::string& str) { value_ = strToUUID(str); }
 
 		/** Reset to initial state */
 		void reset() { value_ = {}; }
@@ -32,10 +32,10 @@ namespace cql {
 		bool empty() const { return value_.first == 0 && value_.second == 0; }
 
 		/** Get the string representation of this uuid */
-		seastar::sstring str() const { return uuidToStr(value_); }
+		std::string str() const { return uuidToStr(value_); }
 
 		/** Encode to binary data */
-		void encodeBody(seastar::sstring& data) {
+		void encodeBody(std::string& data) {
 			auto highBitsBe = seastar::cpu_to_be(value_.first);
 			auto lowBitsBe = seastar::cpu_to_be(value_.second);
 			data.append(reinterpret_cast<const char*>(&highBitsBe), sizeof(highBitsBe));

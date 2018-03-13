@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <limits>
-#include <core/sstring.hh>
+#include <string>
 #include <core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 #include <CQLDriver/Common/Exceptions/EncodeException.hpp>
@@ -12,10 +13,10 @@ namespace cql {
 	class ProtocolSizedStringBase {
 	public:
 		/** Get the value of string, only available when state is NormalState */
-		const seastar::sstring& get() const& { return value_; }
+		const std::string& get() const& { return value_; }
 
 		/** Get the mutable value of string */
-		seastar::sstring& get() & { return value_; }
+		std::string& get() & { return value_; }
 
 		/** Get the state */
 		StateType state() const { return state_; }
@@ -34,13 +35,13 @@ namespace cql {
 		}
 
 		/** Set the value of string and set the state to NormalState */
-		void set(const seastar::sstring& value) {
+		void set(const std::string& value) {
 			state_ = NormalState;
 			value_ = value;
 		}
 
 		/** Set the value of string and set the state to NormalState */
-		void set(seastar::sstring&& value) {
+		void set(std::string&& value) {
 			state_ = NormalState;
 			value_ = std::move(value);
 		}
@@ -58,7 +59,7 @@ namespace cql {
 		}
 
 		/** Encode to binary data */
-		void encode(seastar::sstring& data) const {
+		void encode(std::string& data) const {
 			if (state_ != NormalState) {
 				LengthType size = seastar::cpu_to_be(static_cast<LengthType>(state_));
 				data.append(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -98,11 +99,11 @@ namespace cql {
 		/** Constructors */
 		ProtocolSizedStringBase() : value_(), state_(DefaultState) { }
 		explicit ProtocolSizedStringBase(StateType state) : value_(), state_(state) { }
-		explicit ProtocolSizedStringBase(seastar::sstring&& value) :
+		explicit ProtocolSizedStringBase(std::string&& value) :
 			value_(std::move(value)), state_(NormalState) {}
 
 	protected:
-		seastar::sstring value_;
+		std::string value_;
 		StateType state_;
 	};
 }

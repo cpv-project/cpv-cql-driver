@@ -25,19 +25,19 @@ TEST(TestNullable, getset) {
 TEST(TestNullable, encodeBody) {
 	{
 		NullableInt value;
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(""));
 	}
 	{
 		NullableInt value(0);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x00"));
 	}
 	{
 		NullableInt value(123);
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString("\x00\x00\x00\x7b"));
 	}

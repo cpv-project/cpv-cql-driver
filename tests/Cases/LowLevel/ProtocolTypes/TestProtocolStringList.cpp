@@ -23,7 +23,7 @@ TEST(TestProtocolStringList, encode) {
 		cql::ProtocolString("abc"),
 		cql::ProtocolString("aaaaa")
 	});
-	seastar::sstring data;
+	std::string data;
 	value.encode(data);
 	ASSERT_EQ(data, makeTestString("\x00\x02""\x00\x03""abc""\x00\x05""aaaaa"));
 }
@@ -61,9 +61,9 @@ TEST(TestProtocolStringList, decode) {
 		cql::ProtocolStringList longList;
 		for (std::size_t i = 1, j = cql::ProtocolStringList::SmallSizeBoundary + 3; i < j; ++i) {
 			longList.get().emplace_back(
-				seastar::sstring(reinterpret_cast<const char*>(&i), sizeof(i)));
+				std::string(reinterpret_cast<const char*>(&i), sizeof(i)));
 		}
-		seastar::sstring data;
+		std::string data;
 		longList.encode(data);
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();

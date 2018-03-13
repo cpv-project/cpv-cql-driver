@@ -4,7 +4,7 @@
 
 namespace cql {
 	/** Encode to binary data */
-	void ProtocolInetAddr::encode(seastar::sstring& data) const {
+	void ProtocolInetAddr::encode(std::string& data) const {
 		std::uint8_t size = static_cast<std::uint8_t>(value_.size());
 		if (size == 0) {
 			throw EncodeException(CQL_CODEINFO, "address is undefined");

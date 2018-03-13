@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <utility>
 #include <chrono>
-#include <core/sstring.hh>
 #include <core/shared_ptr.hh>
 #include <net/socket_defs.hh>
 
@@ -14,7 +13,7 @@ namespace cql {
 	class NodeConfiguration {
 	public:
 		/** Set the hostname and the port of this node */
-		NodeConfiguration& setAddress(seastar::sstring&& hostname, std::uint16_t port);
+		NodeConfiguration& setAddress(std::string&& hostname, std::uint16_t port);
 
 		/** Set should connect this node with ssl connection, defaut value is false */
 		NodeConfiguration& setUseSSL(bool value);
@@ -30,10 +29,10 @@ namespace cql {
 
 		/** Set to use password authentication for this node */
 		NodeConfiguration& setPasswordAuthentication(
-			seastar::sstring&& username, seastar::sstring&& password);
+			std::string&& username, std::string&& password);
 
 		/** Get the hostname and the port of this node */
-		const std::pair<seastar::sstring, std::uint16_t>& getAddress() const&;
+		const std::pair<std::string, std::uint16_t>& getAddress() const&;
 
 		/** Get should connect this node with ssl connection */
 		bool getUseSSL() const;
@@ -48,10 +47,10 @@ namespace cql {
 		std::size_t getMaxPendingMessages() const;
 
 		/** Get the full authentication class name */
-		const seastar::sstring& getAuthenticatorClass() const&;
+		const std::string& getAuthenticatorClass() const&;
 
 		/** Get the authentication data, the format depends on the class */
-		const seastar::sstring& getAuthenticatorData() const&;
+		const std::string& getAuthenticatorData() const&;
 
 		/** Get the resolved ip address, return whether the ip address is available and not expired */
 		bool getIpAddress(

@@ -12,10 +12,10 @@ namespace cql {
 		using RequestMessageBase::reset;
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Encode message body to binary data */
-		void encodeBody(const ConnectionInfo& info, seastar::sstring& data) const override;
+		void encodeBody(const ConnectionInfo& info, std::string& data) const override;
 	};
 }
 

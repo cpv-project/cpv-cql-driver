@@ -16,10 +16,10 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Encode message body to binary data */
-		void encodeBody(const ConnectionInfo& info, seastar::sstring& data) const override;
+		void encodeBody(const ConnectionInfo& info, std::string& data) const override;
 
 		/** The query id returned from prepare result */
 		const ProtocolShortBytes& getPreparedQueryId() const& { return preparedQueryId_; }

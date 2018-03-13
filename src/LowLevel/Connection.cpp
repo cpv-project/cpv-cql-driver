@@ -269,7 +269,7 @@ namespace cql {
 	}
 
 	/** Close the connection */
-	void Connection::close(const seastar::sstring& errorMessage) {
+	void Connection::close(const std::string& errorMessage) {
 		// close the socket and reset the ready state
 		socket_ = SocketHolder();
 		isReady_ = false;

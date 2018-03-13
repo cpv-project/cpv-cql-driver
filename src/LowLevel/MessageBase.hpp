@@ -30,7 +30,7 @@ namespace cql {
 		MessageHeader& getHeader() &;
 
 		/** Get description of this message */
-		virtual seastar::sstring toString() const = 0;
+		virtual std::string toString() const = 0;
 
 		/** Constructor */
 		MessageBase(); 

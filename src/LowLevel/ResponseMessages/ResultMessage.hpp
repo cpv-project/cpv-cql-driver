@@ -17,7 +17,7 @@ namespace cql {
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */
-		seastar::sstring toString() const override;
+		std::string toString() const override;
 
 		/** Decode message body from binary data */
 		void decodeBody(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer) override;
@@ -62,8 +62,8 @@ namespace cql {
 		ProtocolString& getSchemaChangeTarget() & { return schemaChangeTarget_; }
 
 		/** [For Kind SchemaChange] Get the schema change options, depends on schema change type */
-		const seastar::sstring& getSchemaChangeOptions() const& { return schemaChangeOptions_; }
-		seastar::sstring& getSchemaChangeOptions() & { return schemaChangeOptions_; }
+		const std::string& getSchemaChangeOptions() const& { return schemaChangeOptions_; }
+		std::string& getSchemaChangeOptions() & { return schemaChangeOptions_; }
 
 		/** Constructor */
 		ResultMessage();
@@ -83,7 +83,7 @@ namespace cql {
 		// For Kind SchemaChange
 		ProtocolString schemaChangeType_;
 		ProtocolString schemaChangeTarget_;
-		seastar::sstring schemaChangeOptions_;
+		std::string schemaChangeOptions_;
 	};
 }
 

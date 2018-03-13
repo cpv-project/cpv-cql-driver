@@ -22,13 +22,13 @@ TEST(TestTuple, getset) {
 TEST(TestTuple, encodeBody) {
 	{
 		cql::Tuple<> value;
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(""));
 	}
 	{
 		cql::Tuple<cql::Int, cql::Text> value(123, "abc");
-		seastar::sstring data;
+		std::string data;
 		value.encodeBody(data);
 		ASSERT_EQ(data, makeTestString(
 			"\x00\x00\x00\x04\x00\x00\x00\x7b"

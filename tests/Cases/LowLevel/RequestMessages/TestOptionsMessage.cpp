@@ -6,7 +6,7 @@ TEST(TestOptionsMessage, encode) {
 	cql::ConnectionInfo info;
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::RequestMessageFactory::makeRequestMessage<cql::OptionsMessage>();
-		seastar::sstring data;
+		std::string data;
 		message->getHeader().encodeHeaderPre(info, data);
 		message->encodeBody(info, data);
 		message->getHeader().encodeHeaderPost(info, data);

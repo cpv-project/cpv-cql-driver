@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <core/sstring.hh>
 
 namespace cql {
 	/**
@@ -28,7 +27,7 @@ namespace cql {
 		void reset() { value_ = 0; }
 
 		/** Encode and decode functions */
-		void encode(seastar::sstring& data) const;
+		void encode(std::string& data) const;
 		void decode(const char*& ptr, const char* end);
 
 		/** Constructors */

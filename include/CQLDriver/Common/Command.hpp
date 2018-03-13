@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <utility>
 #include <chrono>
-#include <core/sstring.hh>
 #include "./Utility/Object.hpp"
 #include "./CommonDefinitions.hpp"
 #include "./ColumnTrait.hpp"
@@ -45,14 +44,14 @@ namespace cql {
 		 * For the first page this is unnecessary.
 		 * Please sure you called the setPageSize before this function.
 		 */
-		Command& setPagingState(seastar::sstring&& pagingState) &;
+		Command& setPagingState(std::string&& pagingState) &;
 
 		/**
 		 * Set the paging state of this query.
 		 * For the first page this is unnecessary.
 		 * Please sure you called the setPageSize before this function.
 		 */
-		Command&& setPagingState(seastar::sstring&& pagingState) && {
+		Command&& setPagingState(std::string&& pagingState) && {
 			return std::move(setPagingState(std::move(pagingState)));
 		}
 
@@ -124,7 +123,7 @@ namespace cql {
 		const std::pair<std::size_t, bool>& getPageSize() const&;
 
 		/** Get the paging state of this query */
-		const seastar::sstring& getPagingState() const&;
+		const std::string& getPagingState() const&;
 
 		/** Get the count of parameters of this query */
 		std::size_t getParameterCount() const&;
@@ -133,10 +132,10 @@ namespace cql {
 		std::size_t& getParameterCount() &;
 
 		/** Get the encoded parameters of this query */
-		const seastar::sstring& getParameters() const&;
+		const std::string& getParameters() const&;
 
 		/** Get the mutable encoded parameters of this query */
-		seastar::sstring& getParameters() &;
+		std::string& getParameters() &;
 
 		/**
 		 * Get the serial consistency level of this query,
@@ -151,7 +150,7 @@ namespace cql {
 		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimestamp() const&;
 
 		/** Constructor */
-		explicit Command(seastar::sstring&& query);
+		explicit Command(std::string&& query);
 
 		/** Constructor */
 		Command(const char* query, std::size_t size);
@@ -168,9 +167,9 @@ namespace cql {
 
 	private:
 		/** Encode implementation of addParameters */
-		static void addParametersEncode(seastar::sstring&) { }
+		static void addParametersEncode(std::string&) { }
 		template <class Head, class... Rest>
-		static void addParametersEncode(seastar::sstring& data, Head&& head, Rest&&... rest) {
+		static void addParametersEncode(std::string& data, Head&& head, Rest&&... rest) {
 			ColumnTrait<std::decay_t<Head>>::encode(std::forward<Head>(head), data);
 			addParametersEncode(data, std::forward<Rest>(rest)...);
 		}

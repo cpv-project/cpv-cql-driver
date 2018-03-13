@@ -8,7 +8,7 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring AuthChallengeMessage::toString() const {
+	std::string AuthChallengeMessage::toString() const {
 		return "AuthChallengeMessage()";
 	}
 

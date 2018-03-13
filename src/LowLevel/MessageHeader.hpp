@@ -1,5 +1,4 @@
 #pragma once
-#include <core/sstring.hh>
 #include <core/temporary_buffer.hh>
 #include "./LowLevelDefinitions.hpp"
 #include "./ConnectionInfo.hpp"
@@ -15,10 +14,10 @@ namespace cql {
 	class MessageHeader {
 	public:
 		/** Encode message header to binary data */
-		void encodeHeaderPre(const ConnectionInfo& info, seastar::sstring& data) const;
+		void encodeHeaderPre(const ConnectionInfo& info, std::string& data) const;
 
 		/** Update body length in binary data */
-		void encodeHeaderPost(const ConnectionInfo& info, seastar::sstring& data) const;
+		void encodeHeaderPost(const ConnectionInfo& info, std::string& data) const;
 
 		/** Decode message header from binary data */
 		void decodeHeader(const ConnectionInfo& info, seastar::temporary_buffer<char>&& buffer);

@@ -6,7 +6,7 @@
 namespace cql {
 	/** Encode message header to binary data */
 	void MessageHeader::encodeHeaderPre(
-		const ConnectionInfo& info, seastar::sstring& data) const {
+		const ConnectionInfo& info, std::string& data) const {
 		if (!data.empty()) {
 			throw LogicException(CQL_CODEINFO, "data should be empty");
 		}
@@ -22,7 +22,7 @@ namespace cql {
 
 	/** Update body length in binary data */
 	void MessageHeader::encodeHeaderPost(
-		const ConnectionInfo& info, seastar::sstring& data) const {
+		const ConnectionInfo& info, std::string& data) const {
 		// assume it's version 4
 		// direction should always be response
 		auto headerSize = info.getHeaderSize();
@@ -30,7 +30,7 @@ namespace cql {
 			throw LogicException(CQL_CODEINFO, "please call encodeHeaderPre first");
 		}
 		static thread_local decltype(bodyLength_) bodyLength;
-		static thread_local seastar::sstring bodyLengthData;
+		static thread_local std::string bodyLengthData;
 		bodyLength.set(data.size() - headerSize);
 		bodyLengthData.resize(0);
 		bodyLength.encode(bodyLengthData);

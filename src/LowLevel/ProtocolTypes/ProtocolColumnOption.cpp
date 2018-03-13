@@ -137,7 +137,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOption::encode(seastar::sstring& data) const {
+	void ProtocolColumnOption::encode(std::string& data) const {
 		if ((type_ == ColumnType::Custom ||
 			type_ == ColumnType::List ||
 			type_ == ColumnType::Map ||
@@ -186,7 +186,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOptionCustomPayload::encode(seastar::sstring& data) const {
+	void ProtocolColumnOptionCustomPayload::encode(std::string& data) const {
 		value_.encode(data);
 	}
 
@@ -196,7 +196,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOptionListPayload::encode(seastar::sstring& data) const {
+	void ProtocolColumnOptionListPayload::encode(std::string& data) const {
 		elementType_.encode(data);
 	}
 
@@ -206,7 +206,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOptionMapPayload::encode(seastar::sstring& data) const {
+	void ProtocolColumnOptionMapPayload::encode(std::string& data) const {
 		keyType_.encode(data);
 		valueType_.encode(data);
 	}
@@ -218,7 +218,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOptionSetPayload::encode(seastar::sstring& data) const {
+	void ProtocolColumnOptionSetPayload::encode(std::string& data) const {
 		elementType_.encode(data);
 	}
 
@@ -228,7 +228,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOptionUDTPayload::encode(seastar::sstring& data) const {
+	void ProtocolColumnOptionUDTPayload::encode(std::string& data) const {
 		ProtocolShort fieldsLength(fields_.size());
 		if (fieldsLength.get() != fields_.size()) {
 			throw LogicException(CQL_CODEINFO, "too many udt fields cause overflow");
@@ -257,7 +257,7 @@ namespace cql {
 	}
 
 	/** Encode to binary data */
-	void ProtocolColumnOptionTuplePayload::encode(seastar::sstring& data) const {
+	void ProtocolColumnOptionTuplePayload::encode(std::string& data) const {
 		ProtocolShort fieldsLength(types_.size());
 		if (fieldsLength.get() != types_.size()) {
 			throw LogicException(CQL_CODEINFO, "too many tuple types cause overflow");

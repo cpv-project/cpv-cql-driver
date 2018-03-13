@@ -5,12 +5,12 @@ namespace cql {
 	class CommandData {
 	public:
 		std::pair<const char*, std::size_t> queryCStr;
-		seastar::sstring queryStr;
+		std::string queryStr;
 		ConsistencyLevel consistencyLevel;
 		std::pair<std::size_t, bool> pageSize;
-		seastar::sstring pagingState;
+		std::string pagingState;
 		std::size_t parameterCount;
-		seastar::sstring parameters;
+		std::string parameters;
 		std::pair<ConsistencyLevel, bool> serialConsistencyLevel;
 		std::pair<std::chrono::system_clock::time_point, bool> defaultTimestamp;
 
@@ -33,7 +33,7 @@ namespace cql {
 			resetExceptQuery();
 		}
 
-		void reset(seastar::sstring&& query) {
+		void reset(std::string&& query) {
 			queryCStr = { nullptr, 0 };
 			queryStr = std::move(query);
 			resetExceptQuery();
@@ -69,7 +69,7 @@ namespace cql {
 	}
 
 	/** Set the page state of this query */
-	Command& Command::setPagingState(seastar::sstring&& pagingState) & {
+	Command& Command::setPagingState(std::string&& pagingState) & {
 		data_->pagingState = std::move(pagingState);
 		return *this;
 	}
@@ -108,7 +108,7 @@ namespace cql {
 	}
 
 	/** Get the page state of this query */
-	const seastar::sstring& Command::getPagingState() const& {
+	const std::string& Command::getPagingState() const& {
 		return data_->pagingState;
 	}
 
@@ -123,12 +123,12 @@ namespace cql {
 	}
 
 	/** Get the encoded parameters of this query */
-	const seastar::sstring& Command::getParameters() const& {
+	const std::string& Command::getParameters() const& {
 		return data_->parameters;
 	}
 
 	/** Get the mutable encoded parameters of this query */
-	seastar::sstring& Command::getParameters() & {
+	std::string& Command::getParameters() & {
 		return data_->parameters;
 	}
 
@@ -145,7 +145,7 @@ namespace cql {
 	}
 
 	/** Constructor */
-	Command::Command(seastar::sstring&& query) :
+	Command::Command(std::string&& query) :
 		data_(makeObject<CommandData>(std::move(query))) { }
 
 	/** Constructor */

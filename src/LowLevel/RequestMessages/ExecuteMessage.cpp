@@ -9,12 +9,12 @@ namespace cql {
 	}
 
 	/** Get description of this message */
-	seastar::sstring ExecuteMessage::toString() const {
+	std::string ExecuteMessage::toString() const {
 		return "ExecuteMessage()";
 	}
 
 	/** Encode message body to binary data */
-	void ExecuteMessage::encodeBody(const ConnectionInfo&, seastar::sstring& data) const {
+	void ExecuteMessage::encodeBody(const ConnectionInfo&, std::string& data) const {
 		// The body of the message must be: <id><query_parameters>
 		preparedQueryId_.encode(data);
 		queryParameters_.encode(data);
