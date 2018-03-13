@@ -12,6 +12,9 @@ namespace cql {
 	/** High level object that use to perform database operations */
 	class Session {
 	public:
+		/** Check whether this is a valid session (will be false if moved) */
+		bool isValid() const;
+
 		/** Execute the query command and return the result set */
 		seastar::future<ResultSet> query(Command&& command);
 

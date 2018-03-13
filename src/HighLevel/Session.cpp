@@ -2,6 +2,11 @@
 #include <CQLDriver/Common/Exceptions/NotImplementedException.hpp>
 
 namespace cql {
+	/** Check whether this is a valid session (will be false if moved) */
+	bool Session::isValid() const {
+		return data_ != nullptr;
+	}
+
 	/** Execute the query command and return the result set */
 	seastar::future<ResultSet> Session::query(Command&& command) {
 		throw NotImplementedException(CQL_CODEINFO);
