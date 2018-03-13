@@ -1,3 +1,4 @@
+#include <CQLDriver/Common/ColumnTypes/Text.hpp>
 #include <LowLevel/ResponseMessages/ResultMessage.hpp>
 #include <LowLevel/ResponseMessages/ResponseMessageFactory.hpp>
 #include <TestUtility/GTestUtils.hpp>
@@ -38,19 +39,28 @@ TEST(TestResultMessage, decode) {
 			ASSERT_EQ(message->getRowsMetadata().getFlags(), cql::ResultRowsMetadataFlags::NoMetadata);
 			ASSERT_EQ(message->getRowsMetadata().getColumnsCount(), 3);
 			ASSERT_EQ(message->getRowsCount().get(), 4);
-			ASSERT_EQ(message->getRowsContents().size(), 12);
-			ASSERT_EQ(message->getRowsContents().at(0).get(), "a_1");
-			ASSERT_EQ(message->getRowsContents().at(1).get(), "a_2");
-			ASSERT_EQ(message->getRowsContents().at(2).get(), "a_3");
-			ASSERT_EQ(message->getRowsContents().at(3).get(), "b_1");
-			ASSERT_EQ(message->getRowsContents().at(4).get(), "b_2");
-			ASSERT_EQ(message->getRowsContents().at(5).get(), "b_3");
-			ASSERT_EQ(message->getRowsContents().at(6).get(), "c_1");
-			ASSERT_EQ(message->getRowsContents().at(7).get(), "c_2");
-			ASSERT_EQ(message->getRowsContents().at(8).get(), "c_3");
-			ASSERT_EQ(message->getRowsContents().at(9).get(), "d_1");
-			ASSERT_EQ(message->getRowsContents().at(10).get(), "d_2");
-			ASSERT_EQ(message->getRowsContents().at(11).get(), "d_3__");
+			cql::Text column_1;
+			cql::Text column_2;
+			cql::Text column_3;
+			ASSERT_EQ(message->getResultSet().getRowsCount(), 4);
+			ASSERT_EQ(message->getResultSet().getColumnsCount(), 3);
+			message->getResultSet().fill(column_1, column_2, column_3);
+			ASSERT_EQ(column_1, "a_1");
+			ASSERT_EQ(column_2, "a_2");
+			ASSERT_EQ(column_3, "a_3");
+			message->getResultSet().fill(column_1, column_2, column_3);
+			ASSERT_EQ(column_1, "b_1");
+			ASSERT_EQ(column_2, "b_2");
+			ASSERT_EQ(column_3, "b_3");
+			message->getResultSet().fill(column_1, column_2, column_3);
+			ASSERT_EQ(column_1, "c_1");
+			ASSERT_EQ(column_2, "c_2");
+			ASSERT_EQ(column_3, "c_3");
+			message->getResultSet().fill(column_1, column_2, column_3);
+			ASSERT_EQ(column_1, "d_1");
+			ASSERT_EQ(column_2, "d_2");
+			ASSERT_EQ(column_3, "d_3__");
+			ASSERT_EQ(message->getResultSet().getDecodePtr(), message->getResultSet().getDecodeEnd());
 		}
 		{
 			// SetKeySpace

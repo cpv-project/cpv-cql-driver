@@ -1,4 +1,5 @@
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
+#include "../../Common/ResultSetData.hpp"
 #include "./ResultMessage.hpp"
 
 namespace cql {
@@ -8,7 +9,7 @@ namespace cql {
 		kind_.reset();
 		rowsMetadata_.reset();
 		rowsCount_.reset();
-		rowsContents_.clear();
+		resultSet_ = ResultSet(nullptr);
 		keySpaceSet_.reset();
 		preparedQueryId_.reset();
 		preparedMetadata_.reset();
@@ -41,17 +42,15 @@ namespace cql {
 			rowsCount_.decode(ptr, end);
 			auto rowsCount = static_cast<std::size_t>(rowsCount_.get());
 			auto columnsCount = rowsMetadata_.getColumnsCount();
-			if (rowsCount_.get() < 0 ||
-				std::numeric_limits<std::size_t>::max() / rowsCount < columnsCount) {
-				throw LogicException(CQL_CODEINFO,
-					"result rows * columns overflow, rows:", rowsCount, "columns", columnsCount);
-			}
-			auto contentsLength = rowsCount * columnsCount;
-			rowsContents_.resize(0);
-			for (std::size_t i = 0; i < contentsLength; ++i) {
-				rowsContents_.emplace_back();
-				rowsContents_.back().decode(ptr, end);
-			}
+			auto fromOffset = ptr - buffer.begin();
+			auto toOffset = end - buffer.begin();
+			resultSet_ = ResultSet(makeObject<ResultSetData>(
+				rowsCount,
+				columnsCount,
+				std::move(buffer),
+				fromOffset,
+				toOffset
+			));
 		} else if (kind == ResultKind::SetKeySpace) {
 			// for result to a "use" query
 			keySpaceSet_.decode(ptr, end);
@@ -77,7 +76,7 @@ namespace cql {
 		kind_(),
 		rowsMetadata_(),
 		rowsCount_(),
-		rowsContents_(),
+		resultSet_(nullptr),
 		keySpaceSet_(),
 		preparedQueryId_(),
 		preparedMetadata_(),
