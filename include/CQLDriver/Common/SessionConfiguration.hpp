@@ -44,6 +44,9 @@ namespace cql {
 		 */
 		SessionConfiguration& setDnsCacheTime(std::chrono::milliseconds dnsCacheTime);
 
+		/** Set the default keyspace of all connections created by this configuration */
+		SessionConfiguration& setDefaultKeySpace(const std::string& keySpace);
+
 		/** Get the minimum database connection pool size */
 		std::size_t getMinPoolSize() const;
 
@@ -55,6 +58,9 @@ namespace cql {
 
 		/** Get the dns cache time for the hostname of nodes */
 		std::chrono::milliseconds getDnsCacheTime() const;
+
+		/** Get the default keyspace of all connections created by this configuration */
+		const std::string& getDefaultKeySpace() const&;
 
 		/** Constructor */
 		SessionConfiguration();

@@ -8,12 +8,14 @@ namespace cql {
 			minPoolSize(5),
 			maxPoolSize(100),
 			maxWaitersAfterConnectionsExhausted(100),
-			dnsCacheTime(30000) { }
+			dnsCacheTime(30000),
+			defaultKeySpace() { }
 
 		std::size_t minPoolSize;
 		std::size_t maxPoolSize;
 		std::size_t maxWaitersAfterConnectionsExhausted;
 		std::chrono::milliseconds dnsCacheTime;
+		std::string defaultKeySpace;
 	};
 
 	/** Set the minimum database connection pool size.  */
@@ -40,6 +42,12 @@ namespace cql {
 		return *this;
 	}
 
+	/** Set the default keyspace of all connections created by this configuration */
+	SessionConfiguration& SessionConfiguration::setDefaultKeySpace(const std::string& keySpace) {
+		data_->defaultKeySpace = keySpace;
+		return *this;
+	}
+
 	/** Get the minimum database connection pool size */
 	std::size_t SessionConfiguration::getMinPoolSize() const {
 		return data_->minPoolSize;
@@ -58,6 +66,11 @@ namespace cql {
 	/** Get the dns cache time for the hostname of nodes */
 	std::chrono::milliseconds SessionConfiguration::getDnsCacheTime() const {
 		return data_->dnsCacheTime;
+	}
+
+	/** Get the default keyspace of all connections created by this configuration */
+	const std::string& SessionConfiguration::getDefaultKeySpace() const& {
+		return data_->defaultKeySpace;
 	}
 
 	/** Constructor */
