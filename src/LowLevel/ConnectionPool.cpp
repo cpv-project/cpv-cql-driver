@@ -13,15 +13,26 @@ namespace cql {
 	std::pair<seastar::lw_shared_ptr<Connection>, ConnectionStream>
 		ConnectionPool::tryGetConnection() {
 		// find connection which has most free streams
-		auto it = std::max_element(allConnections_.begin(), allConnections_.end(), [](auto& a, auto& b) {
-			return a->getFreeStreamsCount() < b->getFreeStreamsCount();
-		});
-		if (it == allConnections_.end()) {
-			return { nullptr, ConnectionStream() };
+		decltype(allConnections_)::iterator it;
+		while (true) {
+			it = std::max_element(allConnections_.begin(), allConnections_.end(), [](auto& a, auto& b) {
+				return a->getFreeStreamsCount() < b->getFreeStreamsCount();
+			});
+			if (it == allConnections_.end()) {
+				// no connection available
+				return { nullptr, ConnectionStream() };
+			} else if ((*it)->isReady()) {
+				// found a usable conection
+				break;
+			} else {
+				// found a closed connection
+				allConnections_.erase(it);
+			}
 		}
 		// get stream from the connection
 		auto stream = (*it)->openStream();
 		if (!stream.isValid()) {
+			// max free stream count is 0
 			return { nullptr, ConnectionStream() };
 		}
 		return { *it, std::move(stream) };
