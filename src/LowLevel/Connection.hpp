@@ -31,6 +31,9 @@ namespace cql {
 		/** Get the connection information */
 		const ConnectionInfo& getConnectionInfo() const& { return connectionInfo_; }
 
+		/** Check whether this connection is ready */
+		bool isReady() const { return isReady_; }
+
 		/** Initialize connection and wait until it's ready to send ordinary messages */
 		seastar::future<> ready();
 

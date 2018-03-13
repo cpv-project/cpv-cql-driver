@@ -160,6 +160,7 @@ namespace cql {
 			}).handle_exception([&self, &sendingPromise] (std::exception_ptr ex) {
 				// this message is failed, report the error to both waiters
 				sendingPromise.set_exception(ex);
+				self->close(joinString("send message failed:", ex));
 				return seastar::make_exception_future(NetworkException(
 					CQL_CODEINFO, "send message to",
 					self->nodeConfiguration_->getAddress().first, "failed:", ex));
