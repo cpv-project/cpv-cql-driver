@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "../ProtocolTypes/ProtocolByte.hpp"
 #include "../ProtocolTypes/ProtocolBatchParameters.hpp"
 #include "./RequestMessageBase.hpp"
 
@@ -22,10 +21,6 @@ namespace cql {
 		/** Encode message body to binary data */
 		void encodeBody(const ConnectionInfo& info, std::string& data) const override;
 
-		/** The type of batch, can be either "Logged", "UnLogged", or "Counter" */
-		BatchType getType() const;
-		void setType(BatchType type);
-
 		/** The batch parameters */
 		const ProtocolBatchParameters& getBatchParameters() const& { return batchParameters_; }
 		ProtocolBatchParameters& getBatchParameters() & { return batchParameters_; }
@@ -38,7 +33,6 @@ namespace cql {
 		BatchMessage();
 
 	private:
-		ProtocolByte type_;
 		ProtocolBatchParameters batchParameters_;
 		std::vector<std::string> preparedQueryIds_;
 	};

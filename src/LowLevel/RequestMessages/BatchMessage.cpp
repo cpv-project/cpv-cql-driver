@@ -7,14 +7,24 @@ namespace cql {
 	/** For Object */
 	void BatchMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
-		type_.reset();
 		batchParameters_.reset();
 		preparedQueryIds_.resize(0);
 	}
 
 	/** Get description of this message */
 	std::string BatchMessage::toString() const {
-		return joinString("", "BatchMessage(type: ", getType(), ")");
+		std::string str("BatchMessage(");
+		auto& batchCommand = batchParameters_.getBatchCommand();
+		if (batchCommand.isValid()) {
+			str.append(joinString("", "type: ", batchCommand.getType(), ", queries: "));
+			for (std::size_t i = 0, j = batchCommand.getQueryCount(); i < j; ++i) {
+				auto query = batchCommand.getQuery(i);
+				str.append(query.first, query.second);
+				str.append("; ");
+			}
+		}
+		str.append(")");
+		return str;
 	}
 
 	/** Encode message body to binary data */
@@ -30,7 +40,8 @@ namespace cql {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
 		// <type>
-		type_.encode(data);
+		ProtocolByte type(enumValue(batchCommand.getType()));
+		type.encode(data);
 		// <n>, sum(parameter set count for query in queries)
 		std::size_t queryCountValue = 0;
 		for (std::size_t i = 0, j = batchCommand.getQueryCount(); i < j; ++i) {
@@ -111,16 +122,6 @@ namespace cql {
 		batchParameters_.encode(data);
 	}
 
-	/** Get the type of batch */
-	BatchType BatchMessage::getType() const {
-		return static_cast<BatchType>(type_.get());
-	}
-
-	/** Set the type of batch */
-	void BatchMessage::setType(BatchType type) {
-		type_.set(enumValue(type));
-	}
-
 	/** Get the prepared query id of the query at the specificed index */
 	const std::string& BatchMessage::getPreparedQueryId(std::size_t index) const& {
 		thread_local static std::string empty;
@@ -146,7 +147,6 @@ namespace cql {
 
 	/** Constructor */
 	BatchMessage::BatchMessage() :
-		type_(),
 		batchParameters_(),
 		preparedQueryIds_() { }
 }

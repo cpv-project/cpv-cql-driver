@@ -9,9 +9,9 @@ TEST(TestBatchMessage, encode) {
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::RequestMessageFactory::makeRequestMessage<cql::BatchMessage>();
 		std::string data;
-		message->setType(cql::BatchType::UnLogged);
 		message->getBatchParameters().setBatchCommand(
 			cql::BatchCommand()
+				.setType(cql::BatchType::UnLogged)
 				.setConsistency(cql::ConsistencyLevel::One)
 				.setSerialConsistency(cql::ConsistencyLevel::LocalSerial)
 				.addQuery("abc")
@@ -32,7 +32,6 @@ TEST(TestBatchMessage, encode) {
 	for (std::size_t i = 0; i < 3; ++i) {
 		auto message = cql::RequestMessageFactory::makeRequestMessage<cql::BatchMessage>();
 		std::string data;
-		message->setType(cql::BatchType::Logged);
 		message->getBatchParameters().setBatchCommand(
 			cql::BatchCommand()
 				.setConsistency(cql::ConsistencyLevel::Two)
@@ -61,7 +60,8 @@ TEST(TestBatchMessage, encode) {
 			"\x00\x00\x00\x00\x03""abc""\x00\x01""\x00\x00\x00\x04\x00\x00\x00\x03"
 			"\x01\x00\x03""aaa""\x00\x01""\x00\x00\x00\x04\x00\x00\x00\x01"
 			"\x01\x00\x03""aaa""\x00\x01""\x00\x00\x00\x04\x00\x00\x00\x02"
-			"\x00\x02\x00"));
+			"\x00\x02"
+			"\x00"));
 	}
 }
 
