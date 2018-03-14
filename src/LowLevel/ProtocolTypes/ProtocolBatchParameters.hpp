@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <CQLDriver/Common/CommonDefinitions.hpp>
 #include <CQLDriver/Common/BatchCommand.hpp>
 #include "../LowLevelDefinitions.hpp"
@@ -17,7 +18,8 @@ namespace cql {
 
 		/** The batch command contains queries and parameters */
 		void setBatchCommand(BatchCommand&& batchCommand);
-		const BatchCommand& getBatchCommand() const& { return batchCommand_; }
+		void setBatchCommandRef(BatchCommand& batchCommand);
+		const BatchCommand& getBatchCommand() const& { return batchCommandRef_.get(); }
 
 		/** Get the flags that indicate which component is included */
 		BatchParametersFlags getFlags() const {
@@ -31,9 +33,20 @@ namespace cql {
 		/** Constructor */
 		ProtocolBatchParameters();
 
+		/** Move constructor */
+		ProtocolBatchParameters(ProtocolBatchParameters&& other);
+
+		/** Move assignment */
+		ProtocolBatchParameters& operator=(ProtocolBatchParameters&& other);
+
+		/** Disallow copy */
+		ProtocolBatchParameters(const ProtocolBatchParameters&) = delete;
+		ProtocolBatchParameters& operator=(const ProtocolBatchParameters&) = delete;
+
 	private:
 		ProtocolByte flags_;
 		BatchCommand batchCommand_;
+		std::reference_wrapper<BatchCommand> batchCommandRef_;
 	};
 }
 

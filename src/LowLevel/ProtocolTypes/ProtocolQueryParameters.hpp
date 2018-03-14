@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <CQLDriver/Common/CommonDefinitions.hpp>
 #include <CQLDriver/Common/Command.hpp>
 #include "../LowLevelDefinitions.hpp"
@@ -21,7 +22,8 @@ namespace cql {
 
 		/** The command contains query and parameters */
 		void setCommand(Command&& command);
-		const Command& getCommand() const& { return command_; }
+		void setCommandRef(Command& command);
+		const Command& getCommand() const& { return commandRef_.get(); }
 
 		/** Get the flags that indicate which component is included */
 		QueryParametersFlags getFlags() const {
@@ -35,9 +37,20 @@ namespace cql {
 		/** Constructor */
 		ProtocolQueryParameters();
 
+		/** Move constructor */
+		ProtocolQueryParameters(ProtocolQueryParameters&& other);
+
+		/** Move assignment */
+		ProtocolQueryParameters& operator=(ProtocolQueryParameters&& other);
+
+		/** Disallow copy */
+		ProtocolQueryParameters(const ProtocolQueryParameters&) = delete;
+		ProtocolQueryParameters& operator=(const ProtocolQueryParameters&) = delete;
+
 	private:
 		ProtocolByte flags_;
 		Command command_;
+		std::reference_wrapper<Command> commandRef_;
 	};
 }
 

@@ -19,6 +19,28 @@ TEST(TestProtocolQueryParameters, getset) {
 	ASSERT_EQ(command.getPagingState(), "state");
 }
 
+TEST(TestProtocolQueryParameters, move) {
+	cql::ProtocolQueryParameters a;
+	a.setCommand(cql::Command("use a;"));
+	ASSERT_TRUE(a.getCommand().isValid());
+
+	cql::ProtocolQueryParameters b = std::move(a);
+	ASSERT_FALSE(a.getCommand().isValid());
+	ASSERT_TRUE(b.getCommand().isValid());
+
+	cql::Command command("use b;");
+	b.setCommandRef(command);
+	ASSERT_EQ(&command, &b.getCommand());
+	ASSERT_TRUE(command.isValid());
+	ASSERT_TRUE(b.getCommand().isValid());
+
+	a = std::move(b);
+	ASSERT_EQ(&command, &a.getCommand());
+	ASSERT_TRUE(command.isValid());
+	ASSERT_TRUE(a.getCommand().isValid());
+	ASSERT_FALSE(b.getCommand().isValid());
+}
+
 TEST(TestProtocolQueryParameters, encode) {
 	{
 		cql::ProtocolQueryParameters value;

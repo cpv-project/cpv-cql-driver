@@ -13,6 +13,7 @@ namespace cql {
 	void ProtocolQueryParameters::reset() {
 		flags_.set(enumValue(QueryParametersFlags::None));
 		command_ = cql::Command(nullptr);
+		commandRef_ = std::ref(command_);
 	}
 
 	/* Set whether to not receive metadata in result */
@@ -26,6 +27,14 @@ namespace cql {
 
 	/** Set the command contains query and parameters */
 	void ProtocolQueryParameters::setCommand(Command&& command) {
+		// this function will take the ownership of the command
+		command_ = std::move(command);
+		setCommandRef(command_);
+	}
+
+	/** Set the command contains query and parameters */
+	void ProtocolQueryParameters::setCommandRef(Command& command) {
+		// this function won't take the ownership of the command
 		if (!command.isValid()) {
 			throw LogicException(CQL_CODEINFO, "can't set a invalid command to query parameters");
 		}
@@ -47,54 +56,56 @@ namespace cql {
 			flags |= QueryParametersFlags::WithDefaultTimestamp;
 		}
 		flags_.set(enumValue(flags));
-		command_ = std::move(command);
+		commandRef_ = std::ref(command);
 	}
 
 	/** Encode to binary data */
 	void ProtocolQueryParameters::encode(std::string& data) const {
-		if (!command_.isValid()) {
+		auto& command = commandRef_.get();
+		if (!command.isValid()) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
-		ProtocolConsistency consistency(command_.getConsistency());
+		ProtocolConsistency consistency(command.getConsistency());
 		consistency.encode(data);
 		flags_.encode(data);
 		auto flags = getFlags();
 		if (enumTrue(flags & QueryParametersFlags::WithValues)) {
-			ProtocolShort parameterCount(command_.getParameterCount());
-			if (parameterCount.get() != command_.getParameterCount()) {
+			ProtocolShort parameterCount(command.getParameterCount());
+			if (parameterCount.get() != command.getParameterCount()) {
 				throw LogicException(CQL_CODEINFO, "too many parameters");
 			}
 			parameterCount.encode(data);
-			auto& parameters = command_.getParameters();
+			auto& parameters = command.getParameters();
 			data.append(parameters.data(), parameters.size());
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithPageSize)) {
-			ProtocolInt pageSize(command_.getPageSize().first);
+			ProtocolInt pageSize(command.getPageSize().first);
 			pageSize.encode(data);
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithPagingState)) {
-			auto& pagingState = command_.getPagingState();
+			auto& pagingState = command.getPagingState();
 			ProtocolInt pagingStateSize(pagingState.size());
 			pagingStateSize.encode(data);
 			data.append(pagingState.data(), pagingState.size());
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithSerialConsistency)) {
 			ProtocolConsistency serialConsistency(
-				command_.getSerialConsistency().first);
+				command.getSerialConsistency().first);
 			serialConsistency.encode(data);
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithDefaultTimestamp)) {
-			ProtocolTimestamp timeStamp(command_.getDefaultTimestamp().first);
+			ProtocolTimestamp timeStamp(command.getDefaultTimestamp().first);
 			timeStamp.encode(data);
 		}
 	}
 
 	/** Decode from binary data */
 	void ProtocolQueryParameters::decode(const char*& ptr, const char* end) {
-		command_ = Command("");
+		auto& command = commandRef_.get();
+		command = Command("");
 		ProtocolConsistency consistency;
 		consistency.decode(ptr, end);
-		command_.setConsistency(consistency.get());
+		command.setConsistency(consistency.get());
 		flags_.decode(ptr, end);
 		auto flags = getFlags();
 		if (enumTrue(flags & QueryParametersFlags::WithValues)) {
@@ -105,8 +116,8 @@ namespace cql {
 			ProtocolShort parameterCount;
 			ProtocolInt parameterSize;
 			parameterCount.decode(ptr, end);
-			command_.getParameterCount() = parameterCount.get();
-			auto& encodedParameters = command_.getParameters();
+			command.getParameterCount() = parameterCount.get();
+			auto& encodedParameters = command.getParameters();
 			for (std::size_t i = 0, j = parameterCount.get(); i < j; ++i) {
 				parameterSize.decode(ptr, end);
 				parameterSize.encode(encodedParameters);
@@ -123,28 +134,62 @@ namespace cql {
 		if (enumTrue(flags & QueryParametersFlags::WithPageSize)) {
 			ProtocolInt pageSize;
 			pageSize.decode(ptr, end);
-			command_.setPageSize(pageSize.get());
+			command.setPageSize(pageSize.get());
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithPagingState)) {
 			ProtocolBytes pagingState;
 			pagingState.decode(ptr, end);
-			command_.setPagingState(std::move(pagingState.get()));
+			command.setPagingState(std::move(pagingState.get()));
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithSerialConsistency)) {
 			ProtocolConsistency serialConsistency;
 			serialConsistency.decode(ptr, end);
-			command_.setSerialConsistency(serialConsistency.get());
+			command.setSerialConsistency(serialConsistency.get());
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithDefaultTimestamp)) {
 			ProtocolTimestamp timeStamp;
 			timeStamp.decode(ptr, end);
-			command_.setDefaultTimestamp(timeStamp.get());
+			command.setDefaultTimestamp(timeStamp.get());
 		}
 	}
 
 	/** Constructor */
 	ProtocolQueryParameters::ProtocolQueryParameters() :
 		flags_(enumValue(QueryParametersFlags::None)),
-		command_(nullptr) { }
+		command_(nullptr),
+		commandRef_(command_) { }
+
+	/** Move constructor */
+	ProtocolQueryParameters::ProtocolQueryParameters(ProtocolQueryParameters&& other) :
+		flags_(other.flags_),
+		command_(nullptr),
+		commandRef_(command_) {
+		if (&other.command_ == &other.commandRef_.get()) {
+			// owns the command
+			command_ = std::move(other.command_);
+		} else {
+			// not owns the command
+			commandRef_ = other.commandRef_;
+		}
+		other.reset();
+	}
+
+	/** Move assignment */
+	ProtocolQueryParameters& ProtocolQueryParameters::operator=(ProtocolQueryParameters&& other) {
+		if (this != &other) {
+			flags_ = other.flags_;
+			if (&other.command_ == &other.commandRef_.get()) {
+				// owns the command
+				command_ = std::move(other.command_);
+				commandRef_ = std::ref(command_);
+			} else {
+				// not owns the command
+				command_ = Command(nullptr);
+				commandRef_ = other.commandRef_;
+			}
+			other.reset();
+		}
+		return *this;
+	}
 }
 

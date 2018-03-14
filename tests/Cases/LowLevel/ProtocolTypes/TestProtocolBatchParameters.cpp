@@ -32,6 +32,28 @@ TEST(TestProtocolBatchParameters, getset) {
 	}
 }
 
+TEST(TestProtocolBatchParameters, move) {
+	cql::ProtocolBatchParameters a;
+	a.setBatchCommand(cql::BatchCommand());
+	ASSERT_TRUE(a.getBatchCommand().isValid());
+
+	cql::ProtocolBatchParameters b = std::move(a);
+	ASSERT_FALSE(a.getBatchCommand().isValid());
+	ASSERT_TRUE(b.getBatchCommand().isValid());
+
+	cql::BatchCommand batchCommand;
+	b.setBatchCommandRef(batchCommand);
+	ASSERT_EQ(&batchCommand, &b.getBatchCommand());
+	ASSERT_TRUE(batchCommand.isValid());
+	ASSERT_TRUE(b.getBatchCommand().isValid());
+
+	a = std::move(b);
+	ASSERT_EQ(&batchCommand, &a.getBatchCommand());
+	ASSERT_TRUE(batchCommand.isValid());
+	ASSERT_TRUE(a.getBatchCommand().isValid());
+	ASSERT_FALSE(b.getBatchCommand().isValid());
+}
+
 TEST(TestProtocolBatchParameters, encode) {
 	{
 		cql::ProtocolBatchParameters value;
