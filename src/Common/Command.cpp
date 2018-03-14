@@ -13,6 +13,7 @@ namespace cql {
 		std::string parameters;
 		std::pair<ConsistencyLevel, bool> serialConsistencyLevel;
 		std::pair<std::chrono::system_clock::time_point, bool> defaultTimestamp;
+		std::size_t maxRetries;
 
 		CommandData() :
 			queryCStr(nullptr, 0),
@@ -23,7 +24,8 @@ namespace cql {
 			parameterCount(),
 			parameters(),
 			serialConsistencyLevel(),
-			defaultTimestamp() { }
+			defaultTimestamp(),
+			maxRetries() { }
 
 		static void freeResources() { }
 
@@ -48,6 +50,7 @@ namespace cql {
 			parameters.resize(0);
 			serialConsistencyLevel = { ConsistencyLevel::Serial, false };
 			defaultTimestamp = { {}, false };
+			maxRetries = 0;
 		}
 	};
 
@@ -85,6 +88,12 @@ namespace cql {
 	Command& Command::setDefaultTimestamp(
 		std::chrono::system_clock::time_point timeStamp) & {
 		data_->defaultTimestamp = { timeStamp, true };
+		return *this;
+	}
+
+	/** Set the maximum retry times *after* the first try is failed */
+	Command& Command::setMaxRetries(std::size_t maxRetries) & {
+		data_->maxRetries = maxRetries;
 		return *this;
 	}
 
@@ -142,6 +151,11 @@ namespace cql {
 	const std::pair<std::chrono::system_clock::time_point, bool>&
 		Command::getDefaultTimestamp() const& {
 		return data_->defaultTimestamp;
+	}
+
+	/** Get the maximum retry times *after* the first try is failed */
+	std::size_t Command::getMaxRetries() const {
+		return data_->maxRetries;
 	}
 
 	/** Constructor */

@@ -130,3 +130,15 @@ TEST(TestCommand, defaultTimestamp) {
 	}
 }
 
+TEST(TestCommand, maxRetries) {
+	{
+		cql::Command command("use a;");
+		ASSERT_EQ(command.getMaxRetries(), 0);
+	}
+	{
+		auto command = cql::Command("use a;")
+			.setMaxRetries(2);
+		ASSERT_EQ(command.getMaxRetries(), 2);
+	}
+}
+

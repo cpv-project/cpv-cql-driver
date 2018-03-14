@@ -113,6 +113,14 @@ namespace cql {
 			return std::move(setDefaultTimestamp(timeStamp));
 		}
 
+		/** Set the maximum retry times *after* the first try is failed */
+		Command& setMaxRetries(std::size_t maxRetries) &;
+
+		/** Set the maximum retry times *after* the first try is failed */
+		Command&& setMaxRetries(std::size_t maxRetries) && {
+			return std::move(setMaxRetries(maxRetries));
+		}
+
 		/** Get the query string of this query */
 		std::pair<const char*, std::size_t> getQuery() const&;
 
@@ -148,6 +156,9 @@ namespace cql {
 		 * the second value is false if is not set.
 		 */
 		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimestamp() const&;
+
+		/** Get the maximum retry times *after* the first try is failed */
+		std::size_t getMaxRetries() const;
 
 		/** Constructor */
 		explicit Command(std::string&& query);
