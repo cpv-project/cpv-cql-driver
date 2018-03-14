@@ -34,12 +34,12 @@ TEST(TestCommand, query) {
 TEST(TestCommand, consistencyLevel) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Any);
+		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Quorum);
 	}
 	{
 		auto command = cql::Command("use a;")
-			.setConsistency(cql::ConsistencyLevel::Quorum);
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Quorum);
+			.setConsistency(cql::ConsistencyLevel::One);
+		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::One);
 	}
 }
 

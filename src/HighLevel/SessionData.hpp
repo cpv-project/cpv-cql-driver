@@ -1,25 +1,20 @@
 #pragma once
 #include <CQLDriver/Common/SessionConfiguration.hpp>
 #include <CQLDriver/Common/NodeCollection.hpp>
+#include "../LowLevel/ConnectionPool.hpp"
 
 namespace cql {
 	/** Defines members of Session */
 	class SessionData {
 	public:
-		seastar::shared_ptr<SessionConfiguration> sessionConfiguration;
-		seastar::shared_ptr<NodeCollection> nodeCollection;
+		seastar::lw_shared_ptr<ConnectionPool> connectionPool;
 
-		SessionData() :
-			sessionConfiguration(),
-			nodeCollection() { }
+		SessionData() : connectionPool() { }
 
 		static void freeResources() { }
 
-		void reset(
-			const seastar::shared_ptr<SessionConfiguration>& sessionConfigurationRef,
-			const seastar::shared_ptr<NodeCollection>& nodeCollectionRef) {
-			sessionConfiguration = sessionConfigurationRef;
-			nodeCollection = nodeCollectionRef;
+		void reset(const seastar::lw_shared_ptr<ConnectionPool>& connectionPoolRef) {
+			connectionPool = connectionPoolRef;
 		}
 	};
 }

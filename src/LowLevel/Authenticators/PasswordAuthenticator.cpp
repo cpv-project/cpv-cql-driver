@@ -18,7 +18,7 @@ namespace cql {
 					CQL_CODEINFO, "server didn't require authentication"));
 			} else if (opCode != MessageType::Authenticate) {
 				return seastar::make_exception_future(AuthenticateException(
-					CQL_CODEINFO, "unexcepted authenticate response:", message->toString()));
+					CQL_CODEINFO, "unexpected authenticate response:", message->toString()));
 			}
 			auto authenticateMessage = std::move(message).template cast<AuthenticateMessage>();
 			auto& authenticatorClass = authenticateMessage->getAuthenticatorClass().get();

@@ -25,13 +25,13 @@ namespace cql {
 		}
 
 		/**
-		 * Set the consistency level of this batch, default is "Any"
+		 * Set the consistency level of this batch, default is "Quorum"
 		 * For more information see this page:
 		 * https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html
 		 */
 		BatchCommand& setConsistency(ConsistencyLevel consistencyLevel) &;
 
-		/** Set the consistency level of this batch, default is "Any" */
+		/** Set the consistency level of this batch, default is "Quorum" */
 		BatchCommand&& setConsistency(ConsistencyLevel consistencyLevel) && {
 			return std::move(setConsistency(consistencyLevel));
 		}

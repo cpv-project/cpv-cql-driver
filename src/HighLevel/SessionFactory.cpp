@@ -1,26 +1,28 @@
 #include <CQLDriver/HighLevel/SessionFactory.hpp>
+#include "../LowLevel/Connection.hpp"
 #include "./SessionData.hpp"
 
 namespace cql {
 	/** Defines members of SessionFactory */
 	class SessionFactoryData {
 	public:
-		seastar::shared_ptr<SessionConfiguration> sessionConfiguration;
+		seastar::lw_shared_ptr<SessionConfiguration> sessionConfiguration;
 		seastar::shared_ptr<NodeCollection> nodeCollection;
+		seastar::lw_shared_ptr<ConnectionPool> connectionPool;
 
 		SessionFactoryData(
 			const SessionConfiguration& sessionConfigurationRef,
 			const seastar::shared_ptr<NodeCollection>& nodeCollectionRef) :
-			sessionConfiguration(
-				seastar::make_shared<SessionConfiguration>(sessionConfigurationRef)),
-			nodeCollection(nodeCollectionRef) { }
+			sessionConfiguration(seastar::make_lw_shared<
+				SessionConfiguration>(sessionConfigurationRef)),
+			nodeCollection(nodeCollectionRef),
+			connectionPool(seastar::make_lw_shared<
+				ConnectionPool>(sessionConfiguration, nodeCollection)) { }
 	};
 
 	/** Create a new session instance */
 	Session SessionFactory::getSession() {
-		return Session(makeObject<SessionData>(
-			data_->sessionConfiguration,
-			data_->nodeCollection));
+		return Session(makeObject<SessionData>(data_->connectionPool));
 	}
 
 	/** Constructor */

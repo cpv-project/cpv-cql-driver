@@ -43,7 +43,7 @@ namespace cql {
 
 	private:
 		void resetExceptQuery() {
-			consistencyLevel = ConsistencyLevel::Any;
+			consistencyLevel = ConsistencyLevel::Quorum;
 			pageSize = { 0, false };
 			pagingState.resize(0);
 			parameterCount = 0;
@@ -59,7 +59,7 @@ namespace cql {
 		return data_ != nullptr;
 	}
 
-	/** Set the consistency level of this query */
+	/** Set the consistency level of this batch, default is "Quorum" */
 	Command& Command::setConsistency(ConsistencyLevel consistencyLevel) & {
 		data_->consistencyLevel = consistencyLevel;
 		return *this;

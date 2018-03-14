@@ -31,12 +31,12 @@ TEST(TestBatchCommand, type) {
 TEST(TestBatchCommand, consistencyLevel) {
 	{
 		cql::BatchCommand command;
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Any);
+		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Quorum);
 	}
 	{
 		auto command = cql::BatchCommand()
-			.setConsistency(cql::ConsistencyLevel::Quorum);
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Quorum);
+			.setConsistency(cql::ConsistencyLevel::One);
+		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::One);
 	}
 }
 

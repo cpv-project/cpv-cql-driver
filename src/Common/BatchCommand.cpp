@@ -45,7 +45,7 @@ namespace cql {
 
 		void reset() {
 			batchType = BatchType::Logged;
-			consistencyLevel = ConsistencyLevel::Any;
+			consistencyLevel = ConsistencyLevel::Quorum;
 			queries.resize(0);
 			serialConsistencyLevel = { ConsistencyLevel::Serial, false };
 			defaultTimestamp = { {}, false };
@@ -64,7 +64,7 @@ namespace cql {
 		return *this;
 	}
 
-	/** Set the consistency level of this batch, default is "Any" */
+	/** Set the consistency level of this batch, default is "Quorum" */
 	BatchCommand& BatchCommand::setConsistency(ConsistencyLevel consistencyLevel) & {
 		data_->consistencyLevel = consistencyLevel;
 		return *this;

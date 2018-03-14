@@ -17,7 +17,7 @@ namespace cql {
 					authenticateMessage->getAuthenticatorClass().get()));
 			} else if (opCode != MessageType::Ready) {
 				return seastar::make_exception_future(AuthenticateException(
-					CQL_CODEINFO, "unexcepted authenticate response:", message->toString()));
+					CQL_CODEINFO, "unexpected authenticate response:", message->toString()));
 			}
 			// authenticate successful
 			return seastar::make_ready_future();

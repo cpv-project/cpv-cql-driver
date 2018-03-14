@@ -17,13 +17,13 @@ namespace cql {
 		bool isValid() const;
 
 		/**
-		 * Set the consistency level of this query
+		 * Set the consistency level of this query, default is "Quorum"
 		 * For more information see this page:
 		 * https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html
 		 */
 		Command& setConsistency(ConsistencyLevel consistencyLevel) &;
 
-		/** Set the consistency level of this query */
+		/** Set the consistency level of this query, default is "Quorum" */
 		Command&& setConsistency(ConsistencyLevel consistencyLevel) && {
 			return std::move(setConsistency(consistencyLevel));
 		}

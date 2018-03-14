@@ -63,7 +63,7 @@ namespace cql {
 			// send STARTUP
 			if (message->getHeader().getOpCode() != MessageType::Supported) {
 				return seastar::make_exception_future(LogicException(
-					CQL_CODEINFO, "unexcepted response to OPTION message:", message->toString()));
+					CQL_CODEINFO, "unexpected response to OPTION message:", message->toString()));
 			}
 			auto startupMessage = RequestMessageFactory::makeRequestMessage<StartupMessage>();
 			return self->sendMessage(std::move(startupMessage), self->streamZero_);
@@ -88,12 +88,12 @@ namespace cql {
 				// check RESULT
 				if (message->getHeader().getOpCode() != MessageType::Result) {
 					return seastar::make_exception_future(ResponseErrorException(
-						CQL_CODEINFO, "unexcepted response to use keyspace query:", message->toString()));
+						CQL_CODEINFO, "unexpected response to use keyspace query:", message->toString()));
 				}
 				auto resultMessage = std::move(message).template cast<ResultMessage>();
 				if (resultMessage->getKind() != ResultKind::SetKeySpace) {
 					return seastar::make_exception_future(LogicException(
-						CQL_CODEINFO, "unexcepted kind of set keyspace result:", message->toString()));
+						CQL_CODEINFO, "unexpected kind of set keyspace result:", message->toString()));
 				}
 				return seastar::make_ready_future<>();
 			});
