@@ -1,3 +1,6 @@
+#include <core/do_with.hh>
+#include <CQLDriver/Common/ColumnTypes/Int.hpp>
+#include <CQLDriver/Common/ColumnTypes/Text.hpp>
 #include <CQLDriver/Common/Exceptions/ResponseErrorException.hpp>
 #include <CQLDriver/HighLevel/SessionFactory.hpp>
 #include <TestUtility/GTestUtils.hpp>
@@ -29,6 +32,44 @@ TEST_FUTURE(TestSession, queryError) {
 		ASSERT_THROWS_CONTAINS(
 			cql::ResponseErrorException, f.get(),
 			"InvalidQuery: unconfigured table notexisttable");
+	});
+}
+
+TEST_FUTURE(TestSession, execute) {
+	cql::SessionFactory sessionFactory(
+		cql::SessionConfiguration(),
+		cql::NodeCollection::create({
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
+		}));
+	auto session = sessionFactory.getSession();
+	return seastar::do_with(std::move(session), [] (auto& session) {
+		return seastar::make_ready_future<>().then([&session] {
+			return session.execute(cql::Command("drop keyspace if exists testkeyspace"));
+		}).then([&session] {
+			return session.execute(cql::Command(
+				"create keyspace testkeyspace with replication = "
+				"{ 'class': 'SimpleStrategy', 'replication_factor': 1 }"));
+		}).then([&session] {
+			return session.execute(cql::Command(
+				"create table testkeyspace.testtable (id int primary key, name text)"));
+		}).then([&session] {
+			return session.execute(cql::Command(
+				"insert into testkeyspace.testtable (id, name) values (?,?)")
+				.addParameters(cql::Int(1), cql::Text("abc")));
+		}).then([&session] {
+			return session.query(cql::Command(
+				"select id, name from testkeyspace.testtable"));
+		}).then([] (auto result) {
+			ASSERT_EQ(result.getRowsCount(), 1);
+			ASSERT_EQ(result.getColumnsCount(), 2);
+			cql::Int id;
+			cql::Text name;
+			result.fill(id, name);
+			ASSERT_EQ(id, 1);
+			ASSERT_EQ(name, "abc");
+			ASSERT_EQ(result.getDecodePtr(), result.getDecodeEnd());
+		});
 	});
 }
 
