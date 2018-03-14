@@ -91,7 +91,7 @@ namespace cql {
 		return *this;
 	}
 
-	/** Set the maximum retry times *after* the first try is failed */
+	/** Set the maximum retry times *after* the first try is failed, default is 0 */
 	Command& Command::setMaxRetries(std::size_t maxRetries) & {
 		data_->maxRetries = maxRetries;
 		return *this;

@@ -16,14 +16,22 @@ namespace cql {
 		/** Check whether this is a valid command (will be false if moved) */
 		bool isValid() const;
 
+		/** Set the type of this batch, default is "Logged" */
+		BatchCommand& setType(BatchType batchType) &;
+
+		/** Set the type of this batch, default is "Logged" */
+		BatchCommand&& setType(BatchType batchType) && {
+			return std::move(setType(batchType));
+		}
+
 		/**
-		 * Set the consistency level of this batch
+		 * Set the consistency level of this batch, default is "Any"
 		 * For more information see this page:
 		 * https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html
 		 */
 		BatchCommand& setConsistency(ConsistencyLevel consistencyLevel) &;
 
-		/** Set the consistency level of this batch */
+		/** Set the consistency level of this batch, default is "Any" */
 		BatchCommand&& setConsistency(ConsistencyLevel consistencyLevel) && {
 			return std::move(setConsistency(consistencyLevel));
 		}
@@ -124,6 +132,17 @@ namespace cql {
 			return std::move(setDefaultTimestamp(timeStamp));
 		}
 
+		/** Set the maximum retry times *after* the first try is failed, default is 0 */
+		BatchCommand& setMaxRetries(std::size_t maxRetries) &;
+
+		/** Set the maximum retry times *after* the first try is failed, default is 0 */
+		BatchCommand&& setMaxRetries(std::size_t maxRetries) && {
+			return std::move(setMaxRetries(maxRetries));
+		}
+
+		/** Get the type of this batch */
+		BatchType getType() const;
+
 		/** Get the consistency level of this batch */
 		ConsistencyLevel getConsistency() const;
 
@@ -154,6 +173,9 @@ namespace cql {
 		 * the second value is false if is not set.
 		 */
 		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimestamp() const&;
+
+		/** Get the maximum retry times *after* the first try is failed */
+		std::size_t getMaxRetries() const;
 
 		/** Constructor */
 		BatchCommand();

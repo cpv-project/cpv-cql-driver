@@ -16,6 +16,18 @@ TEST(TestBatchCommand, isValid) {
 	ASSERT_FALSE(b.isValid());
 }
 
+TEST(TestBatchCommand, type) {
+	{
+		cql::BatchCommand command;
+		ASSERT_EQ(command.getType(), cql::BatchType::Logged);
+	}
+	{
+		auto command = cql::BatchCommand()
+			.setType(cql::BatchType::Counter);
+		ASSERT_EQ(command.getType(), cql::BatchType::Counter);
+	}
+}
+
 TEST(TestBatchCommand, consistencyLevel) {
 	{
 		cql::BatchCommand command;
@@ -131,6 +143,18 @@ TEST(TestBatchCommand, defaultTimestamp) {
 			.setDefaultTimestamp(now);
 		ASSERT_EQ(command.getDefaultTimestamp().first, now);
 		ASSERT_EQ(command.getDefaultTimestamp().second, true);
+	}
+}
+
+TEST(TestBatchCommand, maxRetries) {
+	{
+		cql::BatchCommand command;
+		ASSERT_EQ(command.getMaxRetries(), 0);
+	}
+	{
+		auto command = cql::BatchCommand()
+			.setMaxRetries(2);
+		ASSERT_EQ(command.getMaxRetries(), 2);
 	}
 }
 

@@ -26,24 +26,30 @@ namespace cql {
 				parameterSets() { }
 		};
 
+		BatchType batchType;
 		ConsistencyLevel consistencyLevel;
 		std::vector<QueryData> queries;
 		std::pair<ConsistencyLevel, bool> serialConsistencyLevel;
 		std::pair<std::chrono::system_clock::time_point, bool> defaultTimestamp;
+		std::size_t maxRetries;
 
 		BatchCommandData() :
+			batchType(),
 			consistencyLevel(),
 			queries(),
 			serialConsistencyLevel(),
-			defaultTimestamp() { }
+			defaultTimestamp(),
+			maxRetries() { }
 
 		static void freeResources() { }
 
 		void reset() {
+			batchType = BatchType::Logged;
 			consistencyLevel = ConsistencyLevel::Any;
 			queries.resize(0);
 			serialConsistencyLevel = { ConsistencyLevel::Serial, false };
 			defaultTimestamp = { {}, false };
+			maxRetries = 0;
 		}
 	};
 
@@ -52,7 +58,13 @@ namespace cql {
 		return data_ != nullptr;
 	}
 
-	/** Set the consistency level of this batch */
+	/** Set the type of this batch, default is "Logged" */
+	BatchCommand& BatchCommand::setType(BatchType batchType) & {
+		data_->batchType = batchType;
+		return *this;
+	}
+
+	/** Set the consistency level of this batch, default is "Any" */
 	BatchCommand& BatchCommand::setConsistency(ConsistencyLevel consistencyLevel) & {
 		data_->consistencyLevel = consistencyLevel;
 		return *this;
@@ -92,6 +104,17 @@ namespace cql {
 		std::chrono::system_clock::time_point timeStamp) & {
 		data_->defaultTimestamp = { timeStamp, true };
 		return *this;
+	}
+
+	/** Set the maximum retry times *after* the first try is failed, default is 0 */
+	BatchCommand& BatchCommand::setMaxRetries(std::size_t maxRetries) & {
+		data_->maxRetries = maxRetries;
+		return *this;
+	}
+
+	/** Get the type of this batch */
+	BatchType BatchCommand::getType() const {
+		return data_->batchType;
 	}
 
 	/** Get the consistency level of this batch */
@@ -156,6 +179,11 @@ namespace cql {
 	const std::pair<std::chrono::system_clock::time_point, bool>&
 		BatchCommand::getDefaultTimestamp() const& {
 		return data_->defaultTimestamp;
+	}
+
+	/** Get the maximum retry times *after* the first try is failed */
+	std::size_t BatchCommand::getMaxRetries() const {
+		return data_->maxRetries;
 	}
 
 	/** Constructor */

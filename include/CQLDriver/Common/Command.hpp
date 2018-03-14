@@ -113,10 +113,10 @@ namespace cql {
 			return std::move(setDefaultTimestamp(timeStamp));
 		}
 
-		/** Set the maximum retry times *after* the first try is failed */
+		/** Set the maximum retry times *after* the first try is failed, default is 0 */
 		Command& setMaxRetries(std::size_t maxRetries) &;
 
-		/** Set the maximum retry times *after* the first try is failed */
+		/** Set the maximum retry times *after* the first try is failed, default is 0 */
 		Command&& setMaxRetries(std::size_t maxRetries) && {
 			return std::move(setMaxRetries(maxRetries));
 		}
