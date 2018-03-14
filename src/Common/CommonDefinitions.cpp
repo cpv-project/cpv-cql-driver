@@ -53,6 +53,16 @@ namespace cql {
 		return staticNames;
 	}
 
+	const std::vector<std::pair<BatchType, const char*>>&
+		EnumDescriptions<BatchType>::get() {
+		static std::vector<std::pair<BatchType, const char*>> staticNames({
+			{ BatchType::Logged, "Logged" },
+			{ BatchType::UnLogged, "UnLogged" },
+			{ BatchType::Counter, "Counter" },
+		});
+		return staticNames;
+	}
+
 	const std::vector<std::pair<ErrorCode, const char*>>&
 		EnumDescriptions<ErrorCode>::get() {
 		static std::vector<std::pair<ErrorCode, const char*>> staticNames({

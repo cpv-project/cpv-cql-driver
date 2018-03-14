@@ -69,6 +69,22 @@ namespace cql {
 	};
 
 	/**
+	 * Indicating the type of batch to use
+	 * The value of this enum is the <type> in batch message.
+	 * Check native_protocol_v4.spec section 4.1.7.
+	 */
+	enum class BatchType {
+		Logged = 0,
+		UnLogged = 1,
+		Counter = 2
+	};
+
+	template <>
+	struct EnumDescriptions<BatchType> {
+		static const std::vector<std::pair<BatchType, const char*>>& get();
+	};
+
+	/**
 	 * Error codes,
 	 * Check native_protocol_v4.spec section 9.
 	 */
