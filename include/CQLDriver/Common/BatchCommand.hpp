@@ -68,6 +68,14 @@ namespace cql {
 			return std::move(addQuery<Size>(query));
 		}
 
+		/** Prepare the last query to reduce the message size */
+		BatchCommand& prepareQuery() &;
+
+		/** Prepare the last query to reduce the message size */
+		BatchCommand&& prepareQuery() && {
+			return std::move(prepareQuery());
+		}
+
 		/** Open a new parameter set explicitly of the last query */
 		BatchCommand& openParameterSet() &;
 

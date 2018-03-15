@@ -62,6 +62,16 @@ namespace cql {
 		return *this;
 	}
 
+	/** Prepare the last query to reduce the message size */
+	BatchCommand& BatchCommand::prepareQuery() & {
+		if (data_->queries.empty()) {
+			throw cql::LogicException(CQL_CODEINFO,
+				"please call addQuery before prepareQuery");
+		}
+		data_->queries.back().needPrepare = true;
+		return *this;
+	}
+
 	/** Open a new parameter set explicitly of the last query */
 	BatchCommand& BatchCommand::openParameterSet() & {
 		if (data_->queries.empty()) {

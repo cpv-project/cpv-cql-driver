@@ -10,6 +10,7 @@ namespace cql {
 	public:
 		std::pair<const char*, std::size_t> queryCStr;
 		std::string queryStr;
+		bool needPrepare;
 		std::vector<std::pair<std::size_t, std::string>> parameterSets;
 
 		std::pair<const char*, std::size_t> getQuery() const& {
@@ -26,18 +27,21 @@ namespace cql {
 		}
 
 		BatchQueryData() :
-			queryCStr(),
+			queryCStr(nullptr, 0),
 			queryStr(),
+			needPrepare(false),
 			parameterSets() { }
 
 		BatchQueryData(const char* query, std::size_t size) :
 			queryCStr(query, size),
 			queryStr(),
+			needPrepare(false),
 			parameterSets() { }
 
 		explicit BatchQueryData(std::string&& query) :
 			queryCStr(nullptr, 0),
 			queryStr(std::move(query)),
+			needPrepare(false),
 			parameterSets() { }
 	};
 }

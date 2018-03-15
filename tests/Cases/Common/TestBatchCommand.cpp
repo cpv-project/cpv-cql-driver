@@ -59,6 +59,17 @@ TEST(TestBatchCommand, query) {
 	}
 }
 
+TEST(TestBatchCommand, prepare) {
+	auto command = cql::BatchCommand()
+		.addQuery("insert into a (k, v) values (123, 'abc');")
+		.addQuery("insert into b (k, c, v) values (100, 0, 'asd');")
+			.prepareQuery();
+	auto queries = command.getQueries();
+	ASSERT_EQ(queries.size(), 2);
+	ASSERT_FALSE(queries.at(0).needPrepare);
+	ASSERT_TRUE(queries.at(1).needPrepare);
+}
+
 TEST(TestBatchCommand, parameters) {
 	auto command = cql::BatchCommand()
 		.addQuery("insert into a (k, v) values (?, ?);")
