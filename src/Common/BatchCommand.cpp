@@ -1,34 +1,14 @@
 #include <CQLDriver/Common/BatchCommand.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
+#include "./BatchQueryData.hpp"
 
 namespace cql {
 	/** Defines members of BatchCommand */
 	class BatchCommandData {
 	public:
-		struct QueryData {
-			std::pair<const char*, std::size_t> queryCStr;
-			std::string queryStr;
-			std::vector<std::pair<std::size_t, std::string>> parameterSets;
-
-			QueryData() :
-				queryCStr(),
-				queryStr(),
-				parameterSets() { }
-
-			QueryData(const char* query, std::size_t size) :
-				queryCStr(query, size),
-				queryStr(),
-				parameterSets() { }
-
-			explicit QueryData(std::string&& query) :
-				queryCStr(nullptr, 0),
-				queryStr(std::move(query)),
-				parameterSets() { }
-		};
-
 		BatchType batchType;
 		ConsistencyLevel consistencyLevel;
-		std::vector<QueryData> queries;
+		std::vector<BatchQueryData> queries;
 		std::pair<ConsistencyLevel, bool> serialConsistencyLevel;
 		std::pair<std::chrono::system_clock::time_point, bool> defaultTimestamp;
 		std::size_t maxRetries;
@@ -122,25 +102,9 @@ namespace cql {
 		return data_->consistencyLevel;
 	}
 
-	/** Get how many queries in this batch */
-	std::size_t BatchCommand::getQueryCount() const {
-		return data_->queries.size();
-	}
-
-	/** Get the query string by index */
-	std::pair<const char*, std::size_t> BatchCommand::getQuery(std::size_t index) const& {
-		auto& queryData = data_->queries.at(index);
-		if (queryData.queryCStr.first != nullptr) {
-			return queryData.queryCStr;
-		} else {
-			return { queryData.queryStr.c_str(), queryData.queryStr.size() };
-		}
-	}
-
-	/** Get the parameter sets by index */
-	const BatchCommand::ParameterSetsType&
-		BatchCommand::getParameterSets(std::size_t index) const& {
-		return data_->queries.at(index).parameterSets;
+	/** Get all queries in this batch */
+	const std::vector<BatchQueryData>& BatchCommand::getQueries() const& {
+		return data_->queries;
 	}
 
 	/** Get the mutable count of parameters of the last parameter set */

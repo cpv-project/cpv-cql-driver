@@ -10,6 +10,9 @@ namespace cql {
 	/** Defines members of BatchCommand */
 	class BatchCommandData;
 
+	/** Defines members of a single query in batch command */
+	class BatchQueryData;
+
 	/** Class represents multiple cql commands for execute */
 	class BatchCommand {
 	public:
@@ -146,15 +149,8 @@ namespace cql {
 		/** Get the consistency level of this batch */
 		ConsistencyLevel getConsistency() const;
 
-		/** Get how many queries in this batch */
-		std::size_t getQueryCount() const;
-
-		/** Get the query string by index */
-		std::pair<const char*, std::size_t> getQuery(std::size_t index) const&;
-
-		/** Get the parameter sets by index */
-		using ParameterSetsType = std::vector<std::pair<std::size_t, std::string>>;
-		const ParameterSetsType& getParameterSets(std::size_t index) const&;
+		/** Get all queries in this batch */
+		const std::vector<BatchQueryData>& getQueries() const&;
 
 		/** Get the mutable count of parameters of the last parameter set */
 		std::size_t& getParameterCountOfLastSet() &;

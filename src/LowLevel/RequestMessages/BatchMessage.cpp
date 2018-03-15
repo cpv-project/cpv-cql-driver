@@ -1,4 +1,5 @@
 #include "./BatchMessage.hpp"
+#include "../../Common/BatchQueryData.hpp"
 #include "../ProtocolTypes/ProtocolByte.hpp"
 #include "../ProtocolTypes/ProtocolShort.hpp"
 #include "../ProtocolTypes/ProtocolInt.hpp"
@@ -17,9 +18,9 @@ namespace cql {
 		auto& batchCommand = batchParameters_.getBatchCommand();
 		if (batchCommand.isValid()) {
 			str.append(joinString("", "type: ", batchCommand.getType(), ", queries: "));
-			for (std::size_t i = 0, j = batchCommand.getQueryCount(); i < j; ++i) {
-				auto query = batchCommand.getQuery(i);
-				str.append(query.first, query.second);
+			for (const auto& query : batchCommand.getQueries()) {
+				auto queryStr = query.getQuery();
+				str.append(queryStr.first, queryStr.second);
 				str.append("; ");
 			}
 		}
@@ -44,8 +45,8 @@ namespace cql {
 		type.encode(data);
 		// <n>, sum(parameter set count for query in queries)
 		std::size_t queryCountValue = 0;
-		for (std::size_t i = 0, j = batchCommand.getQueryCount(); i < j; ++i) {
-			auto& parameterSets = batchCommand.getParameterSets(i);
+		for (const auto& query : batchCommand.getQueries()) {
+			auto& parameterSets = query.parameterSets;
 			if (parameterSets.empty()) {
 				// no parameter set means execute just once
 				++queryCountValue;
@@ -66,18 +67,20 @@ namespace cql {
 		ProtocolShort parameterCount;
 		const auto& constSelf = *this;
 		std::size_t queryCountVerify = 0;
-		for (std::size_t i = 0, j = batchCommand.getQueryCount(); i < j; ++i) {
+		const auto& queries = batchCommand.getQueries();
+		for (std::size_t i = 0, j = queries.size(); i < j; ++i) {
+			auto& query = queries[i];
 			auto& preparedQueryId = constSelf.getPreparedQueryId(i);
 			if (preparedQueryId.empty()) {
 				kind.set(enumValue(BatchQueryKind::Query));
-				stringOrId = batchCommand.getQuery(i);
+				stringOrId = query.getQuery();
 				stringSize.set(stringOrId.second);
 			} else {
 				kind.set(enumValue(BatchQueryKind::PreparedQueryId));
 				stringOrId = { preparedQueryId.data(), preparedQueryId.size() };
 				idSize.set(stringOrId.second);
 			}
-			auto& parameterSets = batchCommand.getParameterSets(i);
+			auto& parameterSets = query.parameterSets;
 			if (parameterSets.empty()) {
 				// no parameter set means execute just once
 				// <kind>
@@ -139,7 +142,7 @@ namespace cql {
 		} else {
 			auto& batchCommand = batchParameters_.getBatchCommand();
 			if (batchCommand.isValid()) {
-				preparedQueryIds_.resize(batchCommand.getQueryCount());
+				preparedQueryIds_.resize(batchCommand.getQueries().size());
 			}
 			return preparedQueryIds_.at(index);
 		}

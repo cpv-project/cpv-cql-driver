@@ -1,6 +1,7 @@
 #include <CQLDriver/Common/BatchCommand.hpp>
 #include <CQLDriver/Common/ColumnTypes/Int.hpp>
 #include <CQLDriver/Common/ColumnTypes/Text.hpp>
+#include <Common/BatchQueryData.hpp>
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestBatchCommand, isValid) {
@@ -43,18 +44,17 @@ TEST(TestBatchCommand, consistencyLevel) {
 TEST(TestBatchCommand, query) {
 	{
 		cql::BatchCommand command;
-		ASSERT_EQ(command.getQueryCount(), 0);
+		ASSERT_EQ(command.getQueries().size(), 0);
 	}
 	{
 		auto command = cql::BatchCommand()
 			.addQuery("insert into a (k, v) values (123, 'abc');")
 			.addQuery("insert into b (k, c, v) values (100, 0, 'asd');");
-		ASSERT_EQ(command.getQueryCount(), 2);
-		ASSERT_EQ(
-			std::string(command.getQuery(0).first, command.getQuery(0).second),
+		auto queries = command.getQueries();
+		ASSERT_EQ(queries.size(), 2);
+		ASSERT_EQ(queries.at(0).getQueryAsString(),
 			"insert into a (k, v) values (123, 'abc');");
-		ASSERT_EQ(
-			std::string(command.getQuery(1).first, command.getQuery(1).second),
+		ASSERT_EQ(queries.at(1).getQueryAsString(),
 			"insert into b (k, c, v) values (100, 0, 'asd');");
 	}
 }
@@ -72,44 +72,40 @@ TEST(TestBatchCommand, parameters) {
 				.addParameter(cql::Int(127))
 				.addParameter(cql::Int(255))
 				.addParameter(cql::Text("qwert"));
-	ASSERT_EQ(command.getQueryCount(), 2);
-	ASSERT_EQ(
-		std::string(command.getQuery(0).first, command.getQuery(0).second),
+	auto queries = command.getQueries();
+	ASSERT_EQ(queries.size(), 2);
+
+	auto query_0 = queries.at(0);
+	ASSERT_EQ(query_0.getQueryAsString(),
 		"insert into a (k, v) values (?, ?);");
-	ASSERT_EQ(command.getParameterSets(0).size(), 1);
-	ASSERT_EQ(command.getParameterSets(0).at(0).first, 2);
-	ASSERT_EQ(command.getParameterSets(0).at(0).second, makeTestString(
+	ASSERT_EQ(query_0.parameterSets.size(), 1);
+	ASSERT_EQ(query_0.parameterSets.at(0).first, 2);
+	ASSERT_EQ(query_0.parameterSets.at(0).second, makeTestString(
 		"\x00\x00\x00\x04\x00\x00\x00\x7b"
 		"\x00\x00\x00\x03""abc"));
-	ASSERT_EQ(
-		std::string(command.getQuery(1).first, command.getQuery(1).second),
+
+	auto query_1 = queries.at(1);
+	ASSERT_EQ(query_1.getQueryAsString(),
 		"insert into b (k, c, v) values (?, ?, ?);");
-	ASSERT_EQ(command.getParameterSets(1).size(), 2);
-	ASSERT_EQ(command.getParameterSets(1).at(0).first, 3);
-	ASSERT_EQ(command.getParameterSets(1).at(0).second, makeTestString(
+	ASSERT_EQ(query_1.parameterSets.size(), 2);
+	ASSERT_EQ(query_1.parameterSets.at(0).first, 3);
+	ASSERT_EQ(query_1.parameterSets.at(0).second, makeTestString(
 		"\x00\x00\x00\x04\x00\x00\x00\x64"
 		"\x00\x00\x00\x04\x00\x00\x00\x00"
 		"\x00\x00\x00\x03""asd"));
-	ASSERT_EQ(command.getParameterSets(1).at(1).first, 3);
-	ASSERT_EQ(command.getParameterSets(1).at(1).second, makeTestString(
+	ASSERT_EQ(query_1.parameterSets.at(1).first, 3);
+	ASSERT_EQ(query_1.parameterSets.at(1).second, makeTestString(
 		"\x00\x00\x00\x04\x00\x00\x00\x7f"
 		"\x00\x00\x00\x04\x00\x00\x00\xff"
 		"\x00\x00\x00\x05""qwert"));
 }
 
 TEST(TestBatchCommand, parametersError) {
-	{
-		cql::BatchCommand command;
-		ASSERT_THROWS_CONTAINS(
-			cql::LogicException,
-			command.addParameter(cql::Int(1)),
-			"please call addQuery before addParameters");
-	}
-	{
-		cql::BatchCommand command;
-		ASSERT_THROWS(std::out_of_range, command.getQuery(0));
-		ASSERT_THROWS(std::out_of_range, command.getParameterSets(0));
-	}
+	cql::BatchCommand command;
+	ASSERT_THROWS_CONTAINS(
+		cql::LogicException,
+		command.addParameter(cql::Int(1)),
+		"please call addQuery before addParameters");
 }
 
 TEST(TestBatchCommand, serialConsistencyLevel) {
