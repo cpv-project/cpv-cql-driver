@@ -4,7 +4,7 @@
 TEST(TestProtocolResultPreparedMetadata, getset) {
 	{
 		cql::ProtocolResultPreparedMetadata value;
-		value.setPartitionKeyIndexes({ cql::ProtocolInt(1) });
+		value.setPartitionKeyIndexes({ cql::ProtocolShort(1) });
 		value.setColumns({ cql::ProtocolResultColumn(), cql::ProtocolResultColumn() });
 		value.getColumns().at(0).setKeySpace("k");
 		value.getColumns().at(0).setTable("t");
@@ -50,7 +50,7 @@ TEST(TestProtocolResultPreparedMetadata, getset) {
 TEST(TestProtocolResultPreparedMetadata, encode) {
 	{
 		cql::ProtocolResultPreparedMetadata value;
-		value.setPartitionKeyIndexes({ cql::ProtocolInt(1) });
+		value.setPartitionKeyIndexes({ cql::ProtocolShort(1) });
 		value.setColumns({ cql::ProtocolResultColumn(), cql::ProtocolResultColumn() });
 		value.getColumns().at(0).setKeySpace("k");
 		value.getColumns().at(0).setTable("t");
@@ -66,7 +66,7 @@ TEST(TestProtocolResultPreparedMetadata, encode) {
 			"\x00\x00\x00\x00"
 			"\x00\x00\x00\x02"
 			"\x00\x00\x00\x01"
-			"\x00\x00\x00\x01"
+			"\x00\x01"
 			"\x00\x01""k""\x00\x01""t""\x00\x01""a""\x00\x09"
 			"\x00\x01""K""\x00\x01""T""\x00\x01""b""\x00\x01"));
 	}
@@ -97,7 +97,7 @@ TEST(TestProtocolResultPreparedMetadata, decode) {
 			"\x00\x00\x00\x00"
 			"\x00\x00\x00\x02"
 			"\x00\x00\x00\x01"
-			"\x00\x00\x00\x01"
+			"\x00\x01"
 			"\x00\x01""k""\x00\x01""t""\x00\x01""a""\x00\x09"
 			"\x00\x01""K""\x00\x01""T""\x00\x01""b""\x00\x01");
 		auto ptr = data.c_str();

@@ -22,7 +22,7 @@ namespace cql {
 		seastar::future<> execute(Command&& command);
 
 		/** Perform multiple modification commands in batch */
-		seastar::future<> batchExecute(BatchCommand command);
+		seastar::future<> batchExecute(BatchCommand&& command);
 
 		/** Constructor */
 		explicit Session(Object<SessionData>&& data);

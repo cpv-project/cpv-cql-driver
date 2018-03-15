@@ -115,7 +115,7 @@ namespace cql {
 				parameterCount.encode(data);
 				// <value_1>...<value_n>
 				data.append(parameterSet.second.data(), parameterSet.second.size());
-				queryCountVerify += parameterSet.first;
+				++queryCountVerify;
 			}
 		}
 		if (queryCountValue != queryCountVerify) {

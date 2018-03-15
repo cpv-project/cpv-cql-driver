@@ -1,6 +1,7 @@
 #pragma once
 #include "../LowLevelDefinitions.hpp"
 #include "./ProtocolInt.hpp"
+#include "./ProtocolShort.hpp"
 #include "./ProtocolString.hpp"
 #include "./ProtocolResultColumn.hpp"
 
@@ -28,12 +29,12 @@ namespace cql {
 		}
 
 		/** The partition key column positions, only available if all partition keys presented */
-		const std::vector<ProtocolInt>& getPartitionKeyIndexes() const& { return partitionKeyIndexes_; }
-		std::vector<ProtocolInt>& getPartitionKeyIndexes() & { return partitionKeyIndexes_; }
-		void setPartitionKeyIndexes(const std::vector<ProtocolInt>& partitionKeyIndexes) {
+		const std::vector<ProtocolShort>& getPartitionKeyIndexes() const& { return partitionKeyIndexes_; }
+		std::vector<ProtocolShort>& getPartitionKeyIndexes() & { return partitionKeyIndexes_; }
+		void setPartitionKeyIndexes(const std::vector<ProtocolShort>& partitionKeyIndexes) {
 			partitionKeyIndexes_ = partitionKeyIndexes;
 		}
-		void setPartitionKeyIndexes(std::vector<ProtocolInt>&& partitionKeyIndexes) {
+		void setPartitionKeyIndexes(std::vector<ProtocolShort>&& partitionKeyIndexes) {
 			partitionKeyIndexes_ = std::move(partitionKeyIndexes);
 		}
 
@@ -58,7 +59,7 @@ namespace cql {
 
 	private:
 		ProtocolInt flags_;
-		std::vector<ProtocolInt> partitionKeyIndexes_;
+		std::vector<ProtocolShort> partitionKeyIndexes_;
 		ProtocolString globalKeySpace_;
 		ProtocolString globalTable_;
 		std::vector<ProtocolResultColumn> columns_;
