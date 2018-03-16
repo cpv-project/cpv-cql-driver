@@ -87,5 +87,20 @@ namespace cql {
 		});
 		return staticNames;
 	}
+
+	const std::vector<std::pair<LogLevel, const char*>>&
+		EnumDescriptions<LogLevel>::get() {
+		static std::vector<std::pair<LogLevel, const char*>> staticNames({
+			{ LogLevel::Emergency, "Emergency" },
+			{ LogLevel::Alert, "Alert" },
+			{ LogLevel::Critical, "Critical" },
+			{ LogLevel::Error, "Error" },
+			{ LogLevel::Warning, "Warning" },
+			{ LogLevel::Notice, "Notice" },
+			{ LogLevel::Info, "Info" },
+			{ LogLevel::Debug, "Debug" },
+		});
+		return staticNames;
+	}
 }
 

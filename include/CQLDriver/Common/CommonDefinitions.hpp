@@ -114,6 +114,23 @@ namespace cql {
 		static const std::vector<std::pair<ErrorCode, const char*>>& get();
 	};
 
+	/** For logger */
+	enum class LogLevel {
+		Emergency = 0,
+		Alert = 1,
+		Critical = 2,
+		Error = 3,
+		Warning = 4,
+		Notice = 5,
+		Info = 6,
+		Debug = 7
+	};
+
+	template <>
+	struct EnumDescriptions<LogLevel> {
+		static const std::vector<std::pair<LogLevel, const char*>>& get();
+	};
+
 	/** The full class name of the IAuthenticator in use */
 	namespace AuthenticatorClasses {
 		static const char* AllowAllAuthenticator = "org.apache.cassandra.auth.AllowAllAuthenticator";
