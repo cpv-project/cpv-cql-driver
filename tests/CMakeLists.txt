@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME} ${Files} ${PublicHeaders} ${InternalHeaders})
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 add_subdirectory(../3rd-party/googletest googletest EXCLUDE_FROM_ALL)
 include_directories(../src ../tests)
-target_link_libraries(${PROJECT_NAME} gtest_main)
+target_link_libraries(${PROJECT_NAME} gtest_main CQLDriver)
 
 # add predefined macros
 add_definitions(-DDB_SIMPLE_IP="127.0.0.1")
