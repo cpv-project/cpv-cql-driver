@@ -20,7 +20,7 @@ namespace cql {
 		template <class... Args>
 		void log(LogLevel logLevel, const Args&... args) {
 			if (isEnabled(logLevel)) {
-				logImpl(logLevel, joinString(" ", joinString("<", logLevel, ">"), args...));
+				logImpl(logLevel, joinString("", '<', logLevel, "> ", joinString(" ", args...), '\n'));
 			}
 		}
 

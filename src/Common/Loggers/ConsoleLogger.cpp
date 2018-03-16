@@ -5,9 +5,9 @@ namespace cql {
 	/** The implmentation of log, writes to console */
 	void ConsoleLogger::logImpl(LogLevel logLevel, const std::string& message) {
 		if (logLevel <= LogLevel::Warning) {
-			std::cerr << message << std::endl;
+			std::cerr << message;
 		} else {
-			std::cout << message << std::endl;
+			std::cout << message;
 		}
 	}
 }
