@@ -170,41 +170,59 @@ namespace cql {
 		}
 		std::size_t maxRetries = command.getMaxRetries();
 		return seastar::do_with(
-			std::move(command), data_->connectionPool, maxRetries, ResultSet(nullptr),
-			[] (auto& command, auto& connectionPool, auto& maxRetries, auto& result) {
-			return seastar::repeat([&command, &connectionPool, &maxRetries, &result] {
+			std::move(command),
+			data_->connectionPool,
+			maxRetries,
+			seastar::lw_shared_ptr<Connection>(),
+			ConnectionStream(),
+			ResultSet(nullptr), [] (
+			auto& command,
+			auto& connectionPool,
+			auto& maxRetries,
+			auto& connection,
+			auto& stream,
+			auto& result) {
+			return seastar::repeat([
+				&command,
+				&connectionPool,
+				&maxRetries,
+				&connection,
+				&stream,
+				&result] {
 				// get connection
 				return connectionPool->getConnection().then(
-					[&command, &maxRetries, &result] (auto connection, auto stream) {
+					[&connection, &stream] (auto connectionVal, auto streamVal) {
+					connection = std::move(connectionVal);
+					stream = std::move(streamVal);
+				}).then([&command, &connection, &stream] {
 					// send QUERY
 					auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
 					auto& queryParameters = queryMessage->getQueryParameters();
 					queryParameters.setSkipMetadata(true);
 					queryParameters.setCommandRef(command);
-					return connection->sendMessage(std::move(queryMessage), stream).then(
-						[connection=std::move(connection), stream=std::move(stream)] {
-						// receive RESULT
-						return connection->waitNextMessage(stream);
-					}).then([&command, &maxRetries, &result] (auto message) {
-						// handle RESULT
-						if (message->getHeader().getOpCode() == MessageType::Result) {
-							auto resultMessage = std::move(message).template cast<ResultMessage>();
-							if (resultMessage->getKind() == ResultKind::Rows) {
-								result = std::move(resultMessage->getResultSet());
-							} else {
-								result = getEmptyResultSet();
-							}
-							return seastar::make_ready_future<>();
+					return connection->sendMessage(std::move(queryMessage), stream);
+				}).then([&connection, &stream] {
+					// receive RESULT
+					return connection->waitNextMessage(stream);
+				}).then([&command, &maxRetries, &result] (auto message) {
+					// handle RESULT
+					if (message->getHeader().getOpCode() == MessageType::Result) {
+						auto resultMessage = std::move(message).template cast<ResultMessage>();
+						if (resultMessage->getKind() == ResultKind::Rows) {
+							result = std::move(resultMessage->getResultSet());
+						} else {
+							result = getEmptyResultSet();
 						}
-						// handle ERROR
-						if (message->getHeader().getOpCode() == MessageType::Error) {
-							auto errorMessage = std::move(message).template cast<ErrorMessage>();
-							return handleErrorMessage(std::move(errorMessage), command, maxRetries);
-						}
-						// unexpected message type
-						return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
-					});
-				}).then([] {
+						return seastar::make_ready_future<>();
+					}
+					// handle ERROR
+					if (message->getHeader().getOpCode() == MessageType::Error) {
+						auto errorMessage = std::move(message).template cast<ErrorMessage>();
+						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+					}
+					// unexpected message type
+					return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
+				}).then([&connectionPool, &connection, &stream] {
 					// query successful
 					return seastar::stop_iteration::yes;
 				}).handle_exception([&maxRetries] (std::exception_ptr ex) {
@@ -216,6 +234,11 @@ namespace cql {
 					} else {
 						return seastar::make_exception_future<
 							seastar::stop_iteration>(std::move(ex));
+					}
+				}).finally([&connectionPool, &connection, &stream] {
+					// return the connection
+					if (connection.get() != nullptr && stream.isValid()) {
+						connectionPool->returnConnection(std::move(connection), std::move(stream));
 					}
 				});
 			}).then([&result] {
@@ -236,35 +259,50 @@ namespace cql {
 		}
 		std::size_t maxRetries = command.getMaxRetries();
 		return seastar::do_with(
-			std::move(command), data_->connectionPool, maxRetries,
-			[] (auto& command, auto& connectionPool, auto& maxRetries) {
-			return seastar::repeat([&command, &connectionPool, &maxRetries] {
+			std::move(command),
+			data_->connectionPool,
+			maxRetries,
+			seastar::lw_shared_ptr<Connection>(),
+			ConnectionStream(), [] (
+			auto& command,
+			auto& connectionPool,
+			auto& maxRetries,
+			auto& connection,
+			auto& stream) {
+			return seastar::repeat([
+				&command,
+				&connectionPool,
+				&maxRetries,
+				&connection,
+				&stream] {
 				// get connection
 				return connectionPool->getConnection().then(
-					[&command, &maxRetries] (auto connection, auto stream) {
+					[&connection, &stream] (auto connectionVal, auto streamVal) {
+					connection = std::move(connectionVal);
+					stream = std::move(streamVal);
+				}).then([&command, &connection, &stream] {
 					// send QUERY
 					auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
 					auto& queryParameters = queryMessage->getQueryParameters();
 					queryParameters.setSkipMetadata(true);
 					queryParameters.setCommandRef(command);
-					return connection->sendMessage(std::move(queryMessage), stream).then(
-						[connection=std::move(connection), stream=std::move(stream)] {
-						// receive RESULT
-						return connection->waitNextMessage(stream);
-					}).then([&command, &maxRetries] (auto message) {
-						// handle RESULT
-						if (message->getHeader().getOpCode() == MessageType::Result) {
-							return seastar::make_ready_future<>();
-						}
-						// handle ERROR
-						if (message->getHeader().getOpCode() == MessageType::Error) {
-							auto errorMessage = std::move(message).template cast<ErrorMessage>();
-							return handleErrorMessage(std::move(errorMessage), command, maxRetries);
-						}
-						// unexpected message type
-						return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
-					});
-				}).then([] {
+					return connection->sendMessage(std::move(queryMessage), stream);
+				}).then([&connection, &stream] {
+					// receive RESULT
+					return connection->waitNextMessage(stream);
+				}).then([&command, &maxRetries] (auto message) {
+					// handle RESULT
+					if (message->getHeader().getOpCode() == MessageType::Result) {
+						return seastar::make_ready_future<>();
+					}
+					// handle ERROR
+					if (message->getHeader().getOpCode() == MessageType::Error) {
+						auto errorMessage = std::move(message).template cast<ErrorMessage>();
+						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+					}
+					// unexpected message type
+					return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
+				}).then([&connectionPool, &connection, &stream] {
 					// execute successful
 					return seastar::stop_iteration::yes;
 				}).handle_exception([&maxRetries] (std::exception_ptr ex) {
@@ -276,6 +314,11 @@ namespace cql {
 					} else {
 						return seastar::make_exception_future<
 							seastar::stop_iteration>(std::move(ex));
+					}
+				}).finally([&connectionPool, &connection, &stream] {
+					// return the connection
+					if (connection.get() != nullptr && stream.isValid()) {
+						connectionPool->returnConnection(std::move(connection), std::move(stream));
 					}
 				});
 			});
@@ -292,43 +335,61 @@ namespace cql {
 			return seastar::make_ready_future<>();
 		}
 		std::size_t maxRetries = command.getMaxRetries();
+		std::size_t prepareIndex = 0;
 		return seastar::do_with(
-			std::move(command), data_->connectionPool, maxRetries,
-			[] (auto& command, auto& connectionPool, auto& maxRetries) {
-			return seastar::repeat([&command, &connectionPool, &maxRetries] {
+			std::move(command),
+			data_->connectionPool,
+			maxRetries,
+			seastar::lw_shared_ptr<Connection>(),
+			ConnectionStream(),
+			Object<BatchMessage>(nullptr),
+			prepareIndex, [] (
+			auto& command,
+			auto& connectionPool,
+			auto& maxRetries,
+			auto& connection,
+			auto& stream,
+			auto& batchMessage,
+			auto& prepareIndex) {
+			return seastar::repeat([
+				&command,
+				&connectionPool,
+				&maxRetries,
+				&connection,
+				&stream,
+				&batchMessage,
+				&prepareIndex] {
 				// get connection
 				return connectionPool->getConnection().then(
-					[&command, &maxRetries] (auto connection, auto stream) {
-					auto batchMessage = RequestMessageFactory::makeRequestMessage<BatchMessage>();
-					batchMessage->getBatchParameters().setBatchCommandRef(command);
+					[&connection, &stream] (auto connectionVal, auto streamVal) {
+					connection = std::move(connectionVal);
+					stream = std::move(streamVal);
+				}).then(
+					[&command, &maxRetries, &connection, &stream, &batchMessage, &prepareIndex] {
 					// prepare queries
-					std::size_t prepareIndex = 0;
-					return seastar::do_with(
-						std::move(connection), std::move(stream), std::move(batchMessage), prepareIndex,
-						[&command, &maxRetries]
-						(auto& connection, auto& stream, auto& batchMessage, auto& prepareIndex) {
-						return prepareQueries(
-							command, maxRetries, connection, stream, batchMessage, prepareIndex).then(
-							[&connection, &stream, &batchMessage] {
-							// send BATCH
-							return connection->sendMessage(std::move(batchMessage), stream);
-						}).then([&connection, &stream] {
-							// receive RESULT
-							return connection->waitNextMessage(stream);
-						}).then([&command, &maxRetries] (auto message) {
-							// handle RESULT
-							if (message->getHeader().getOpCode() == MessageType::Result) {
-								return seastar::make_ready_future<>();
-							}
-							// handle ERROR
-							if (message->getHeader().getOpCode() == MessageType::Error) {
-								auto errorMessage = std::move(message).template cast<ErrorMessage>();
-								return handleErrorMessage(std::move(errorMessage), command, maxRetries);
-							}
-							// unexpected message type
-							return handleUnexpectMessage(std::move(message), "BATCH", maxRetries);
-						});
-					});
+					batchMessage = RequestMessageFactory::makeRequestMessage<BatchMessage>();
+					batchMessage->getBatchParameters().setBatchCommandRef(command);
+					prepareIndex = 0;
+					return prepareQueries(
+						command, maxRetries, connection, stream, batchMessage, prepareIndex);
+				}).then([&connection, &stream, &batchMessage] {
+					// send BATCH
+					return connection->sendMessage(std::move(batchMessage), stream);
+				}).then([&connection, &stream] {
+					// receive RESULT
+					return connection->waitNextMessage(stream);
+				}).then([&command, &maxRetries] (auto message) {
+					// handle RESULT
+					if (message->getHeader().getOpCode() == MessageType::Result) {
+						return seastar::make_ready_future<>();
+					}
+					// handle ERROR
+					if (message->getHeader().getOpCode() == MessageType::Error) {
+						auto errorMessage = std::move(message).template cast<ErrorMessage>();
+						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+					}
+					// unexpected message type
+					return handleUnexpectMessage(std::move(message), "BATCH", maxRetries);
 				}).then([] {
 					// batch execute successful
 					return seastar::stop_iteration::yes;
@@ -341,6 +402,11 @@ namespace cql {
 					} else {
 						return seastar::make_exception_future<
 							seastar::stop_iteration>(std::move(ex));
+					}
+				}).finally([&connectionPool, &connection, &stream] {
+					// return the connection
+					if (connection.get() != nullptr && stream.isValid()) {
+						connectionPool->returnConnection(std::move(connection), std::move(stream));
 					}
 				});
 			});

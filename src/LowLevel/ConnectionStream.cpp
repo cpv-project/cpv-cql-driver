@@ -15,6 +15,19 @@ namespace cql {
 		return isValid_;
 	}
 
+	/** Release this stream */
+	void ConnectionStream::close() {
+		if (isValid_) {
+			isValid_ = false;
+			if (freeStreamIds_.get() != nullptr) {
+				freeStreamIds_->emplace_back(streamId_);
+			} else {
+				// throw an exception will abort the program, just output the error log
+				std::cerr << "valid stream can't hold a null stream ids" << std::endl;
+			}
+		}
+	}
+
 	/** Constructor */
 	ConnectionStream::ConnectionStream() :
 		isValid_(false),
@@ -52,19 +65,6 @@ namespace cql {
 	/** Destructor */
 	ConnectionStream::~ConnectionStream() {
 		close();
-	}
-
-	/** Release this stream */
-	void ConnectionStream::close() {
-		if (isValid_) {
-			isValid_ = false;
-			if (freeStreamIds_.get() != nullptr) {
-				freeStreamIds_->emplace_back(streamId_);
-			} else {
-				// throw an exception will abort the program, just output the error log
-				std::cerr << "valid stream can't hold a null stream ids" << std::endl;
-			}
-		}
 	}
 }
 

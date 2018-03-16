@@ -73,15 +73,16 @@ namespace cql {
 		return future;
 	}
 
-	/** Tell connection pool some connection become idle, this is optional */
-	void ConnectionPool::notifyConnectionBecomeIdle(
-		seastar::lw_shared_ptr<Connection>&& connection) {
+	/** Return the connection to the pool manually, this is optional */
+	void ConnectionPool::returnConnection(
+		seastar::lw_shared_ptr<Connection>&& connection, ConnectionStream&& stream) {
+		stream.close();
 		if (!waiters_.empty()) {
 			auto promise = waiters_.pop();
 			auto stream = connection->openStream();
 			if (!stream.isValid()) {
 				promise.set_exception(LogicException(CQL_CODEINFO,
-					"open stream form a idle connection notified failed"));
+					"open stream form a returned connection failed"));
 			} else {
 				promise.set_value(std::move(connection), std::move(stream));
 			}

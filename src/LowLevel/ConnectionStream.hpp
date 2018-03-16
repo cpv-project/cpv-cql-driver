@@ -15,6 +15,9 @@ namespace cql {
 		/** Get whether this object holds a valid and in use stream id */
 		bool isValid() const;
 
+		/** Release this stream */
+		void close();
+
 		/** Constructor */
 		ConnectionStream();
 
@@ -33,10 +36,6 @@ namespace cql {
 
 		/** Destructor */
 		~ConnectionStream();
-
-	private:
-		/** Release this stream */
-		void close();
 
 	private:
 		bool isValid_;

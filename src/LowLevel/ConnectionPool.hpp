@@ -19,8 +19,9 @@ namespace cql {
 		/** Get a connection with idle stream, wait until they are available */
 		seastar::future<seastar::lw_shared_ptr<Connection>, ConnectionStream> getConnection();
 
-		/** Tell connection pool some connection become idle, this is optional */
-		void notifyConnectionBecomeIdle(seastar::lw_shared_ptr<Connection>&& connection);
+		/** Return the connection to the pool manually, this is optional */
+		void returnConnection(
+			seastar::lw_shared_ptr<Connection>&& connection, ConnectionStream&& stream);
 
 		/** Constructor */
 		ConnectionPool(

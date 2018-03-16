@@ -11,7 +11,7 @@ namespace cql {
 			maxWaitersAfterConnectionsExhausted(100),
 			dnsCacheTime(30000),
 			defaultKeySpace(),
-			logger(Logger::createConsole(LogLevel::Debug)) { }
+			logger(Logger::createNoop()) { }
 
 		std::size_t minPoolSize;
 		std::size_t maxPoolSize;

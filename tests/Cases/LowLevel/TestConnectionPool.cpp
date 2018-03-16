@@ -133,7 +133,7 @@ TEST_FUTURE(TestConnectionPool, getConnectionFailed) {
 		});
 }
 
-TEST_FUTURE(TestConnectionPool, getConnectionWithNotify) {
+TEST_FUTURE(TestConnectionPool, getConnectionThenReturn) {
 	static const std::size_t testMaxStream = 5;
 	static const std::size_t testMinPoolSize = 1;
 	static const std::size_t testMaxPoolSize = 3;
@@ -167,8 +167,7 @@ TEST_FUTURE(TestConnectionPool, getConnectionWithNotify) {
 						.then([connectionPool,
 							connection=std::move(connection),
 							stream=std::move(stream)] () mutable {
-							stream = {};
-							connectionPool->notifyConnectionBecomeIdle(std::move(connection));
+							connectionPool->returnConnection(std::move(connection), std::move(stream));
 						});
 					}
 				}).then([&count] {
@@ -215,7 +214,7 @@ TEST_FUTURE(TestConnectionPool, getConnectionWithTimer) {
 						seastar::sleep(std::chrono::milliseconds(1))
 						.then([connectionPool, stream=std::move(stream)] () mutable {
 							stream = {};
-							// did not call notifyConnectionBecomeIdle
+							// did not call returnConnection
 						});
 					}
 				}).then([&count] {
