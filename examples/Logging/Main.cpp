@@ -7,7 +7,8 @@ int main(int argc, char** argv) {
 	app.run(argc, argv, [] {
 		cql::SessionFactory sessionFactory(
 			cql::SessionConfiguration()
-				.setDefaultKeySpace("system"),
+				.setDefaultKeySpace("system")
+				.setLogger(cql::Logger::createConsole(cql::LogLevel::Debug)),
 			cql::NodeCollection::create({
 				cql::NodeConfiguration()
 					.setAddress("127.0.0.1", 9043)
