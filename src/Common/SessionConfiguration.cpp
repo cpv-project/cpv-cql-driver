@@ -1,4 +1,5 @@
 #include <CQLDriver/Common/SessionConfiguration.hpp>
+#include <CQLDriver/Common/Exceptions/LogicException.hpp>
 
 namespace cql {
 	/** Defines members of SessionConfiguration */
@@ -9,13 +10,15 @@ namespace cql {
 			maxPoolSize(100),
 			maxWaitersAfterConnectionsExhausted(100),
 			dnsCacheTime(30000),
-			defaultKeySpace() { }
+			defaultKeySpace(),
+			logger(Logger::createConsole(LogLevel::Debug)) { }
 
 		std::size_t minPoolSize;
 		std::size_t maxPoolSize;
 		std::size_t maxWaitersAfterConnectionsExhausted;
 		std::chrono::milliseconds dnsCacheTime;
 		std::string defaultKeySpace;
+		seastar::shared_ptr<Logger> logger;
 	};
 
 	/** Set the minimum database connection pool size.  */
@@ -48,6 +51,15 @@ namespace cql {
 		return *this;
 	}
 
+	/** Set the logger instance */
+	SessionConfiguration& SessionConfiguration::setLogger(const seastar::shared_ptr<Logger>& logger) {
+		if (logger == nullptr) {
+			throw LogicException(CQL_CODEINFO, "logger is nullptr");
+		}
+		data_->logger = logger;
+		return *this;
+	}
+
 	/** Get the minimum database connection pool size */
 	std::size_t SessionConfiguration::getMinPoolSize() const {
 		return data_->minPoolSize;
@@ -71,6 +83,11 @@ namespace cql {
 	/** Get the default keyspace of all connections created by this configuration */
 	const std::string& SessionConfiguration::getDefaultKeySpace() const& {
 		return data_->defaultKeySpace;
+	}
+
+	/** Get the logger instance */
+	const seastar::shared_ptr<Logger>& SessionConfiguration::getLogger() const& {
+		return data_->logger;
 	}
 
 	/** Constructor */

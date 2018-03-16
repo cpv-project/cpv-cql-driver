@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <chrono>
 #include <core/shared_ptr.hh>
+#include "./Logger.hpp"
 
 namespace cql {
 	/** Defines members of SessionConfiguration */
@@ -47,6 +48,9 @@ namespace cql {
 		/** Set the default keyspace of all connections created by this configuration */
 		SessionConfiguration& setDefaultKeySpace(const std::string& keySpace);
 
+		/** Set the logger instance */
+		SessionConfiguration& setLogger(const seastar::shared_ptr<Logger>& logger);
+
 		/** Get the minimum database connection pool size */
 		std::size_t getMinPoolSize() const;
 
@@ -61,6 +65,9 @@ namespace cql {
 
 		/** Get the default keyspace of all connections created by this configuration */
 		const std::string& getDefaultKeySpace() const&;
+
+		/** Get the logger instance */
+		const seastar::shared_ptr<Logger>& getLogger() const&;
 
 		/** Constructor */
 		SessionConfiguration();

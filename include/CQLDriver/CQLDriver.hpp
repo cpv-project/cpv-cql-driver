@@ -21,6 +21,7 @@
 #include "./Common/Utility/UUIDUtils.hpp"
 #include "./Common/BatchCommand.hpp"
 #include "./Common/Command.hpp"
+#include "./Common/Logger.hpp"
 #include "./Common/NodeCollection.hpp"
 #include "./Common/NodeConfiguration.hpp"
 #include "./Common/ResultSet.hpp"

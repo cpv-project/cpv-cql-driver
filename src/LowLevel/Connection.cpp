@@ -24,6 +24,12 @@ namespace cql {
 		}
 		auto self = shared_from_this();
 		return seastar::futurize_apply([self] {
+			// log connect
+			auto& logger = self->sessionConfiguration_->getLogger();
+			if (logger->isEnabled(LogLevel::Info)) {
+				logger->log(LogLevel::Info, "create connection to",
+					self->nodeConfiguration_->getAddressAsString());
+			}
 			// connect to database server
 			seastar::socket_address address;
 			if (self->nodeConfiguration_->getIpAddress(
@@ -51,7 +57,7 @@ namespace cql {
 			// connect failed
 			return seastar::make_exception_future(NetworkException(
 				CQL_CODEINFO, "connect to",
-				self->nodeConfiguration_->getAddress().first, "failed:\n", ex));
+				self->nodeConfiguration_->getAddressAsString(), "failed:\n", ex));
 		}).then([self] {
 			// send OPTION
 			auto optionMessage = RequestMessageFactory::makeRequestMessage<OptionsMessage>();
@@ -151,6 +157,11 @@ namespace cql {
 			auto& sendingPromise,
 			auto& previousSendingFuture) {
 			return previousSendingFuture.then([&self, &message] {
+				// log message
+				auto& logger = self->sessionConfiguration_->getLogger();
+				if (logger->isEnabled(LogLevel::Debug)) {
+					logger->log(LogLevel::Debug, "send message:", message->toString());
+				}
 				// encode message to binary data
 				self->sendingBuffer_.resize(0);
 				message->getHeader().encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
@@ -213,6 +224,11 @@ namespace cql {
 							seastar::temporary_buffer<char>&& buf) mutable {
 							auto message = ResponseMessageFactory::makeResponseMessage(std::move(header));
 							message->decodeBody(self->connectionInfo_, std::move(buf));
+							// log message
+							auto& logger = self->sessionConfiguration_->getLogger();
+							if (logger->isEnabled(LogLevel::Debug)) {
+								logger->log(LogLevel::Debug, "received message:", message->toString());
+							}
 							// find the corresponding promise
 							auto streamId = message->getHeader().getStreamId();
 							if (streamId >= self->receivedMessageQueueMap_.size()) {
@@ -307,6 +323,9 @@ namespace cql {
 
 	/** Close the connection */
 	void Connection::close(const std::string& errorMessage) {
+		// log close
+		auto& logger = sessionConfiguration_->getLogger();
+		logger->log(LogLevel::Info, "close connection:", errorMessage);
 		// close the socket and reset the ready state
 		socket_ = SocketHolder();
 		isReady_ = false;

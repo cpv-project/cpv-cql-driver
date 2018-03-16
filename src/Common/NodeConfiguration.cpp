@@ -1,8 +1,9 @@
+#include <CQLDriver/Common/NodeConfiguration.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include <CQLDriver/Common/Exceptions/NotImplementedException.hpp>
 #include <CQLDriver/Common/Exceptions/FormatException.hpp>
+#include <CQLDriver/Common/Utility/StringUtils.hpp>
 #include <CQLDriver/Common/CommonDefinitions.hpp>
-#include <CQLDriver/Common/NodeConfiguration.hpp>
 #include <stdexcept>
 #include <net/inet_address.hh>
 
@@ -105,6 +106,11 @@ namespace cql {
 	/** Get the hostname and the port of this node */
 	const std::pair<std::string, std::uint16_t>& NodeConfiguration::getAddress() const& {
 		return data_->address;
+	}
+
+	/** Get the string representation of the hostname and the port of this node */
+	std::string NodeConfiguration::getAddressAsString() const {
+		return joinString("", data_->address.first, ':', data_->address.second);
 	}
 
 	/** Get should connect this node with ssl connection */

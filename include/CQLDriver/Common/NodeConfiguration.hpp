@@ -34,6 +34,9 @@ namespace cql {
 		/** Get the hostname and the port of this node */
 		const std::pair<std::string, std::uint16_t>& getAddress() const&;
 
+		/** Get the string representation of the hostname and the port of this node */
+		std::string getAddressAsString() const;
+
 		/** Get should connect this node with ssl connection */
 		bool getUseSSL() const;
 

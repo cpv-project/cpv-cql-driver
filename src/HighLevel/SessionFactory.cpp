@@ -1,4 +1,5 @@
 #include <CQLDriver/HighLevel/SessionFactory.hpp>
+#include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include "../LowLevel/Connection.hpp"
 #include "./SessionData.hpp"
 
@@ -17,7 +18,11 @@ namespace cql {
 				SessionConfiguration>(sessionConfigurationRef)),
 			nodeCollection(nodeCollectionRef),
 			connectionPool(seastar::make_lw_shared<
-				ConnectionPool>(sessionConfiguration, nodeCollection)) { }
+				ConnectionPool>(sessionConfiguration, nodeCollection)) {
+			if (nodeCollection == nullptr) {
+				throw LogicException(CQL_CODEINFO, "nodeCollection is nullptr");
+			}
+		}
 	};
 
 	/** Create a new session instance */
@@ -30,7 +35,6 @@ namespace cql {
 		const SessionConfiguration& sessionConfiguration,
 		const seastar::shared_ptr<NodeCollection>& nodeCollection) :
 		data_(seastar::make_shared<SessionFactoryData>(
-			sessionConfiguration,
-			nodeCollection)) { }
+			sessionConfiguration, nodeCollection)) { }
 }
 

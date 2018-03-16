@@ -36,7 +36,7 @@ TEST_FUTURE(TestConnection, waitForReadyConnectFailed) {
 	return connection->ready().then_wrapped([] (auto&& f) {
 		ASSERT_THROWS_CONTAINS(
 			cql::ConnectionInitializeException, f.get(),
-			"connect to host.not.exist failed:");
+			"connect to host.not.exist:123 failed:");
 	});
 }
 
