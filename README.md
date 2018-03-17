@@ -3,9 +3,9 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ef5c262ba1674ccc9427630a09d4681a)](https://www.codacy.com/app/303248153/cpv-cql-driver?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cpv-project/cpv-cql-driver&amp;utm_campaign=Badge_Grade)
 [![license](https://img.shields.io/github/license/cpv-project/cpv-manage-scripts.svg)]() 
 
-This is a cassandra/scylla driver written in c++ based on the seastar framework, it's fast and easy to use.
-For seastar framework please see [here](https://github.com/scylladb/seastar).
-It's new and has not been extensively tested, you should use it carefully.
+This is a cassandra/scylla driver written in c++ based on the seastar framework, it's fast and easy to use.<br/>
+For seastar framework please see [here](https://github.com/scylladb/seastar).<br/>
+It's new and has not been extensively tested, you should use it carefully.<br/>
 
 # Features
 
