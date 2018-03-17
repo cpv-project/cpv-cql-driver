@@ -17,6 +17,7 @@
 #include "./Common/ColumnTypes/Int.hpp"
 #include "./Common/ColumnTypes/List.hpp"
 #include "./Common/ColumnTypes/Map.hpp"
+#include "./Common/ColumnTypes/MemRef.hpp"
 #include "./Common/ColumnTypes/Nullable.hpp"
 #include "./Common/ColumnTypes/Set.hpp"
 #include "./Common/ColumnTypes/SmallInt.hpp"
