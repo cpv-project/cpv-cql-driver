@@ -1,18 +1,57 @@
-# C++ driver for Cassandra/Scylla based on seastar framework
+# C++ driver for Cassandra/Scylla based on the seastar framework
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ef5c262ba1674ccc9427630a09d4681a)](https://www.codacy.com/app/303248153/cpv-cql-driver?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cpv-project/cpv-cql-driver&amp;utm_campaign=Badge_Grade)
 [![license](https://img.shields.io/github/license/cpv-project/cpv-manage-scripts.svg)]() 
 
-# TBD
+This is a cassandra/scylla driver written in c++ based on the seastar framework, it's fast and easy to use.
+For seastar framework please see [here](https://github.com/scylladb/seastar).
+It's new and has not been extensively tested, you should use it carefully.
 
-This project is still in development, more information will post later.
+# Features
+
+- [Futures based API](TODO)
+- [Connection pooling](TODO)
+- [Connection multiplexing](TODO)
+- [Automatic retry](TODO)
+- [Load balancing](TODO)
+- [Authentication](TODO)
+- [SSL](TODO)
+- [Batch Operation](TODO)
+
+# Documents
+
+- [Hello World](./docs/HelloWorld.md)
+- [Configuration](./docs/Configuration.md)
+- [Query](./docs/Query.md)
+- [Execute](./docs/Execute.md)
+- [Batch Execute](./docs/BatchExecute.md)
+- [Column Types](./docs/ColumnTypes.md)
+- [Logging](./docs/Logging.md)
+- [Benchmark](./docs/Benchmark.md)
+
+# Running tests
+
+Here are the steps to run the unit tests, for now only ubuntu is supported.
 
 ``` text
 git clone --recurse-submodules ssh://git@github.com/cpv-project/cpv-cql-driver
 cd cpv-cql-driver/tests
+sh ../install-dependencies.sh
 sh prepare.sh
 sh run_tests.sh
 ```
+
+# Contribution
+
+You should follow these rules when you are contributing code.
+
+- Use tabs instead of spaces
+- For class names, use camel case and start with a upper case (e.g. SomeClass)
+- For function names, use camel case and start with a lower case (e.g. someFunction)
+- For local variable names, use camel case and start with a lower case (e.g. someInt)
+- For global variable names, use camel case and start with a upper case (e.g. SomeGlobalValue)
+- For class member names, use camel case and start with a lower case and ends with `_` (e.g. someMember_)
+- Write comments for every public class and function, keep the code as simple as possible
 
 # License
 
