@@ -27,6 +27,9 @@ before_install:
   - sed -i 's/sudo usermod/#sudo usermod/g' ./3rd-party/cpv-manage-scripts/scylla/docker_setup.sh
   - sed -i 's/sudo systemctl/#sudo systemctl/g' ./3rd-party/cpv-manage-scripts/scylla/docker_setup.sh
   - echo
+  - echo 'install dependencies'
+  - sed -i 's/libboost-all-dev//g' ./3rd-party/seastar/install-dependencies.sh
+  - sed -i 's/g++-5/g++-7/g' ./3rd-party/seastar/install-dependencies.sh
   - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh && cd ..
   - echo
@@ -34,6 +37,7 @@ before_install:
   - sed -i 's/configure.py/configure.py --c-compiler gcc-7 --compiler g++-7/g' build-debug.sh
   - sed -i 's/configure.py/configure.py --c-compiler gcc-7 --compiler g++-7/g' build-release.sh
   - echo
+  - echo 'support ubuntu 14.04 really sucks'
   - export CC=gcc-7
   - export CXX=g++-7
 
