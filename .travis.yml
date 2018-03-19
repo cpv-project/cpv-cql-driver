@@ -13,7 +13,7 @@ addons:
 git:
   submodules: false
 before_install:
-  - ssh-keygen
+  - cat /dev/zero | ssh-keygen
   - git submodule update --init --recursive
   - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh
