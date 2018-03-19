@@ -1,4 +1,4 @@
-This driver supports following column types:
+This driver supports following column types:<br/>
 Notice all column types can't hold a null value unless `Nullable<T>` is used.
 
 # Ascii
