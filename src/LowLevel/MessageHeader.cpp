@@ -35,7 +35,7 @@ namespace cql {
 		bodyLengthData.resize(0);
 		bodyLength.encode(bodyLengthData);
 		std::memcpy(
-			data.data() + headerSize - bodyLengthData.size(),
+			&data[headerSize - bodyLengthData.size()],
 			bodyLengthData.data(),
 			bodyLengthData.size());
 	}
