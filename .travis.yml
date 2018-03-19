@@ -8,6 +8,8 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - g++-7
+      - cmake
       - realpath
 services:
   - docker
@@ -23,8 +25,8 @@ before_install:
   - sed -i 's/sudo usermod/#sudo usermod/g' ./3rd-party/cpv-manage-scripts/scylla/docker_setup.sh
   - sed -i 's/sudo systemctl/#sudo systemctl/g' ./3rd-party/cpv-manage-scripts/scylla/docker_setup.sh
   - echo
-  - echo 'create scylla containers'
-  - cd tests && sudo sh prepare.sh
+  - sudo sh install-dependencies.sh
+  - cd tests && sudo sh prepare.sh && cd ..
   - echo
   - export CC=gcc-7
   - export CXX=g++-7
