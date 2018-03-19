@@ -88,7 +88,7 @@ TEST(TestNullable, operations) {
 		a->reset();
 		ASSERT_FALSE(a.isNull());
 		ASSERT_EQ(a.get(), 0);
-		a->set(321);
+		a.set(321);
 		a.reset();
 		ASSERT_TRUE(a.isNull());
 		ASSERT_EQ(a.get(), 0);

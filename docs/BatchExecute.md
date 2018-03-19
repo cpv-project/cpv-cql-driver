@@ -104,8 +104,8 @@ but you have to ensure the string is alive until `Session::batchExecute` is fini
 Prepare the last query to reduce the message size.<br/>
 Notice it will increase one roundtrip.<br/>
 
-**For now this driver won't rememeber prepared query, the query will be prepared every time the batch command is executed.**
-I want to implement this feature but I don't know what to do if a node has restarted, detect it by receives events may be unreliable.
+**For now this driver won't rememeber prepared query, the query will be prepared every time the batch command is executed.**<br/>
+I want to implement this feature but I don't know what to do if a node has restarted, detect it by receive events may be unreliable.
 
 ### openParameterSet()
 

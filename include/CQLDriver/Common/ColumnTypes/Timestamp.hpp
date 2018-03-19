@@ -118,7 +118,7 @@ namespace cql {
 			return Timestamp(localTm);
 		}
 
-		/** Create a Time with now, in local timezone */
+		/** Create a Timestamp with now, in utc */
 		static Timestamp now() {
 			return Timestamp(std::chrono::system_clock::now());
 		}
