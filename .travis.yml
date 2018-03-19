@@ -19,6 +19,7 @@ services:
 git:
   submodules: false
 before_install:
+  - gold
   - echo 'fix submodule'
   - sed -i 's/ssh:\/\/git@github.com\//https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
