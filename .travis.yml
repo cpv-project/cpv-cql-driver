@@ -7,9 +7,11 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - sourceline: 'deb http://ppa.launchpad.net/scylladb/ppa/ubuntu trusty main'
     packages:
       - g++-7
       - cmake
+      - scylla-libboost163-all-dev
       - realpath
 services:
   - docker
