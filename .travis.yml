@@ -1,0 +1,18 @@
+language: cpp
+script: cd tests && sh run_tests.sh
+os: linux
+dist: trusty
+sudo: required
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      - cmake
+before_install:
+  - sudo sh install-dependencies.sh
+  - cd tests && sudo sh prepare.sh
+  - export CC=gcc-7
+  - export CXX=g++-7
+
