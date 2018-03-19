@@ -21,10 +21,10 @@ namespace cql {
 		/** Set should use frame compression if available, defaut value is false */
 		NodeConfiguration& setUseCompression(bool value);
 
-		/** Set how many streams can hold in single connection, default value is 20 */
+		/** Set how many streams can hold in a single connection, default value is 20 */
 		NodeConfiguration& setMaxStreams(std::size_t value);
 
-		/** Set how many messages can hold in a received queue for single stream */
+		/** Set how many messages can hold in a received queue for a single stream, default value is 20 */
 		NodeConfiguration& setMaxPendingMessages(std::size_t value);
 
 		/** Set to use password authentication for this node */
@@ -43,10 +43,10 @@ namespace cql {
 		/** Get should use frame compression if available */
 		bool getUseCompression() const;
 
-		/** Get how many streams can hold in single connection */
+		/** Get how many streams can hold in a single connection */
 		std::size_t getMaxStreams() const;
 
-		/** Get how many messages can hold in a received queue for single stream */
+		/** Get how many messages can hold in a received queue for a single stream */
 		std::size_t getMaxPendingMessages() const;
 
 		/** Get the full authentication class name */

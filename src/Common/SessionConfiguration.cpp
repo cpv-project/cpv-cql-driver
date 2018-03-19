@@ -33,7 +33,7 @@ namespace cql {
 		return *this;
 	}
 
-	/** Set how many waitiers can exist after connections are exhausted */
+	/** Set how many waiters can exist after connections are exhausted */
 	SessionConfiguration& SessionConfiguration::setMaxWaitersAfterConnectionsExhausted(std::size_t value) {
 		data_->maxWaitersAfterConnectionsExhausted = value;
 		return *this;

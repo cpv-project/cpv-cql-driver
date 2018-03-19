@@ -117,7 +117,7 @@ cql::SessionFactory sessionFactory(
 
 You can see the other options of `SessionConfiguration` and `NodeConfiguration` in the [next chapter](./Configuration.md).<br/>
 Instance of `SessionFactory` is reference counted, you can copy it as you like.<br/>
-Notice `SessionFactory` is not thread safe, <span style="color:red">you should create a session factory for each thread(core)</span>.<br/>
+Notice `SessionFactory` is not thread safe, **you should create a session factory for each thread(core)**.<br/>
 Each core would have their own session factory and connection pool, it looks weird but that's the seastar way,<br/>
 which not require thread locks and memory barriers at all.
 
@@ -130,7 +130,7 @@ cql::Session session = sessionFactory.getSession();
 ```
 
 Instance of `Session` is move only, you can't copy it.<br/>
-<span style="color:red">Don't execute commands in parallel with the same instance of Session.</span>
+**Don't execute commands in parallel with the same instance of Session**.</span>
 
 ### Create a command
 
@@ -141,7 +141,7 @@ Create a `Command` is like this:
 cql::Command command("select * from batchlog");
 ```
 
-You can use the chain style or the usual style to specific options:
+You can use chain style or command style to specific options:
 
 ``` c++
 auto command = cql::Command("select * from batchlog")

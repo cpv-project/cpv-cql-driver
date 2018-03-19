@@ -71,7 +71,7 @@ namespace cql {
 		return *this;
 	}
 
-	/** Set how many streams can hold in single connection */
+	/** Set how many streams can hold in a single connection */
 	NodeConfiguration& NodeConfiguration::setMaxStreams(std::size_t value) {
 		if (!(value >= 2 && value <= 255)) {
 			throw FormatException(CQL_CODEINFO,
@@ -81,7 +81,7 @@ namespace cql {
 		return *this;
 	}
 
-	/** Set how many messages can hold in a received queue for single stream */
+	/** Set how many messages can hold in a received queue for a single stream */
 	NodeConfiguration& NodeConfiguration::setMaxPendingMessages(std::size_t value) {
 		if (!(value >= 1)) {
 			throw FormatException(CQL_CODEINFO,
@@ -123,12 +123,12 @@ namespace cql {
 		return data_->useCompression;
 	}
 
-	/** Get how many streams can hold in single connection */
+	/** Get how many streams can hold in a single connection */
 	std::size_t NodeConfiguration::getMaxStreams() const {
 		return data_->maxStreams;
 	}
 
-	/** Get how many messages can hold in a received queue for single stream */
+	/** Get how many messages can hold in a received queue for a single stream */
 	std::size_t NodeConfiguration::getMaxPendingMessages() const {
 		return data_->maxPendingMessages;
 	}
