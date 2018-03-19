@@ -10,7 +10,11 @@ addons:
     packages:
       - g++-7
       - cmake
+git:
+  submodules: false
 before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
   - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh
   - export CC=gcc-7
