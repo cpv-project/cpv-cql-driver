@@ -30,7 +30,7 @@ namespace cql {
 			bodySize = seastar::cpu_to_be(
 				static_cast<decltype(bodySize)>(data.size() - prevSize));
 			std::memcpy(
-				data.data() + prevSize - sizeof(bodySize),
+				&data[prevSize - sizeof(bodySize)],
 				&bodySize, sizeof(bodySize));
 		}
 
