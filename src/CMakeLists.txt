@@ -26,7 +26,7 @@ string(REPLACE "-Werror" "" SEASTAR_LDFLAGS "${SEASTAR_LDFLAGS}")
 
 # set compiler and link flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-unused-function -Wno-noexcept-type ${SEASTAR_CFLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto ${SEASTAR_LDFLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -fuse-ld=gold ${SEASTAR_LDFLAGS}")
 
 # generate pkgconfig file for cqldriver
 file(READ ../VERSION VERSION_NUMBER)

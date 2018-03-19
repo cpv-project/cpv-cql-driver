@@ -13,6 +13,7 @@ addons:
       - cmake
       - scylla-libboost163-all-dev
       - realpath
+      - gold
 services:
   - docker
 git:
