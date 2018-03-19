@@ -1,4 +1,5 @@
-After you create a `Session` instance from `SessionFactory`, you can perform database query by use `Session::query` function, the signature of `Session::query` is:
+After you create a `Session` instance from `SessionFactory`, you can perform database query by use the `Session::query` function.<br/>
+The signature of `Session::query` is:
 
 ``` c++
 seastar::future<ResultSet> query(Command&& command);
