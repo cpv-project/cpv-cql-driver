@@ -44,6 +44,19 @@ session.query(std::move(command)).then([] (cql::ResultSet result) {
 
 Set the consistency level of this query, default is "Quorum".<br/>
 For more information see [this page](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html).<br/>
+Supported consistencies:<br/>
+
+- ConsistencyLevel::Any
+- ConsistencyLevel::One
+- ConsistencyLevel::Two
+- ConsistencyLevel::Three
+- ConsistencyLevel::Quorum
+- ConsistencyLevel::All
+- ConsistencyLevel::LocalQuorum
+- ConsistencyLevel::EachQuorum
+- ConsistencyLevel::Serial
+- ConsistencyLevel::LocalSerial
+- ConsistencyLevel::LocalOne
 
 ### setPageSize(std::size_t)
 
@@ -97,6 +110,7 @@ A timestamp in the query itself will still override this timestamp.<br/>
 ### setMaxRetries(std::size_t)
 
 Set the maximum retry times *after* the first try has failed, default is 0.<br/>
+**Please ensure the statement is idempotent, this driver won't check it.**<br/>
 
 # ResultSet
 
