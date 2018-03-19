@@ -3,17 +3,10 @@ script: cd tests && sh run_tests.sh
 os: linux
 dist: trusty
 sudo: required
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - cmake
 git:
   submodules: false
 before_install:
-  - cat /dev/zero | ssh-keygen -q -N ""
+  - sed -i 's/ssh:\/\/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from cassandra.cluster import Cluster
-from cassandra.query import SimpleStatement, BatchStatement
+from cassandra.query import SimpleStatement
 from cassandra import ConsistencyLevel
 import time
 

@@ -25,13 +25,15 @@ if __name__ == "__main__":
 	session.execute(insertBatch)
 
 	start=time.time()
+	selectStr = "select id, name from benchmark_ks.my_table "
+	limitStr = "limit %d"%SELECT_COUNT
 	selectStatement = SimpleStatement(
-		"select id, name from benchmark_ks.my_table limit %d"%SELECT_COUNT,
+		selectStr + limitStr,
 		consistency_level=ConsistencyLevel.QUORUM)
 	for i in range(LOOP_COUNT):
 		rows = session.execute(selectStatement)
 		for row in rows:
-			id, name = row.id, row.name
-			# print(id, name)
+			id_, name = row.id, row.name
+			# print(id_, name)
 	print("used seconds:", time.time()-start)
 
