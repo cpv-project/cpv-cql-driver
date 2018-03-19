@@ -56,7 +56,7 @@ namespace cql {
 		/** Get string data */
 		const char* c_str() const& { return value_.c_str(); }
 		const char* data() const& { return value_.data(); }
-		char* data() & { return value_.data(); }
+		char* data() & { return &value_[0]; }
 
 		/** Get length of string */
 		std::size_t size() const { return value_.size(); }
