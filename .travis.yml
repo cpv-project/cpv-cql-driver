@@ -3,12 +3,13 @@ script: cd tests && sh run_tests.sh
 os: linux
 dist: trusty
 sudo: required
+services:
+  - docker
 git:
   submodules: false
 before_install:
   - sed -i 's/ssh:\/\/git@github.com\//https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
-  - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh
   - export CC=gcc-7
   - export CXX=g++-7
