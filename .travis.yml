@@ -28,6 +28,10 @@ before_install:
   - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh && cd ..
   - echo
+  - echo 'fix build options'
+  - sed -i 's/configure.py/configure.py --c-compiler gcc-7 --compiler g++-7/g' build-debug.sh
+  - sed -i 's/configure.py/configure.py --c-compiler gcc-7 --compiler g++-7/g' build-release.sh
+  - echo
   - export CC=gcc-7
   - export CXX=g++-7
 
