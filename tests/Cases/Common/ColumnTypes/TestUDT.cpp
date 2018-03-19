@@ -10,8 +10,8 @@ namespace {
 }
 
 TEST(TestUDT, fieldInfo) {
-	ASSERT_EQ(makeTestString("id"), UDTType::FieldInfo<0>::Name);
-	ASSERT_EQ(makeTestString("name"), UDTType::FieldInfo<1>::Name);
+	ASSERT_EQ(makeTestString("id"), +UDTType::FieldInfo<0>::Name);
+	ASSERT_EQ(makeTestString("name"), +UDTType::FieldInfo<1>::Name);
 	static_assert(std::is_same<UDTType::FieldInfo<0>::Type, cql::Int>::value, "check type");
 	static_assert(std::is_same<UDTType::FieldInfo<1>::Type, cql::Text>::value, "check type");
 }
