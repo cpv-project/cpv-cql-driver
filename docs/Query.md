@@ -65,6 +65,21 @@ The position is incremental, when this function is called.<br/>
 Add multiple query parameters bound by position.<br/>
 The position is incremental, when this function is called.<br/>
 
+For example:
+
+``` c++
+auto command = cql::Command("insert into exmple_ks.my_table (id, name) values (?,?)")
+	.addParameters(cql::Int(1), cql::Text("a"));
+```
+
+Equals
+
+``` c++
+auto command = cql::Command("insert into exmple_ks.my_table (id, name) values (?,?)")
+	.addParameter(cql::Int(1))
+	.addParameter(cql::Text("a"));
+```
+
 **Named parameter is unsupported, and it's not recommended to use.**
 
 ### setSerialConsistency(ConsistencyLevel)
@@ -124,5 +139,5 @@ for (std::size_t i = 0, j = result.getRowsCount(); i < j; ++i) {
 
 **Get column index by it's name is unsupported, so don't use `select * from ...`.**
 
-For more column types, see the document of [column types](./docs/ColumnTypes.md).
+For more column types, see the document of [column types](./ColumnTypes.md).
 
