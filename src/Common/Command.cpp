@@ -153,7 +153,7 @@ namespace cql {
 		return data_->defaultTimestamp;
 	}
 
-	/** Get the maximum retry times *after* the first try is failed */
+	/** Get the maximum retry times *after* the first try has failed */
 	std::size_t Command::getMaxRetries() const {
 		return data_->maxRetries;
 	}

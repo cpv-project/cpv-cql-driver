@@ -130,7 +130,7 @@ cql::SessionFactory sessionFactory(
 
 # NodeCollection
 
-The default implemention of `NodeCollection` is very simple, it will choose nodes in order, if connect to a node has failed, the node will be put on a fault list, nodes in fault list will not be choose unless a round has finished.
+The default implemention of `NodeCollection` is very simple, it will choose nodes in order, if connect to a node has failed, the node will be put on a fault list, nodes in fault list will not be choose unless a round has finished.<br/>
 For example, there nodes A, B, C, D, E:
 
 - Round 1

@@ -10,12 +10,12 @@ It's new and has not been extensively tested, you should use it carefully.<br/>
 # Features
 
 - [Futures based API](TODO)
-- [Connection pooling](TODO)
-- [Connection multiplexing](TODO)
+- [Connection pooling](./docs/Configuration.md#setminpoolsizestdsize_t)
+- [Connection multiplexing](./docs/Configuration.md#setmaxstreamsstdsize_t)
 - [Automatic retry](TODO)
-- [Load balancing](TODO)
-- [Authentication](TODO)
-- [SSL](TODO)
+- [Load balancing](./docs/Configuration.md#nodecollection)
+- [Authentication](./docs/Configuration.md#setpasswordauthenticationstdstring-stdstring)
+- [SSL](./docs/Configuration.md#setusesslbool)
 - [Batch Operation](TODO)
 
 # Documents
