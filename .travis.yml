@@ -3,6 +3,12 @@ script: cd tests && sh run_tests.sh
 os: linux
 dist: trusty
 sudo: required
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - realpath
 services:
   - docker
 git:
