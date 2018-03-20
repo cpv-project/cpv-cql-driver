@@ -24,5 +24,6 @@ TEST(TestLogger, create) {
 		auto logger = cql::Logger::createNoop();
 		ASSERT_TRUE(logger != nullptr);
 	}
+	ASSERT_TRUE(false);
 }
 
