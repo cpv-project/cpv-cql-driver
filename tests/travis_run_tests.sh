@@ -16,7 +16,7 @@ cp -f ~/scylla-keys/cadb.pem .
 # create container and run
 # sed -i 's/archive.ubuntu.com/cn.archive.ubuntu.com/g' /etc/apt/sources.list
 Command=$(cat <<"EOF"
-  sed -i 's/archive.ubuntu.com/cn.archive.ubuntu.com/g' /etc/apt/sources.list &&
+  sed -i 's/archive.ubuntu.com/cn.archive.ubuntu.com/g' /etc/apt/sources.list && \
   apt-get update && \
   apt-get install sudo -y && \
   cd /project && \
