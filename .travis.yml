@@ -15,13 +15,7 @@ addons:
       - realpath
 services:
   - docker
-git:
-  submodules: false
 before_install:
-  - echo 'fix submodule'
-  - sed -i 's/ssh:\/\/git@github.com\//https:\/\/github.com\//' .gitmodules
-  - git submodule update --init --recursive
-  - echo
   - echo 'do not install docker on travis ci'
   - sed -i 's/sudo apt-get/#sudo apt-get/g' ./3rd-party/cpv-manage-scripts/scylla/docker_setup.sh
   - sed -i 's/sudo usermod/#sudo usermod/g' ./3rd-party/cpv-manage-scripts/scylla/docker_setup.sh
