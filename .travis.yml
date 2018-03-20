@@ -9,7 +9,7 @@ addons:
       - ubuntu-toolchain-r-test
       - sourceline: 'deb http://ppa.launchpad.net/scylladb/ppa/ubuntu trusty main'
     packages:
-      - g++-7
+      - g++-8
       - cmake
       - scylla-libboost163-all-dev
       - realpath
@@ -29,12 +29,12 @@ before_install:
   - echo
   - echo 'install dependencies'
   - sed -i 's/libboost-all-dev//g' ./3rd-party/seastar/install-dependencies.sh
-  - sed -i 's/g++-5/g++-7/g' ./3rd-party/seastar/install-dependencies.sh
+  - sed -i 's/g++-5/g++-8/g' ./3rd-party/seastar/install-dependencies.sh
   - sudo sh install-dependencies.sh
   - cd tests && sudo sh prepare.sh && cd ..
   - echo
   - echo 'fix build options'
-  - sed -i 's/configure.py/configure.py --c-compiler gcc-7 --compiler g++-7 --cflags=-I\/opt\/scylladb\/include --ldflags=-L\/opt\/scylladb\/lib\/x86_64-linux-gnu/g' build-debug.sh
-  - export CC=gcc-7
-  - export CXX=g++-7
+  - sed -i 's/configure.py/configure.py --c-compiler gcc-8 --compiler g++-8 --cflags=-I\/opt\/scylladb\/include --ldflags=-L\/opt\/scylladb\/lib\/x86_64-linux-gnu/g' build-debug.sh
+  - export CC=gcc-8
+  - export CXX=g++-8
 
