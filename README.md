@@ -34,7 +34,7 @@ It's new and has not been extensively tested, you should use it carefully.<br/>
 Here are the steps to run the unit tests, for now only ubuntu is supported.
 
 ``` text
-git clone --recurse-submodules ssh://git@github.com/cpv-project/cpv-cql-driver
+git clone --recurse-submodules https://github.com/cpv-project/cpv-cql-driver
 cd cpv-cql-driver/tests
 sh ../install-dependencies.sh
 sh prepare.sh
