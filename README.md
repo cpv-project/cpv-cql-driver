@@ -11,14 +11,14 @@ It's new and has not been extensively tested, you should use it carefully.<br/>
 
 # Features
 
-- [Futures based API](TODO)
+- [Futures based API](./docs/HelloWorld.md)
 - [Connection pooling](./docs/Configuration.md#setminpoolsizestdsize_t)
 - [Connection multiplexing](./docs/Configuration.md#setmaxstreamsstdsize_t)
-- [Automatic retry](TODO)
+- [Automatic retry](./docs/Query.md#setmaxretriesstdsize_t)
 - [Load balancing](./docs/Configuration.md#nodecollection)
 - [Authentication](./docs/Configuration.md#setpasswordauthenticationstdstring-stdstring)
 - [SSL](./docs/Configuration.md#setusesslbool)
-- [Batch Operation](TODO)
+- [Batch Operation](./docs/BatchExecute.md)
 
 # Documents
 
