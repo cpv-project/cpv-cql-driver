@@ -6,7 +6,7 @@ First, if you don't known about seastar framework, you should read [this](https:
 The first thing we need to do is download this library, use this command:
 
 ``` text
-git clone --recurse-submodules ssh://git@github.com/cpv-project/cpv-cql-driver
+git clone --recurse-submodules https://github.com/cpv-project/cpv-cql-driver
 ```
 
 Then install the packages that required to build it:
