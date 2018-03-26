@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <utility>
 #include <chrono>
-#include <core/shared_ptr.hh>
+#include <memory>
 #include <net/socket_defs.hh>
 
 namespace cql {
@@ -66,8 +66,17 @@ namespace cql {
 		/** Constructor */
 		NodeConfiguration();
 
+		/** Destructor */
+		~NodeConfiguration();
+
+		/** Copy and move */
+		NodeConfiguration(const NodeConfiguration& other);
+		NodeConfiguration(NodeConfiguration&& other);
+		NodeConfiguration& operator=(const NodeConfiguration& other);
+		NodeConfiguration& operator=(NodeConfiguration&& other);
+
 	private:
-		seastar::shared_ptr<NodeConfigurationData> data_;
+		std::unique_ptr<NodeConfigurationData> data_;
 	};
 }
 

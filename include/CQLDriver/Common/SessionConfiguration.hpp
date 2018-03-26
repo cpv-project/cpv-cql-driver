@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <chrono>
-#include <core/shared_ptr.hh>
+#include <memory>
 #include "./Logger.hpp"
 
 namespace cql {
@@ -72,8 +72,17 @@ namespace cql {
 		/** Constructor */
 		SessionConfiguration();
 
+		/** Destructor */
+		~SessionConfiguration();
+
+		/** Copy and move */
+		SessionConfiguration(const SessionConfiguration& other);
+		SessionConfiguration(SessionConfiguration&& other);
+		SessionConfiguration& operator=(const SessionConfiguration& other);
+		SessionConfiguration& operator=(SessionConfiguration&& other);
+
 	private:
-		seastar::shared_ptr<SessionConfigurationData> data_;
+		std::unique_ptr<SessionConfigurationData> data_;
 	};
 }
 

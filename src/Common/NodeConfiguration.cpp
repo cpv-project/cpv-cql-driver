@@ -168,6 +168,33 @@ namespace cql {
 
 	/** Constructor */
 	NodeConfiguration::NodeConfiguration() :
-		data_(seastar::make_shared<NodeConfigurationData>()) { }
+		data_(std::make_unique<NodeConfigurationData>()) { }
+
+	/** Destructor */
+	NodeConfiguration::~NodeConfiguration() = default;
+
+	/** Copy constructor */
+	NodeConfiguration::NodeConfiguration(const NodeConfiguration& other) :
+		data_(std::make_unique<NodeConfigurationData>(*other.data_)) { }
+
+	/** Move constructor */
+	NodeConfiguration::NodeConfiguration(NodeConfiguration&& other) :
+		NodeConfiguration(other) {
+		// Same as copy, disallow empty pointer
+	}
+
+	/** Copy assignment */
+	NodeConfiguration& NodeConfiguration::operator=(const NodeConfiguration& other) {
+		if (this != &other) {
+			data_ = std::make_unique<NodeConfigurationData>(*other.data_);
+		}
+		return *this;
+	}
+
+	/** Move assignment */
+	NodeConfiguration& NodeConfiguration::operator=(NodeConfiguration&& other) {
+		// Same as copy, disallow empty pointer
+		return *this = other;
+	}
 }
 

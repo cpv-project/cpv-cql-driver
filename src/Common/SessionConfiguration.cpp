@@ -92,6 +92,33 @@ namespace cql {
 
 	/** Constructor */
 	SessionConfiguration::SessionConfiguration() :
-		data_(seastar::make_shared<SessionConfigurationData>()) { }
+		data_(std::make_unique<SessionConfigurationData>()) { }
+
+	/** Destructor */
+	SessionConfiguration::~SessionConfiguration() = default;
+
+	/** Copy constructor */
+	SessionConfiguration::SessionConfiguration(const SessionConfiguration& other) :
+		data_(std::make_unique<SessionConfigurationData>(*other.data_)) { }
+	
+	/** Move constructor */
+	SessionConfiguration::SessionConfiguration(SessionConfiguration&& other) :
+		SessionConfiguration(other) {
+		// Same as copy, disallow empty pointer
+	}
+
+	/** Copy assignment */
+	SessionConfiguration& SessionConfiguration::operator=(const SessionConfiguration& other) {
+		if (this != &other) {
+			data_ = std::make_unique<SessionConfigurationData>(*other.data_);
+		}
+		return *this;
+	}
+
+	/** Move assignment */
+	SessionConfiguration& SessionConfiguration::operator=(SessionConfiguration&& other) {
+		// Same as copy, disallow empty pointer
+		return *this = other;
+	}
 }
 
