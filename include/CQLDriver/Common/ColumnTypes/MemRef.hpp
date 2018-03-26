@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <utility>
 #include <iostream>
+#include <string_view>
 #include "./ColumnDefinitions.hpp"
 
 namespace cql {
@@ -29,6 +30,7 @@ namespace cql {
 		/** Set the value of the reference */
 		template <std::size_t Size>
 		void set(const char(&ptr)[Size]) {
+			static_assert(Size > 0, "size of c string should not be 0");
 			value_ = { ptr, Size - 1 };
 		}
 
@@ -72,7 +74,7 @@ namespace cql {
 
 	/** Write the referenced content to stream */
 	static std::ostream& operator<<(std::ostream& stream, const MemRef& value) {
-		stream << std::string(value.data(), value.size());
+		stream << std::string_view(value.data(), value.size());
 		return stream;
 	}
 }

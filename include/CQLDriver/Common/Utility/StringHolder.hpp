@@ -47,7 +47,7 @@ namespace cql {
 		template <std::size_t Size>
 		explicit StringHolder(const char(&ptr)[Size]) :
 			StringHolder(ptr, Size-1) {
-			static_assert(Size > 0, "size of c string is 0");
+			static_assert(Size > 0, "size of c string should not be 0");
 		}
 
 		/** Compare operations */

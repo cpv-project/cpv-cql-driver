@@ -170,7 +170,7 @@ namespace cql {
 		template <std::size_t Size>
 		explicit Command(const char(&query)[Size]) :
 			Command(query, Size-1) {
-			static_assert(Size > 0, "check size");
+			static_assert(Size > 0, "size of c string should not be 0");
 		}
 
 		/** Constructor, build an empty(invalid) command */

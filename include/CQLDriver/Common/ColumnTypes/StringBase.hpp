@@ -23,6 +23,7 @@ namespace cql {
 		/** Set the value of string */
 		template <std::size_t Size>
 		void set(const char(&str)[Size]) {
+			static_assert(Size > 0, "size of c string should not be 0");
 			value_.resize(0);
 			value_.append(str, Size - 1);
 		}
@@ -45,6 +46,7 @@ namespace cql {
 		/** Append the value of string */
 		template <std::size_t Size>
 		void append(const char(&str)[Size]) {
+			static_assert(Size > 0, "size of c string should not be 0");
 			value_.append(str, Size - 1);
 		}
 

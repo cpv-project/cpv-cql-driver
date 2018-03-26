@@ -58,7 +58,7 @@ namespace cql {
 		/** Add a new query to this batch */
 		template <std::size_t Size>
 		BatchCommand& addQuery(const char(&query)[Size]) & {
-			static_assert(Size > 0, "check size");
+			static_assert(Size > 0, "size of c string should not be 0");
 			return addQuery(static_cast<const char*>(query), Size-1);
 		}
 
