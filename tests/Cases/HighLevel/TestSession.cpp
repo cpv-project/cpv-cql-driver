@@ -117,7 +117,10 @@ TEST_FUTURE(TestSession, batchExecute) {
 					.openParameterSet()
 						.addParameters(cql::Int(3), cql::Text("c"))
 				.addQuery("update testkeyspace.testtable set name = ? where id = ?")
-					.addParameters(cql::Text("aaa"), cql::Int(1)));
+					.prepareQuery()
+					.addParameters(cql::Text("aaa"), cql::Int(1))
+				.addQuery("update testkeyspace.testtable set name = ? where id = ?")
+					.addParameters(cql::Text("bsd"), cql::Int(2)));
 		}).then([&session] {
 			return session.query(cql::Command(
 				"select id, name from testkeyspace.testtable"));
@@ -131,7 +134,7 @@ TEST_FUTURE(TestSession, batchExecute) {
 			ASSERT_EQ(name, "aaa");
 			result.fill(id, name);
 			ASSERT_EQ(id, 2);
-			ASSERT_EQ(name, "b");
+			ASSERT_EQ(name, "bsd");
 			result.fill(id, name);
 			ASSERT_EQ(id, 3);
 			ASSERT_EQ(name, "c");

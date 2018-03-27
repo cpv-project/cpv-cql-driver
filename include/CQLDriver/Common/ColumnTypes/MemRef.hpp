@@ -62,8 +62,8 @@ namespace cql {
 
 		/** Constructor */
 		MemRef() : value_(nullptr, 0) { }
-		// cppcheck-suppress noExplicitConstructor
 		template <class... Args>
+		// cppcheck-suppress noExplicitConstructor
 		MemRef(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);
 		}

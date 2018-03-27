@@ -80,8 +80,8 @@ namespace cql {
 
 		/** Constructor */
 		StringBase() : value_() { }
-		// cppcheck-suppress noExplicitConstructor
 		template <class... Args>
+		// cppcheck-suppress noExplicitConstructor
 		StringBase(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);
 		}

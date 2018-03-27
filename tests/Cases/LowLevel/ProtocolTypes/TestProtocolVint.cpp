@@ -78,7 +78,7 @@ TEST(TestProtocolVint, decode) {
 TEST(TestProtocolVint, decodeError) {
 	{
 		cql::ProtocolVint value(0);
-		std::string data;
+		std::string data("");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::DecodeException, value.decode(ptr, end));

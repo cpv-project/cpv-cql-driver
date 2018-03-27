@@ -26,7 +26,7 @@ namespace cql {
 		}
 
 		/** Constructor */
-		Logger(LogLevel logLevel);
+		explicit Logger(LogLevel logLevel);
 
 		/** Create a console logger */
 		static seastar::shared_ptr<Logger> createConsole(LogLevel logLevel);

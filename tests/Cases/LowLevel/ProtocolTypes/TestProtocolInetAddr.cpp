@@ -66,7 +66,7 @@ TEST(TestProtocolInetAddr, decodeError) {
 	}
 	{
 		cql::ProtocolInetAddr value;
-		std::string data;
+		std::string data("");
 		auto ptr = data.c_str();
 		auto end = ptr + data.size();
 		ASSERT_THROWS(cql::DecodeException, value.decode(ptr, end));
