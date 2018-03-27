@@ -45,8 +45,26 @@ namespace cql {
 		 */
 		SessionConfiguration& setDnsCacheTime(std::chrono::milliseconds dnsCacheTime);
 
-		/** Set the default keyspace of all connections created by this configuration */
+		/**
+		 * Set the default keyspace of all connections created by this configuration.
+		 * This can be overridden by specific keyspace in query, for example:
+		 * "select * from my_keyspace.my_table"
+		 */
 		SessionConfiguration& setDefaultKeySpace(const std::string& keySpace);
+
+		/**
+		 * Set the default consistency level.
+		 * The default value is "ConsistencyLevel.Quorum".
+		 * This can be overridden by "setConsistency(...)" in Command and BatchCommand.
+		 */
+		SessionConfiguration& setDefaultConsistency(ConsistencyLevel consistency);
+
+		/**
+		 * Set should prepare all queries by default.
+		 * The default value is false.
+		 * This can be overridden by "prepareQuery(bool)" in Command and BatchCommand.
+		 */
+		SessionConfiguration& setPrepareAllQueries(bool value);
 
 		/** Set the logger instance */
 		SessionConfiguration& setLogger(const seastar::shared_ptr<Logger>& logger);
@@ -65,6 +83,12 @@ namespace cql {
 
 		/** Get the default keyspace of all connections created by this configuration */
 		const std::string& getDefaultKeySpace() const&;
+
+		/** Get the default consistency level */
+		ConsistencyLevel getDefaultConsistency() const;
+
+		/** Get should prepare all queries by default */
+		bool getPrepareAllQueries() const;
 
 		/** Get the logger instance */
 		const seastar::shared_ptr<Logger>& getLogger() const&;

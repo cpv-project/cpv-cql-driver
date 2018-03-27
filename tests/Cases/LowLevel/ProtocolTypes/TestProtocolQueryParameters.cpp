@@ -11,24 +11,25 @@ TEST(TestProtocolQueryParameters, getset) {
 		.setPageSize(100)
 		.setPagingState("state"));
 	auto& command = value.getCommand();
-	ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::One);
+	ASSERT_TRUE(command.getConsistency().has_value());
+	ASSERT_EQ(*command.getConsistency(), cql::ConsistencyLevel::One);
 	ASSERT_EQ(command.getParameterCount(), 1);
 	ASSERT_EQ(command.getParameters(), makeTestString("\x00\x00\x00\x04\x00\x00\x00\x7b"));
-	ASSERT_EQ(command.getPageSize().first, 100);
-	ASSERT_TRUE(command.getPageSize().second);
+	ASSERT_TRUE(command.getPageSize().has_value());
+	ASSERT_EQ(*command.getPageSize(), 100);
 	ASSERT_EQ(command.getPagingState(), "state");
 }
 
 TEST(TestProtocolQueryParameters, move) {
 	cql::ProtocolQueryParameters a;
-	a.setCommand(cql::Command("use a;"));
+	a.setCommand(cql::Command("use a;").setConsistency(cql::ConsistencyLevel::One));
 	ASSERT_TRUE(a.getCommand().isValid());
 
 	cql::ProtocolQueryParameters b = std::move(a);
 	ASSERT_FALSE(a.getCommand().isValid());
 	ASSERT_TRUE(b.getCommand().isValid());
 
-	cql::Command command("use b;");
+	auto command = cql::Command("use b;").setConsistency(cql::ConsistencyLevel::One);
 	b.setCommandRef(command);
 	ASSERT_EQ(&command, &b.getCommand());
 	ASSERT_TRUE(command.isValid());
@@ -100,7 +101,8 @@ TEST(TestProtocolQueryParameters, decode) {
 		ASSERT_TRUE(ptr == end);
 		auto& command = value.getCommand();
 		ASSERT_TRUE(command.isValid());
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::One);
+		ASSERT_TRUE(command.getConsistency().has_value());
+		ASSERT_EQ(*command.getConsistency(), cql::ConsistencyLevel::One);
 		ASSERT_EQ(value.getFlags(),
 			cql::QueryParametersFlags::SkipMetadata |
 			cql::QueryParametersFlags::WithValues |
@@ -110,11 +112,11 @@ TEST(TestProtocolQueryParameters, decode) {
 		ASSERT_EQ(command.getParameters(), makeTestString(
 			"\x00\x00\x00\x01""a"
 			"\x00\x00\x00\x01""b"));
-		ASSERT_EQ(command.getPageSize().first, 100);
-		ASSERT_TRUE(command.getPageSize().second);
+		ASSERT_TRUE(command.getPageSize().has_value());
+		ASSERT_EQ(*command.getPageSize(), 100);
 		ASSERT_EQ(command.getPagingState(), "state");
-		ASSERT_FALSE(command.getSerialConsistency().second);
-		ASSERT_FALSE(command.getDefaultTimestamp().second);
+		ASSERT_FALSE(command.getSerialConsistency().has_value());
+		ASSERT_FALSE(command.getDefaultTimestamp().has_value());
 	}
 	{
 		auto data = makeTestString(
@@ -130,21 +132,21 @@ TEST(TestProtocolQueryParameters, decode) {
 		ASSERT_TRUE(ptr == end);
 		auto& command = value.getCommand();
 		ASSERT_TRUE(command.isValid());
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Two);
+		ASSERT_TRUE(command.getConsistency().has_value());
+		ASSERT_EQ(*command.getConsistency(), cql::ConsistencyLevel::Two);
 		ASSERT_EQ(value.getFlags(),
 			cql::QueryParametersFlags::WithValues |
 			cql::QueryParametersFlags::WithSerialConsistency |
 			cql::QueryParametersFlags::WithDefaultTimestamp);
 		ASSERT_EQ(command.getParameterCount(), 1);
 		ASSERT_EQ(command.getParameters(), makeTestString("\x00\x00\x00\x01""a"));
-		ASSERT_FALSE(command.getPageSize().second);
+		ASSERT_FALSE(command.getPageSize().has_value());
 		ASSERT_EQ(command.getPagingState(), "");
-		ASSERT_EQ(command.getSerialConsistency().first,
-			cql::ConsistencyLevel::LocalSerial);
-		ASSERT_TRUE(command.getSerialConsistency().second);
-		ASSERT_EQ(command.getDefaultTimestamp().first,
+		ASSERT_TRUE(command.getSerialConsistency().has_value());
+		ASSERT_EQ(*command.getSerialConsistency(), cql::ConsistencyLevel::LocalSerial);
+		ASSERT_TRUE(command.getDefaultTimestamp().has_value());
+		ASSERT_EQ(*command.getDefaultTimestamp(),
 			std::chrono::system_clock::from_time_t(0) + std::chrono::microseconds(123));
-		ASSERT_TRUE(command.getDefaultTimestamp().second);
 	}
 }
 

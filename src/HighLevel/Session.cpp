@@ -23,8 +23,9 @@ namespace cql {
 		/** Simple exception only for retry */
 		struct RetryException : public std::exception { };
 
-		/** Should not retry errors like SyntaxError */
+		/** Determinate should do the retry for specificed error code */
 		bool shouldRetry(ErrorCode errorCode) {
+			// should not retry errors like SyntaxError
 			std::size_t errorCodeValue = enumValue(errorCode);
 			bool isUserError = errorCodeValue >= UserErrorCodeBegin &&
 				errorCodeValue < UserErrorCodeEnd;
@@ -35,6 +36,33 @@ namespace cql {
 		ResultSet getEmptyResultSet() {
 			return ResultSet(makeObject<ResultSetData>(
 				0, 0, "", seastar::temporary_buffer<char>(0), 0, 0));
+		}
+
+		/** Set default values in Command from SessionConfiguration */
+		void setDefaultValues(
+			const SessionConfiguration& sessionConfiguration,
+			Command& command) {
+			if (!command.getConsistency().has_value()) {
+				command.setConsistency(sessionConfiguration.getDefaultConsistency());
+			}
+			// FIXME
+			/* if (!command.getNeedPrepare().has_value()) {
+				command.prepareQuery(sessionConfiguration.getPrepareAllQueries());
+			} */
+		}
+
+		/** Set default values in BatchCommand from SessionConfiguration */
+		void setDefaultValues(
+			const SessionConfiguration& sessionConfiguration,
+			BatchCommand& command) {
+			if (!command.getConsistency().has_value()) {
+				command.setConsistency(sessionConfiguration.getDefaultConsistency());
+			}
+			for (auto& query : command.getQueries()) {
+				if (!query.needPrepare.has_value()) {
+					query.needPrepare = sessionConfiguration.getPrepareAllQueries();
+				}
+			}
 		}
 
 		/** Handle error message for query and execute */
@@ -49,11 +77,10 @@ namespace cql {
 			if (maxRetries > 0) {
 				return seastar::make_exception_future<>(RetryException());
 			} else {
-				auto queryStr = command.getQuery();
 				return seastar::make_exception_future<>(ResponseErrorException(
 					CQL_CODEINFO, joinString("",
 					errorCode, ": ", errorMessage->getErrorMessage().get(),
-					", query: ", std::string(queryStr.first, queryStr.second))));
+					", query: ", command.getQuery())));
 			}
 		}
 
@@ -71,8 +98,7 @@ namespace cql {
 			} else {
 				std::string allQueries;
 				for (const auto& query : command.getQueries()) {
-					auto queryStr = query.getQuery();
-					allQueries.append(queryStr.first, queryStr.second);
+					allQueries.append(query.getQuery());
 					allQueries.append("; ");
 				}
 				if (!allQueries.empty()) {
@@ -122,7 +148,7 @@ namespace cql {
 				// send PREPARE
 				auto queryStr = query.getQuery();
 				auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
-				prepareMessage->getQuery().set(queryStr.first, queryStr.second);
+				prepareMessage->getQuery().set(queryStr.data(), queryStr.size());
 				return connection->sendMessage(std::move(prepareMessage), stream).then(
 					[&connection, &stream] {
 					// receive RESULT
@@ -182,6 +208,9 @@ namespace cql {
 			auto& connection,
 			auto& stream,
 			auto& result) {
+			// set default values in command
+			setDefaultValues(connectionPool->getSessionConfiguration(), command);
+			// start retry loop
 			return seastar::repeat([
 				&command,
 				&connectionPool,
@@ -269,6 +298,9 @@ namespace cql {
 			auto& maxRetries,
 			auto& connection,
 			auto& stream) {
+			// set default values in command
+			setDefaultValues(connectionPool->getSessionConfiguration(), command);
+			// start retry loop
 			return seastar::repeat([
 				&command,
 				&connectionPool,
@@ -351,6 +383,9 @@ namespace cql {
 			auto& stream,
 			auto& batchMessage,
 			auto& prepareIndex) {
+			// set default values in batch command
+			setDefaultValues(connectionPool->getSessionConfiguration(), command);
+			// start retry loop
 			return seastar::repeat([
 				&command,
 				&connectionPool,

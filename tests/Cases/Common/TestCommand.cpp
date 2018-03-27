@@ -19,41 +19,37 @@ TEST(TestCommand, isValid) {
 TEST(TestCommand, query) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(
-			std::string(command.getQuery().first, command.getQuery().second),
-			"use a;");
+		ASSERT_EQ(command.getQuery(), "use a;");
 	}
 	{
 		cql::Command command(std::string("use b;"));
-		ASSERT_EQ(
-			std::string(command.getQuery().first, command.getQuery().second),
-			"use b;");
+		ASSERT_EQ(command.getQuery(), "use b;");
 	}
 }
 
 TEST(TestCommand, consistencyLevel) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::Quorum);
+		ASSERT_FALSE(command.getConsistency().has_value());
 	}
 	{
 		auto command = cql::Command("use a;")
 			.setConsistency(cql::ConsistencyLevel::One);
-		ASSERT_EQ(command.getConsistency(), cql::ConsistencyLevel::One);
+		ASSERT_TRUE(command.getConsistency().has_value());
+		ASSERT_EQ(*command.getConsistency(), cql::ConsistencyLevel::One);
 	}
 }
 
 TEST(TestCommand, pageSize) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getPageSize().first, 0);
-		ASSERT_EQ(command.getPageSize().second, false);
+		ASSERT_FALSE(command.getPageSize().has_value());
 	}
 	{
 		auto command = cql::Command("use a;")
 			.setPageSize(123);
-		ASSERT_EQ(command.getPageSize().first, 123);
-		ASSERT_EQ(command.getPageSize().second, true);
+		ASSERT_TRUE(command.getPageSize().has_value());
+		ASSERT_EQ(*command.getPageSize(), 123);
 	}
 }
 
@@ -99,34 +95,33 @@ TEST(TestCommand, parameters) {
 TEST(TestCommand, serialConsistencyLevel) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getSerialConsistency().first, cql::ConsistencyLevel::Serial);
-		ASSERT_EQ(command.getSerialConsistency().second, false);
+		ASSERT_FALSE(command.getSerialConsistency().has_value());
 	}
 	{
 		auto command = cql::Command("use a;")
 			.setSerialConsistency(cql::ConsistencyLevel::Serial);
-		ASSERT_EQ(command.getSerialConsistency().first, cql::ConsistencyLevel::Serial);
-		ASSERT_EQ(command.getSerialConsistency().second, true);
+		ASSERT_TRUE(command.getSerialConsistency().has_value());
+		ASSERT_EQ(*command.getSerialConsistency(), cql::ConsistencyLevel::Serial);
 	}
 	{
 		auto command = cql::Command("use a;")
 			.setSerialConsistency(cql::ConsistencyLevel::LocalSerial);
-		ASSERT_EQ(command.getSerialConsistency().first, cql::ConsistencyLevel::LocalSerial);
-		ASSERT_EQ(command.getSerialConsistency().second, true);
+		ASSERT_TRUE(command.getSerialConsistency().has_value());
+		ASSERT_EQ(*command.getSerialConsistency(), cql::ConsistencyLevel::LocalSerial);
 	}
 }
 
 TEST(TestCommand, defaultTimestamp) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getDefaultTimestamp().second, false);
+		ASSERT_FALSE(command.getDefaultTimestamp().has_value());
 	}
 	{
 		auto now = std::chrono::system_clock::now();
 		auto command = cql::Command("use a;")
 			.setDefaultTimestamp(now);
-		ASSERT_EQ(command.getDefaultTimestamp().first, now);
-		ASSERT_EQ(command.getDefaultTimestamp().second, true);
+		ASSERT_TRUE(command.getDefaultTimestamp().has_value());
+		ASSERT_EQ(*command.getDefaultTimestamp(), now);
 	}
 }
 

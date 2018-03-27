@@ -15,18 +15,9 @@ TEST(TestStringHolder, get) {
 	cql::StringHolder a(std::string("test abc"));
 	cql::StringHolder b("abc", 3);
 	cql::StringHolder c("qwert");
-	ASSERT_EQ(std::string(a.get().first, a.get().second), "test abc");
-	ASSERT_EQ(std::string(b.get().first, b.get().second), "abc");
-	ASSERT_EQ(std::string(c.get().first, c.get().second), "qwert");
-}
-
-TEST(TestStringHolder, getStringView) {
-	cql::StringHolder a(std::string("test abc"));
-	cql::StringHolder b("abc", 3);
-	cql::StringHolder c("qwert");
-	ASSERT_EQ(a.getStringView(), "test abc");
-	ASSERT_EQ(b.getStringView(), "abc");
-	ASSERT_EQ(c.getStringView(), "qwert");
+	ASSERT_EQ(a.get(), "test abc");
+	ASSERT_EQ(b.get(), "abc");
+	ASSERT_EQ(c.get(), "qwert");
 }
 
 TEST(TestStringHolder, compare) {

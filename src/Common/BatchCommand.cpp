@@ -7,10 +7,10 @@ namespace cql {
 	class BatchCommandData {
 	public:
 		BatchType batchType;
-		ConsistencyLevel consistencyLevel;
+		std::optional<ConsistencyLevel> consistencyLevel;
 		std::vector<BatchQueryData> queries;
-		std::pair<ConsistencyLevel, bool> serialConsistencyLevel;
-		std::pair<std::chrono::system_clock::time_point, bool> defaultTimestamp;
+		std::optional<ConsistencyLevel> serialConsistencyLevel;
+		std::optional<std::chrono::system_clock::time_point> defaultTimestamp;
 		std::size_t maxRetries;
 
 		BatchCommandData() :
@@ -25,10 +25,10 @@ namespace cql {
 
 		void reset() {
 			batchType = BatchType::Logged;
-			consistencyLevel = ConsistencyLevel::Quorum;
+			consistencyLevel = {};
 			queries.resize(0);
-			serialConsistencyLevel = { ConsistencyLevel::Serial, false };
-			defaultTimestamp = { {}, false };
+			serialConsistencyLevel = {};
+			defaultTimestamp = {};
 			maxRetries = 0;
 		}
 	};
@@ -63,12 +63,12 @@ namespace cql {
 	}
 
 	/** Prepare the last query to reduce the message size */
-	BatchCommand& BatchCommand::prepareQuery() & {
+	BatchCommand& BatchCommand::prepareQuery(bool value) & {
 		if (data_->queries.empty()) {
 			throw cql::LogicException(CQL_CODEINFO,
 				"please call addQuery before prepareQuery");
 		}
-		data_->queries.back().needPrepare = true;
+		data_->queries.back().needPrepare = value;
 		return *this;
 	}
 
@@ -85,14 +85,14 @@ namespace cql {
 	/** Set the serial consistency level of this query */
 	BatchCommand& BatchCommand::setSerialConsistency(
 		ConsistencyLevel consistencyLevel) & {
-		data_->serialConsistencyLevel = { consistencyLevel, true };
+		data_->serialConsistencyLevel = consistencyLevel;
 		return *this;
 	}
 
 	/** Set the default timestamp of this query */
 	BatchCommand& BatchCommand::setDefaultTimestamp(
 		std::chrono::system_clock::time_point timeStamp) & {
-		data_->defaultTimestamp = { timeStamp, true };
+		data_->defaultTimestamp = timeStamp;
 		return *this;
 	}
 
@@ -108,12 +108,17 @@ namespace cql {
 	}
 
 	/** Get the consistency level of this batch */
-	ConsistencyLevel BatchCommand::getConsistency() const {
+	const std::optional<ConsistencyLevel>& BatchCommand::getConsistency() const& {
 		return data_->consistencyLevel;
 	}
 
-	/** Get all queries in this batch */
+	/** Get the queries in this batch */
 	const std::vector<BatchQueryData>& BatchCommand::getQueries() const& {
+		return data_->queries;
+	}
+
+	/** Get the mutable queries in this batch */
+	std::vector<BatchQueryData>& BatchCommand::getQueries() & {
 		return data_->queries;
 	}
 
@@ -144,13 +149,12 @@ namespace cql {
 	}
 
 	/** Get the serial consistency level of this query */
-	const std::pair<ConsistencyLevel, bool>&
-		BatchCommand::getSerialConsistency() const& {
+	const std::optional<ConsistencyLevel>& BatchCommand::getSerialConsistency() const& {
 		return data_->serialConsistencyLevel;
 	}
 
 	/** Get the default timestamp of this query */
-	const std::pair<std::chrono::system_clock::time_point, bool>&
+	const std::optional<std::chrono::system_clock::time_point>&
 		BatchCommand::getDefaultTimestamp() const& {
 		return data_->defaultTimestamp;
 	}

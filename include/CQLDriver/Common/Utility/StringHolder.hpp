@@ -19,19 +19,13 @@ namespace cql {
 			return ref_.first == nullptr;
 		}
 
-		/** Get the address and size of string */
-		std::pair<const char*, std::size_t> get() const& {
-			if (ref_.first != nullptr) {
-				return ref_;
-			} else {
-				return { str_.data(), str_.size() };
-			}
-		}
-
 		/** Construct a string_view by the content it holds */
-		std::string_view getStringView() const {
-			auto addressAndSize = get();
-			return std::string_view(addressAndSize.first, addressAndSize.second);
+		std::string_view get() const& {
+			if (ref_.first != nullptr) {
+				return std::string_view(ref_.first, ref_.second);
+			} else {
+				return std::string_view(str_);
+			}
 		}
 
 		/** Constructors */
@@ -54,12 +48,10 @@ namespace cql {
 		bool operator==(const StringHolder& other) const {
 			auto a = get();
 			auto b = other.get();
-			if (a.second != b.second) {
-				return false;
-			} else if (a.first == b.first) {
-				return true; // fast path
+			if (a.size() == b.size() && a.data() == b.data()) {
+				return true; // fast path, gcc won't optimize it
 			}
-			return std::memcmp(a.first, b.first, a.second) == 0;
+			return a == b;
 		}
 		bool operator!=(const StringHolder& other) const {
 			return !(*this == other);
@@ -68,7 +60,7 @@ namespace cql {
 		/** Hash functor */
 		struct Hash {
 			std::size_t operator()(const StringHolder& value) const {
-				return std::hash<std::string_view>()(value.getStringView());
+				return std::hash<std::string_view>()(value.get());
 			}
 		};
 
@@ -79,7 +71,7 @@ namespace cql {
 
 	/** Write the content to stream */
 	static std::ostream& operator<<(std::ostream& stream, const StringHolder& value) {
-		stream << value.getStringView();
+		stream << value.get();
 		return stream;
 	}
 }

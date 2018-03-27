@@ -86,7 +86,8 @@ namespace cql {
 			std::string query;
 			query.append("use ").append(defaultkeySpace).append(";");
 			auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
-			queryMessage->getQueryParameters().setCommand(Command(std::move(query)));
+			queryMessage->getQueryParameters().setCommand(
+				Command(std::move(query)).setConsistency(ConsistencyLevel::LocalOne));
 			return self->sendMessage(std::move(queryMessage), self->streamZero_).then([self] {
 				// receive RESULT
 				return self->waitNextMessage(self->streamZero_);

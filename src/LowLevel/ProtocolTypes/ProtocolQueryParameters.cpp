@@ -37,22 +37,24 @@ namespace cql {
 		// this function won't take the ownership of the command
 		if (!command.isValid()) {
 			throw LogicException(CQL_CODEINFO, "can't set a invalid command to query parameters");
+		} else if (!command.getConsistency().has_value()) {
+			throw LogicException(CQL_CODEINFO, "can't set a command with empty consistency");
 		}
 		auto flags = getFlags();
 		flags &= QueryParametersFlags::SkipMetadata;
 		if (command.getParameterCount() > 0) {
 			flags |= QueryParametersFlags::WithValues;
 		}
-		if (command.getPageSize().second) {
+		if (command.getPageSize().has_value()) {
 			flags |= QueryParametersFlags::WithPageSize;
 			if (!command.getPagingState().empty()) {
 				flags |= QueryParametersFlags::WithPagingState;
 			}
 		}
-		if (command.getSerialConsistency().second) {
+		if (command.getSerialConsistency().has_value()) {
 			flags |= QueryParametersFlags::WithSerialConsistency;
 		}
-		if (command.getDefaultTimestamp().second) {
+		if (command.getDefaultTimestamp().has_value()) {
 			flags |= QueryParametersFlags::WithDefaultTimestamp;
 		}
 		flags_.set(enumValue(flags));
@@ -65,7 +67,7 @@ namespace cql {
 		if (!command.isValid()) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
-		ProtocolConsistency consistency(command.getConsistency());
+		ProtocolConsistency consistency(*command.getConsistency());
 		consistency.encode(data);
 		flags_.encode(data);
 		auto flags = getFlags();
@@ -79,7 +81,7 @@ namespace cql {
 			data.append(parameters.data(), parameters.size());
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithPageSize)) {
-			ProtocolInt pageSize(command.getPageSize().first);
+			ProtocolInt pageSize(*command.getPageSize());
 			pageSize.encode(data);
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithPagingState)) {
@@ -89,12 +91,11 @@ namespace cql {
 			data.append(pagingState.data(), pagingState.size());
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithSerialConsistency)) {
-			ProtocolConsistency serialConsistency(
-				command.getSerialConsistency().first);
+			ProtocolConsistency serialConsistency(*command.getSerialConsistency());
 			serialConsistency.encode(data);
 		}
 		if (enumTrue(flags & QueryParametersFlags::WithDefaultTimestamp)) {
-			ProtocolTimestamp timeStamp(command.getDefaultTimestamp().first);
+			ProtocolTimestamp timeStamp(*command.getDefaultTimestamp());
 			timeStamp.encode(data);
 		}
 	}

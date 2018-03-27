@@ -13,6 +13,9 @@ namespace cql {
 	class ConnectionPool :
 		public seastar::enable_lw_shared_from_this<ConnectionPool> {
 	public:
+		/** Get the session configuration used by this pool */
+		const SessionConfiguration& getSessionConfiguration() const& { return *sessionConfiguration_; }
+
 		/** Try to get a connection with idle stream, may return (nullptr, {}) if not available */
 		std::pair<seastar::lw_shared_ptr<Connection>, ConnectionStream> tryGetConnection();
 

@@ -11,6 +11,8 @@ namespace cql {
 			maxWaitersAfterConnectionsExhausted(100),
 			dnsCacheTime(30000),
 			defaultKeySpace(),
+			defaultConsistency(ConsistencyLevel::Quorum),
+			prepareAllQueries(false),
 			logger(Logger::createNoop()) { }
 
 		std::size_t minPoolSize;
@@ -18,6 +20,8 @@ namespace cql {
 		std::size_t maxWaitersAfterConnectionsExhausted;
 		std::chrono::milliseconds dnsCacheTime;
 		std::string defaultKeySpace;
+		ConsistencyLevel defaultConsistency;
+		bool prepareAllQueries;
 		seastar::shared_ptr<Logger> logger;
 	};
 
@@ -48,6 +52,18 @@ namespace cql {
 	/** Set the default keyspace of all connections created by this configuration */
 	SessionConfiguration& SessionConfiguration::setDefaultKeySpace(const std::string& keySpace) {
 		data_->defaultKeySpace = keySpace;
+		return *this;
+	}
+
+	/** Set the default consistency level */
+	SessionConfiguration& SessionConfiguration::setDefaultConsistency(ConsistencyLevel consistency) {
+		data_->defaultConsistency = consistency;
+		return *this;
+	}
+
+	/** Set should prepare all queries by default */
+	SessionConfiguration& SessionConfiguration::setPrepareAllQueries(bool value) {
+		data_->prepareAllQueries = value;
 		return *this;
 	}
 
@@ -83,6 +99,16 @@ namespace cql {
 	/** Get the default keyspace of all connections created by this configuration */
 	const std::string& SessionConfiguration::getDefaultKeySpace() const& {
 		return data_->defaultKeySpace;
+	}
+
+	/** Get the default consistency level */
+	ConsistencyLevel SessionConfiguration::getDefaultConsistency() const {
+		return data_->defaultConsistency;
+	}
+
+	/** Get should prepare all queries by default */
+	bool SessionConfiguration::getPrepareAllQueries() const {
+		return data_->prepareAllQueries;
 	}
 
 	/** Get the logger instance */

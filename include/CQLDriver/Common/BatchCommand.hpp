@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <utility>
 #include <vector>
+#include <optional>
 #include "./Utility/Object.hpp"
 #include "./CommonDefinitions.hpp"
 #include "./ColumnTrait.hpp"
@@ -68,12 +69,16 @@ namespace cql {
 			return std::move(addQuery<Size>(query));
 		}
 
-		/** Prepare the last query to reduce the message size */
-		BatchCommand& prepareQuery() &;
+		/**
+		 * Set should prepare the last query to reduce the message size.
+		 * This will override the default setting in SessionConfiguration.
+		 * The prepare request will only be sent if the query isn't prepared before.
+		 */
+		BatchCommand& prepareQuery(bool value = true) &;
 
-		/** Prepare the last query to reduce the message size */
-		BatchCommand&& prepareQuery() && {
-			return std::move(prepareQuery());
+		/** Set should prepare the last query to reduce the message size */
+		BatchCommand&& prepareQuery(bool value = true) && {
+			return std::move(prepareQuery(value));
 		}
 
 		/** Open a new parameter set explicitly of the last query */
@@ -155,10 +160,13 @@ namespace cql {
 		BatchType getType() const;
 
 		/** Get the consistency level of this batch */
-		ConsistencyLevel getConsistency() const;
+		const std::optional<ConsistencyLevel>& getConsistency() const&;
 
-		/** Get all queries in this batch */
+		/** Get the queries in this batch */
 		const std::vector<BatchQueryData>& getQueries() const&;
+
+		/** Get the mutable queries in this batch */
+		std::vector<BatchQueryData>& getQueries() &;
 
 		/** Get the mutable count of parameters of the last parameter set */
 		std::size_t& getParameterCountOfLastSet() &;
@@ -170,13 +178,13 @@ namespace cql {
 		 * Get the serial consistency level of this query,
 		 * the second value is false if is not set.
 		 */
-		const std::pair<ConsistencyLevel, bool>& getSerialConsistency() const&;
+		const std::optional<ConsistencyLevel>& getSerialConsistency() const&;
 
 		/**
 		 * Get the default timestamp of this query,
 		 * the second value is false if is not set.
 		 */
-		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimestamp() const&;
+		const std::optional<std::chrono::system_clock::time_point>& getDefaultTimestamp() const&;
 
 		/** Get the maximum retry times *after* the first try is failed */
 		std::size_t getMaxRetries() const;

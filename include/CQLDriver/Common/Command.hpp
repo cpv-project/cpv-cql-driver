@@ -2,7 +2,9 @@
 #include <cstdint>
 #include <utility>
 #include <chrono>
+#include <optional>
 #include "./Utility/Object.hpp"
+#include "./Utility/StringHolder.hpp"
 #include "./CommonDefinitions.hpp"
 #include "./ColumnTrait.hpp"
 
@@ -17,13 +19,14 @@ namespace cql {
 		bool isValid() const;
 
 		/**
-		 * Set the consistency level of this query, default is "Quorum"
+		 * Set the consistency level of this query.
+		 * This will override the default setting in SessionConfiguration.
 		 * For more information see this page:
 		 * https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html
 		 */
 		Command& setConsistency(ConsistencyLevel consistencyLevel) &;
 
-		/** Set the consistency level of this query, default is "Quorum" */
+		/** Set the consistency level of this query */
 		Command&& setConsistency(ConsistencyLevel consistencyLevel) && {
 			return std::move(setConsistency(consistencyLevel));
 		}
@@ -122,13 +125,13 @@ namespace cql {
 		}
 
 		/** Get the query string of this query */
-		std::pair<const char*, std::size_t> getQuery() const&;
+		std::string_view getQuery() const&;
 
 		/** Get the consistency level of this query */
-		ConsistencyLevel getConsistency() const;
+		const std::optional<ConsistencyLevel>& getConsistency() const&;
 
 		/** Get the page size of this query, the second value is false if is not set */
-		const std::pair<std::size_t, bool>& getPageSize() const&;
+		const std::optional<std::size_t>& getPageSize() const&;
 
 		/** Get the paging state of this query */
 		const std::string& getPagingState() const&;
@@ -149,13 +152,13 @@ namespace cql {
 		 * Get the serial consistency level of this query,
 		 * the second value is false if is not set.
 		 */
-		const std::pair<ConsistencyLevel, bool>& getSerialConsistency() const&;
+		const std::optional<ConsistencyLevel>& getSerialConsistency() const&;
 
 		/**
 		 * Get the default timestamp of this query,
 		 * the second value is false if is not set.
 		 */
-		const std::pair<std::chrono::system_clock::time_point, bool>& getDefaultTimestamp() const&;
+		const std::optional<std::chrono::system_clock::time_point>& getDefaultTimestamp() const&;
 
 		/** Get the maximum retry times *after* the first try is failed */
 		std::size_t getMaxRetries() const;

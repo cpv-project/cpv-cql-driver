@@ -23,25 +23,24 @@ TEST(TestProtocolBatchParameters, getset) {
 			cql::BatchParametersFlags::WithSerialConsistency |
 			cql::BatchParametersFlags::WithDefaultTimestamp);
 		ASSERT_EQ(value.getBatchCommand().getConsistency(), cql::ConsistencyLevel::Two);
-		ASSERT_EQ(value.getBatchCommand().getSerialConsistency().first,
-			cql::ConsistencyLevel::LocalSerial);
-		ASSERT_TRUE(value.getBatchCommand().getSerialConsistency().second);
-		ASSERT_EQ(value.getBatchCommand().getDefaultTimestamp().first,
+		ASSERT_TRUE(value.getBatchCommand().getSerialConsistency().has_value());
+		ASSERT_EQ(*value.getBatchCommand().getSerialConsistency(), cql::ConsistencyLevel::LocalSerial);
+		ASSERT_TRUE(value.getBatchCommand().getDefaultTimestamp().has_value());
+		ASSERT_EQ(*value.getBatchCommand().getDefaultTimestamp(),
 			std::chrono::system_clock::from_time_t(0) + std::chrono::microseconds(123));
-		ASSERT_TRUE(value.getBatchCommand().getDefaultTimestamp().second);
 	}
 }
 
 TEST(TestProtocolBatchParameters, move) {
 	cql::ProtocolBatchParameters a;
-	a.setBatchCommand(cql::BatchCommand());
+	a.setBatchCommand(cql::BatchCommand().setConsistency(cql::ConsistencyLevel::One));
 	ASSERT_TRUE(a.getBatchCommand().isValid());
 
 	cql::ProtocolBatchParameters b = std::move(a);
 	ASSERT_FALSE(a.getBatchCommand().isValid());
 	ASSERT_TRUE(b.getBatchCommand().isValid());
 
-	cql::BatchCommand batchCommand;
+	auto batchCommand = cql::BatchCommand().setConsistency(cql::ConsistencyLevel::One);
 	b.setBatchCommandRef(batchCommand);
 	ASSERT_EQ(&batchCommand, &b.getBatchCommand());
 	ASSERT_TRUE(batchCommand.isValid());
@@ -97,7 +96,8 @@ TEST(TestProtocolBatchParameters, decode) {
 		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.getFlags(), cql::BatchParametersFlags::None);
 		ASSERT_TRUE(value.getBatchCommand().isValid());
-		ASSERT_EQ(value.getBatchCommand().getConsistency(), cql::ConsistencyLevel::One);
+		ASSERT_TRUE(value.getBatchCommand().getConsistency().has_value());
+		ASSERT_EQ(*value.getBatchCommand().getConsistency(), cql::ConsistencyLevel::One);
 	}
 	{
 		auto data = makeTestString(
@@ -114,12 +114,12 @@ TEST(TestProtocolBatchParameters, decode) {
 			cql::BatchParametersFlags::WithDefaultTimestamp);
 		ASSERT_TRUE(value.getBatchCommand().isValid());
 		ASSERT_EQ(value.getBatchCommand().getConsistency(), cql::ConsistencyLevel::Two);
-		ASSERT_EQ(value.getBatchCommand().getSerialConsistency().first,
+		ASSERT_TRUE(value.getBatchCommand().getSerialConsistency().has_value());
+		ASSERT_EQ(*value.getBatchCommand().getSerialConsistency(),
 			cql::ConsistencyLevel::LocalSerial);
-		ASSERT_TRUE(value.getBatchCommand().getSerialConsistency().second);
-		ASSERT_EQ(value.getBatchCommand().getDefaultTimestamp().first,
+		ASSERT_TRUE(value.getBatchCommand().getDefaultTimestamp().has_value());
+		ASSERT_EQ(*value.getBatchCommand().getDefaultTimestamp(),
 			std::chrono::system_clock::from_time_t(0) + std::chrono::microseconds(123));
-		ASSERT_TRUE(value.getBatchCommand().getDefaultTimestamp().second);
 	}
 }
 

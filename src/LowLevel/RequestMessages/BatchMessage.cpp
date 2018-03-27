@@ -19,8 +19,7 @@ namespace cql {
 		if (batchCommand.isValid()) {
 			str.append(joinString("", "type: ", batchCommand.getType(), ", queries: "));
 			for (const auto& query : batchCommand.getQueries()) {
-				auto queryStr = query.getQuery();
-				str.append(queryStr.first, queryStr.second);
+				str.append(query.getQuery());
 				str.append("; ");
 			}
 		}
@@ -63,7 +62,7 @@ namespace cql {
 		ProtocolByte kind;
 		ProtocolInt stringSize; // query string size
 		ProtocolShort idSize; // prepared query id size
-		std::pair<const char*, std::size_t> stringOrId;
+		std::string_view stringOrId;
 		ProtocolShort parameterCount;
 		const auto& constSelf = *this;
 		std::size_t queryCountVerify = 0;
@@ -74,11 +73,11 @@ namespace cql {
 			if (preparedQueryId.empty()) {
 				kind.set(enumValue(BatchQueryKind::Query));
 				stringOrId = query.getQuery();
-				stringSize.set(stringOrId.second);
+				stringSize.set(stringOrId.size());
 			} else {
 				kind.set(enumValue(BatchQueryKind::PreparedQueryId));
 				stringOrId = { preparedQueryId.data(), preparedQueryId.size() };
-				idSize.set(stringOrId.second);
+				idSize.set(stringOrId.size());
 			}
 			auto& parameterSets = query.parameterSets;
 			if (parameterSets.empty()) {
@@ -91,7 +90,7 @@ namespace cql {
 				} else {
 					idSize.encode(data);
 				}
-				data.append(stringOrId.first, stringOrId.second);
+				data.append(stringOrId);
 				// <n>, parameters count
 				parameterCount.set(0);
 				parameterCount.encode(data);
@@ -106,7 +105,7 @@ namespace cql {
 				} else {
 					idSize.encode(data);
 				}
-				data.append(stringOrId.first, stringOrId.second);
+				data.append(stringOrId);
 				// <n>, parameters count
 				parameterCount.set(parameterSet.first);
 				if (parameterCount.get() != parameterSet.first) {

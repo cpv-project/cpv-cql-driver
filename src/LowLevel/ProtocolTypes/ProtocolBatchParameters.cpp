@@ -24,12 +24,15 @@ namespace cql {
 		if (!batchCommand.isValid()) {
 			throw LogicException(CQL_CODEINFO,
 				"can't set a invalid batch command to batch parameters");
+		} else if (!batchCommand.getConsistency().has_value()) {
+			throw LogicException(CQL_CODEINFO,
+				"can't set a batch command with empty consistency");
 		}
 		auto flags = BatchParametersFlags::None;
-		if (batchCommand.getSerialConsistency().second) {
+		if (batchCommand.getSerialConsistency().has_value()) {
 			flags |= BatchParametersFlags::WithSerialConsistency;
 		}
-		if (batchCommand.getDefaultTimestamp().second) {
+		if (batchCommand.getDefaultTimestamp().has_value()) {
 			flags |= BatchParametersFlags::WithDefaultTimestamp;
 		}
 		flags_.set(enumValue(flags));
@@ -42,17 +45,16 @@ namespace cql {
 		if (!batchCommand.isValid()) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
-		ProtocolConsistency consistency(batchCommand.getConsistency());
+		ProtocolConsistency consistency(*batchCommand.getConsistency());
 		consistency.encode(data);
 		flags_.encode(data);
 		auto flags = getFlags();
 		if (enumTrue(flags & BatchParametersFlags::WithSerialConsistency)) {
-			ProtocolConsistency serialConsistency(
-				batchCommand.getSerialConsistency().first);
+			ProtocolConsistency serialConsistency(*batchCommand.getSerialConsistency());
 			serialConsistency.encode(data);
 		}
 		if (enumTrue(flags & BatchParametersFlags::WithDefaultTimestamp)) {
-			ProtocolTimestamp timeStamp(batchCommand.getDefaultTimestamp().first);
+			ProtocolTimestamp timeStamp(*batchCommand.getDefaultTimestamp());
 			timeStamp.encode(data);
 		}
 	}

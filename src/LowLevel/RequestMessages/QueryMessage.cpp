@@ -13,7 +13,7 @@ namespace cql {
 		std::string query;
 		auto& command = queryParameters_.getCommand();
 		if (command.isValid()) {
-			query.append(command.getQuery().first, command.getQuery().second);
+			query.append(command.getQuery());
 		}
 		return joinString("", "QueryMessage(query: ", query, ")");
 	}
@@ -29,9 +29,9 @@ namespace cql {
 		}
 		// <query>
 		auto query = command.getQuery();
-		ProtocolInt querySize(query.second);
+		ProtocolInt querySize(query.size());
 		querySize.encode(data);
-		data.append(query.first, query.second);
+		data.append(query);
 		// <query_parameters>
 		queryParameters_.encode(data);
 	}
