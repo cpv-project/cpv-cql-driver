@@ -19,6 +19,18 @@ namespace cql {
 		bool isValid() const;
 
 		/**
+		 * Set should prepare this query.
+		 * This will override the default setting in SessionConfiguration.
+		 * The prepare request will only be sent if the query isn't prepared before.
+		 */
+		Command& prepareQuery(bool value = true) &;
+
+		/** Set should prepare this query */
+		Command&& prepareQuery(bool value = true) && {
+			return std::move(prepareQuery(value));
+		}
+
+		/**
 		 * Set the consistency level of this query.
 		 * This will override the default setting in SessionConfiguration.
 		 * For more information see this page:
@@ -126,6 +138,9 @@ namespace cql {
 
 		/** Get the query string of this query */
 		std::string_view getQuery() const&;
+
+		/** Get should prepare this query */
+		const std::optional<bool>& getNeedPrepare() const&;
 
 		/** Get the consistency level of this query */
 		const std::optional<ConsistencyLevel>& getConsistency() const&;

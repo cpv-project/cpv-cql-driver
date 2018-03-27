@@ -70,13 +70,13 @@ namespace cql {
 		}
 
 		/**
-		 * Set should prepare the last query to reduce the message size.
+		 * Set should prepare the last query.
 		 * This will override the default setting in SessionConfiguration.
 		 * The prepare request will only be sent if the query isn't prepared before.
 		 */
 		BatchCommand& prepareQuery(bool value = true) &;
 
-		/** Set should prepare the last query to reduce the message size */
+		/** Set should prepare the last query */
 		BatchCommand&& prepareQuery(bool value = true) && {
 			return std::move(prepareQuery(value));
 		}

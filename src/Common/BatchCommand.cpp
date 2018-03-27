@@ -62,7 +62,7 @@ namespace cql {
 		return *this;
 	}
 
-	/** Prepare the last query to reduce the message size */
+	/** Set should prepare the last query */
 	BatchCommand& BatchCommand::prepareQuery(bool value) & {
 		if (data_->queries.empty()) {
 			throw cql::LogicException(CQL_CODEINFO,

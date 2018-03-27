@@ -5,6 +5,7 @@ namespace cql {
 	class CommandData {
 	public:
 		StringHolder queryStr;
+		std::optional<bool> needPrepare;
 		std::optional<ConsistencyLevel> consistencyLevel;
 		std::optional<std::size_t> pageSize;
 		std::string pagingState;
@@ -16,6 +17,7 @@ namespace cql {
 
 		CommandData() :
 			queryStr(),
+			needPrepare(),
 			consistencyLevel(),
 			pageSize(),
 			pagingState(),
@@ -39,6 +41,7 @@ namespace cql {
 
 	private:
 		void resetExceptQuery() {
+			needPrepare = {};
 			consistencyLevel = {};
 			pageSize = {};
 			pagingState.resize(0);
@@ -53,6 +56,12 @@ namespace cql {
 	/** Check whether this is a valid command (will be false if moved) */
 	bool Command::isValid() const {
 		return data_ != nullptr;
+	}
+
+	/** Set should prepare this query */
+	Command& Command::prepareQuery(bool value) & {
+		data_->needPrepare = value;
+		return *this;
 	}
 
 	/** Set the consistency level of this batch, default is "Quorum" */
@@ -96,6 +105,11 @@ namespace cql {
 	/** Get the query string of this query */
 	std::string_view Command::getQuery() const& {
 		return data_->queryStr.get();
+	}
+
+	/** Get should prepare this query */
+	const std::optional<bool>& Command::getNeedPrepare() const& {
+		return data_->needPrepare;
 	}
 
 	/** Get the consistency level of this query */

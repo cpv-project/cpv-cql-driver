@@ -45,10 +45,9 @@ namespace cql {
 			if (!command.getConsistency().has_value()) {
 				command.setConsistency(sessionConfiguration.getDefaultConsistency());
 			}
-			// FIXME
-			/* if (!command.getNeedPrepare().has_value()) {
+			if (!command.getNeedPrepare().has_value()) {
 				command.prepareQuery(sessionConfiguration.getPrepareAllQueries());
-			} */
+			}
 		}
 
 		/** Set default values in BatchCommand from SessionConfiguration */

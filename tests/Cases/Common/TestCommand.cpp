@@ -27,6 +27,18 @@ TEST(TestCommand, query) {
 	}
 }
 
+TEST(TestCommand, needPrepare) {
+	{
+		cql::Command command("use a;");
+		ASSERT_FALSE(command.getNeedPrepare().has_value());
+	}
+	{
+		auto command = cql::Command("use b;").prepareQuery(true);
+		ASSERT_TRUE(command.getNeedPrepare().has_value());
+		ASSERT_TRUE(*command.getNeedPrepare());
+	}
+}
+
 TEST(TestCommand, consistencyLevel) {
 	{
 		cql::Command command("use a;");
