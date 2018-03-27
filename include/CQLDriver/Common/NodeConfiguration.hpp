@@ -24,7 +24,7 @@ namespace cql {
 		/** Set how many streams can hold in a single connection, default value is 20 */
 		NodeConfiguration& setMaxStreams(std::size_t value);
 
-		/** Set how many messages can hold in a received queue for a single stream, default value is 20 */
+		/** Set how many messages can hold in a received queue for a single stream, default value is 100 */
 		NodeConfiguration& setMaxPendingMessages(std::size_t value);
 
 		/** Set to use password authentication for this node */

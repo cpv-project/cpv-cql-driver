@@ -100,7 +100,7 @@ Set how many streams can hold in a single connection, default value is 20.<br/>
 
 ### setMaxPendingMessages(std::size_t)
 
-Set how many messages can hold in a received queue for a single stream, default value is 20.<br/>
+Set how many messages can hold in a received queue for a single stream, default value is 100.<br/>
 
 ### setPasswordAuthentication(std::string&&, std::string&&)
 

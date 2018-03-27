@@ -12,7 +12,7 @@ TEST(TestNodeConfiguration, all) {
 		ASSERT_FALSE(configuration.getUseSSL());
 		ASSERT_FALSE(configuration.getUseCompression());
 		ASSERT_EQ(configuration.getMaxStreams(), 20);
-		ASSERT_EQ(configuration.getMaxPendingMessages(), 20);
+		ASSERT_EQ(configuration.getMaxPendingMessages(), 100);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::AuthenticatorClasses::AllowAllAuthenticator);
 		ASSERT_TRUE(configuration.getAuthenticatorData().empty());
 		seastar::socket_address address;

@@ -16,7 +16,7 @@ namespace cql {
 			useSSL(false),
 			useCompression(false),
 			maxStreams(20),
-			maxPendingMessages(20),
+			maxPendingMessages(100),
 			authenticatorClass(AuthenticatorClasses::AllowAllAuthenticator),
 			authenticatorData(),
 			ipAddress(),
