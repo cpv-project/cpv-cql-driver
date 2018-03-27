@@ -121,7 +121,13 @@ namespace cql {
 				message->toString()));
 		}
 
-		/** Prepare queries for batchExecute */
+		/**
+		 * Prepare queries for batchExecute.
+		 * This function used pipeline feature of connection,
+		 * notice the max pending messages setting from SessionConfiguration,
+		 * if max pending messages is 100 and there 101 queries to prepare,
+		 * this function may failure because of this limitation.
+		 */
 		seastar::future<> prepareQueries(
 			BatchCommand& command,
 			std::size_t& maxRetries,
@@ -129,35 +135,35 @@ namespace cql {
 			ConnectionStream& stream,
 			Object<BatchMessage>& batchMessage,
 			std::size_t& prepareIndex) {
-			return seastar::repeat(
-				[&command, &maxRetries, &connection, &stream, &batchMessage, &prepareIndex] {
-				auto& queries = command.getQueries();
-				if (prepareIndex >= queries.size()) {
-					// all queries prepared
-					return seastar::make_ready_future<
-						seastar::stop_iteration>(seastar::stop_iteration::yes);
+			auto& queries = command.getQueries();
+			seastar::future<> result = seastar::make_ready_future<>();
+			// send PREPARE
+			for (const auto& query : queries) {
+				if (!*query.needPrepare) {
+					continue;
 				}
-				auto thisIndex = prepareIndex++;
-				auto& query = queries[thisIndex];
-				if (!query.needPrepare) {
-					// prepare next query
-					return seastar::make_ready_future<
-						seastar::stop_iteration>(seastar::stop_iteration::no);
-				}
-				// send PREPARE
 				auto queryStr = query.getQuery();
-				auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
-				prepareMessage->getQuery().set(queryStr.data(), queryStr.size());
-				return connection->sendMessage(std::move(prepareMessage), stream).then(
-					[&connection, &stream] {
+				result = result.then([&connection, &stream, queryStr] {
+					auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
+					prepareMessage->getQuery().set(queryStr.data(), queryStr.size());
+					return connection->sendMessage(std::move(prepareMessage), stream);
+				});
+			}
+			// receive and handle RESULT
+			for (std::size_t i = 0, j = queries.size(); i < j; ++i) {
+				auto& query = queries[i];
+				if (!*query.needPrepare) {
+					continue;
+				}
+				result = result.then([&connection, &stream] {
 					// receive RESULT
 					return connection->waitNextMessage(stream);
-				}).then([&command, &maxRetries, &batchMessage, thisIndex] (auto message) {
+				}).then([&command, &maxRetries, &batchMessage, i] (auto message) {
 					// handle RESULT
 					if (message->getHeader().getOpCode() == MessageType::Result) {
 						auto resultMessage = std::move(message).template cast<ResultMessage>();
 						if (resultMessage->getKind() == ResultKind::Prepared) {
-							batchMessage->getPreparedQueryId(thisIndex) = (
+							batchMessage->getPreparedQueryId(i) = (
 								std::move(resultMessage->getPreparedQueryId().get()));
 							return seastar::make_ready_future<>();
 						} else {
@@ -174,11 +180,9 @@ namespace cql {
 					}
 					// unexpected message type
 					return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
-				}).then([] {
-					// prepare next query
-					return seastar::stop_iteration::no;
 				});
-			});
+			}
+			return result;
 		}
 	}
 
