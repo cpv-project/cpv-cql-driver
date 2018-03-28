@@ -19,11 +19,11 @@ TEST(TestCommand, isValid) {
 TEST(TestCommand, query) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getQuery(), "use a;");
+		ASSERT_EQ(command.getQuery().get(), "use a;");
 	}
 	{
 		cql::Command command(std::string("use b;"));
-		ASSERT_EQ(command.getQuery(), "use b;");
+		ASSERT_EQ(command.getQuery().get(), "use b;");
 	}
 }
 

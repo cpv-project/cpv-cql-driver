@@ -70,6 +70,5 @@ TEST(TestNodeConfiguration, getPreparedQueryId) {
 		ASSERT_EQ(b, "id for b");
 		ASSERT_EQ(c, "");
 	}
-	
 }
 

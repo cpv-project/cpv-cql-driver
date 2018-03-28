@@ -137,7 +137,7 @@ namespace cql {
 		}
 
 		/** Get the query string of this query */
-		std::string_view getQuery() const&;
+		const StringHolder& getQuery() const&;
 
 		/** Get should prepare this query */
 		const std::optional<bool>& getNeedPrepare() const&;

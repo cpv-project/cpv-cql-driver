@@ -53,9 +53,9 @@ TEST(TestBatchCommand, query) {
 			.addQuery("insert into b (k, c, v) values (100, 0, 'asd');");
 		auto queries = command.getQueries();
 		ASSERT_EQ(queries.size(), 2);
-		ASSERT_EQ(queries.at(0).getQuery(),
+		ASSERT_EQ(queries.at(0).queryStr.get(),
 			"insert into a (k, v) values (123, 'abc');");
-		ASSERT_EQ(queries.at(1).getQuery(),
+		ASSERT_EQ(queries.at(1).queryStr.get(),
 			"insert into b (k, c, v) values (100, 0, 'asd');");
 	}
 }
@@ -89,7 +89,7 @@ TEST(TestBatchCommand, parameters) {
 	ASSERT_EQ(queries.size(), 2);
 
 	auto query_0 = queries.at(0);
-	ASSERT_EQ(query_0.getQuery(),
+	ASSERT_EQ(query_0.queryStr.get(),
 		"insert into a (k, v) values (?, ?);");
 	ASSERT_EQ(query_0.parameterSets.size(), 1);
 	ASSERT_EQ(query_0.parameterSets.at(0).first, 2);
@@ -98,7 +98,7 @@ TEST(TestBatchCommand, parameters) {
 		"\x00\x00\x00\x03""abc"));
 
 	auto query_1 = queries.at(1);
-	ASSERT_EQ(query_1.getQuery(),
+	ASSERT_EQ(query_1.queryStr.get(),
 		"insert into b (k, c, v) values (?, ?, ?);");
 	ASSERT_EQ(query_1.parameterSets.size(), 2);
 	ASSERT_EQ(query_1.parameterSets.at(0).first, 3);

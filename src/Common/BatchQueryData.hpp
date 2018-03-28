@@ -14,10 +14,6 @@ namespace cql {
 		std::optional<bool> needPrepare;
 		std::vector<std::pair<std::size_t, std::string>> parameterSets;
 
-		std::string_view getQuery() const& {
-			return queryStr.get();
-		}
-
 		BatchQueryData() :
 			queryStr(),
 			needPrepare(),

@@ -13,7 +13,7 @@ namespace cql {
 		std::string query;
 		auto& command = queryParameters_.getCommand();
 		if (command.isValid()) {
-			query.append(command.getQuery());
+			query.append(command.getQuery().get());
 		}
 		return joinString("", "QueryMessage(query: ", query, ")");
 	}
@@ -28,7 +28,7 @@ namespace cql {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
 		// <query>
-		auto query = command.getQuery();
+		auto query = command.getQuery().get();
 		ProtocolInt querySize(query.size());
 		querySize.encode(data);
 		data.append(query);

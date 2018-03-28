@@ -19,7 +19,7 @@ namespace cql {
 		if (batchCommand.isValid()) {
 			str.append(joinString("", "type: ", batchCommand.getType(), ", queries: "));
 			for (const auto& query : batchCommand.getQueries()) {
-				str.append(query.getQuery());
+				str.append(query.queryStr.get());
 				str.append("; ");
 			}
 		}
@@ -72,7 +72,7 @@ namespace cql {
 			auto& preparedQueryId = constSelf.getPreparedQueryId(i);
 			if (preparedQueryId.empty()) {
 				kind.set(enumValue(BatchQueryKind::Query));
-				stringOrId = query.getQuery();
+				stringOrId = query.queryStr.get();
 				stringSize.set(stringOrId.size());
 			} else {
 				kind.set(enumValue(BatchQueryKind::PreparedQueryId));

@@ -103,8 +103,8 @@ namespace cql {
 	}
 
 	/** Get the query string of this query */
-	std::string_view Command::getQuery() const& {
-		return data_->queryStr.get();
+	const StringHolder& Command::getQuery() const& {
+		return data_->queryStr;
 	}
 
 	/** Get should prepare this query */

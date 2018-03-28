@@ -28,6 +28,9 @@ namespace cql {
 		/** Get the node configuration used by this connection */
 		const NodeConfiguration& getNodeConfiguration() const& { return *nodeConfiguration_; }
 
+		/** Get the mutable node configuration used by this connection */
+		NodeConfiguration& getNodeConfiguration() & { return *nodeConfiguration_; }
+
 		/** Get the connection information */
 		const ConnectionInfo& getConnectionInfo() const& { return connectionInfo_; }
 

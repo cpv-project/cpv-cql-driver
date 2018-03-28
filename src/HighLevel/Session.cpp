@@ -31,14 +31,124 @@ namespace cql {
 			std::vector<std::pair<std::size_t, Object<ResponseMessageBase>>> results;
 		};
 
-		/** Determinate should do the retry for specificed error code */
-		bool shouldRetry(ErrorCode errorCode) {
-			// should not retry errors like SyntaxError
-			std::size_t errorCodeValue = enumValue(errorCode);
-			bool isUserError = errorCodeValue >= UserErrorCodeBegin &&
-				errorCodeValue < UserErrorCodeEnd;
-			return !isUserError;
-		}
+		/** Used to control retry flow */
+		class RetryFlow {
+		public:
+			/** Determinate should do the retry for the specificed error code */
+			static bool shouldRetryFor(ErrorCode errorCode) {
+				// should not retry errors like SyntaxError
+				std::size_t errorCodeValue = enumValue(errorCode);
+				bool isUserError = errorCodeValue >= UserErrorCodeBegin &&
+					errorCodeValue < UserErrorCodeEnd;
+				return !isUserError;
+			}
+
+			/** Handle error message for query and execute */
+			seastar::future<> handleErrorMessage(
+				Object<ErrorMessage>&& errorMessage,
+				Command& command,
+				seastar::lw_shared_ptr<Connection>& connection) {
+				auto errorCode = errorMessage->getErrorCode();
+				if (errorCode == ErrorCode::UnPreparedQuery && unPreparedErrorCount_ == 0) {
+					// evict cached prepare result
+					if (*command.getNeedPrepare()) {
+						auto& nodeConfiguration = connection->getNodeConfiguration();
+						nodeConfiguration.getPreparedQueryId(command.getQuery()).resize(0);
+					}
+					++unPreparedErrorCount_;
+					++maxRetries_;
+				} else if (!shouldRetryFor(errorCode)) {
+					// stop retry
+					maxRetries_ = 0;
+				}
+				if (maxRetries_ > 0) {
+					return seastar::make_exception_future<>(RetryException());
+				} else {
+					return seastar::make_exception_future<>(ResponseErrorException(
+						CQL_CODEINFO, joinString("",
+						errorCode, ": ", errorMessage->getErrorMessage().get(),
+						", query: ", command.getQuery())));
+				}
+			}
+
+			/** Handle error message for batchExecute */
+			seastar::future<> handleErrorMessage(
+				Object<ErrorMessage>&& errorMessage,
+				BatchCommand& command,
+				seastar::lw_shared_ptr<Connection>& connection) {
+				auto errorCode = errorMessage->getErrorCode();
+				if (errorCode == ErrorCode::UnPreparedQuery && unPreparedErrorCount_ == 0) {
+					// evict cached prepare results
+					auto& nodeConfiguration = connection->getNodeConfiguration();
+					for (const auto& query : command.getQueries()) {
+						if (*query.needPrepare) {
+							nodeConfiguration.getPreparedQueryId(query.queryStr).resize(0);
+						}
+					}
+					++unPreparedErrorCount_;
+					++maxRetries_;
+				} else if (!shouldRetryFor(errorCode)) {
+					// stop retry
+					maxRetries_ = 0;
+				}
+				if (maxRetries_ > 0) {
+					return seastar::make_exception_future<>(RetryException());
+				} else {
+					std::string allQueries;
+					for (const auto& query : command.getQueries()) {
+						allQueries.append(query.queryStr.get());
+						allQueries.append("; ");
+					}
+					if (!allQueries.empty()) {
+						allQueries.resize(allQueries.size()-1);
+					}
+					return seastar::make_exception_future<>(ResponseErrorException(
+						CQL_CODEINFO, joinString("",
+						errorCode, ": ", errorMessage->getErrorMessage().get(),
+						", queries: ", allQueries)));
+				}
+			}
+
+			/** Handle unexpected message */
+			seastar::future<> handleUnexpectMessage(
+				Object<ResponseMessageBase>&& message,
+				const char* requestType) {
+				maxRetries_ = 0;
+				return seastar::make_exception_future<>(LogicException(
+					CQL_CODEINFO, "unexpected response to", requestType, "message:",
+					message->toString()));
+			}
+
+			/** Handle unexpected kind in result message */
+			seastar::future<> handleUnexpectResultKind(
+				Object<ResultMessage>&& resultMessage,
+				const char* requestType) {
+				maxRetries_ = 0;
+				return seastar::make_exception_future<>(LogicException(
+					CQL_CODEINFO, "unexpected result kind to", requestType, "message:",
+					resultMessage->toString()));
+			}
+
+			/** Determinate whether should retry or not */
+			seastar::future<seastar::stop_iteration> determinate(std::exception_ptr&& ex) {
+				if (maxRetries_ > 0) {
+					--maxRetries_;
+					return seastar::make_ready_future<
+						seastar::stop_iteration>(seastar::stop_iteration::no);
+				} else {
+					return seastar::make_exception_future<
+						seastar::stop_iteration>(std::move(ex));
+				}
+			}
+
+			/** Constructor */
+			RetryFlow(std::size_t maxRetries) :
+				maxRetries_(maxRetries), unPreparedErrorCount_(0) { }
+
+		private:
+			std::size_t maxRetries_;
+			std::size_t unPreparedErrorCount_;
+		};
 
 		/** For those who use query to execute statements that produce no result */
 		ResultSet getEmptyResultSet() {
@@ -72,63 +182,6 @@ namespace cql {
 			}
 		}
 
-		/** Handle error message for query and execute */
-		seastar::future<> handleErrorMessage(
-			Object<ErrorMessage>&& errorMessage,
-			Command& command,
-			std::size_t& maxRetries) {
-			auto errorCode = errorMessage->getErrorCode();
-			if (!shouldRetry(errorCode)) {
-				maxRetries = 0;
-			}
-			if (maxRetries > 0) {
-				return seastar::make_exception_future<>(RetryException());
-			} else {
-				return seastar::make_exception_future<>(ResponseErrorException(
-					CQL_CODEINFO, joinString("",
-					errorCode, ": ", errorMessage->getErrorMessage().get(),
-					", query: ", command.getQuery())));
-			}
-		}
-
-		/** Handle error message for batchExecute */
-		seastar::future<> handleErrorMessage(
-			Object<ErrorMessage>&& errorMessage,
-			BatchCommand& command,
-			std::size_t& maxRetries) {
-			auto errorCode = errorMessage->getErrorCode();
-			if (!shouldRetry(errorCode)) {
-				maxRetries = 0;
-			}
-			if (maxRetries > 0) {
-				return seastar::make_exception_future<>(RetryException());
-			} else {
-				std::string allQueries;
-				for (const auto& query : command.getQueries()) {
-					allQueries.append(query.getQuery());
-					allQueries.append("; ");
-				}
-				if (!allQueries.empty()) {
-					allQueries.resize(allQueries.size()-1);
-				}
-				return seastar::make_exception_future<>(ResponseErrorException(
-					CQL_CODEINFO, joinString("",
-					errorCode, ": ", errorMessage->getErrorMessage().get(),
-					", queries: ", allQueries)));
-			}
-		}
-
-		/** Handle unexpected message */
-		seastar::future<> handleUnexpectMessage(
-			Object<ResponseMessageBase>&& message,
-			const char* requestType,
-			std::size_t& maxRetries) {
-			maxRetries = 0;
-			return seastar::make_exception_future<>(LogicException(
-				CQL_CODEINFO, "unexpected response to", requestType, "message:",
-				message->toString()));
-		}
-
 		/**
 		 * Prepare queries for batchExecute.
 		 * This function used pipeline feature of connection,
@@ -138,12 +191,14 @@ namespace cql {
 		 */
 		seastar::future<> prepareQueries(
 			BatchCommand& command,
-			std::size_t& maxRetries,
+			RetryFlow& retryFlow,
 			seastar::lw_shared_ptr<Connection>& connection,
 			ConnectionStream& stream,
 			Object<BatchMessage>& batchMessage,
 			Object<PrepareResults>& prepareResults) {
 			auto& queries = command.getQueries();
+			auto& nodeConfiguration = connection->getNodeConfiguration();
+			auto& logger = connection->getSessionConfiguration().getLogger();
 			seastar::future<> result = seastar::make_ready_future<>();
 			// send PREPAREs
 			for (std::size_t i = 0, j = queries.size(); i < j; ++i) {
@@ -151,13 +206,27 @@ namespace cql {
 				if (!*query.needPrepare) {
 					continue;
 				}
-				auto queryStr = query.getQuery();
+				auto& preparedQueryId = nodeConfiguration.getPreparedQueryId(query.queryStr);
+				if (!preparedQueryId.empty()) {
+					if (logger->isEnabled(LogLevel::Debug)) {
+						logger->log(LogLevel::Debug, "hit prepared cache:", query.queryStr.get());
+					}
+					batchMessage->getPreparedQueryId(i) = preparedQueryId;
+					continue; // use previous cached prepare result
+				}
+				if (logger->isEnabled(LogLevel::Debug)) {
+					logger->log(LogLevel::Debug, "prepare:", query.queryStr.get());
+				}
+				auto queryView = query.queryStr.get();
 				prepareResults->results.emplace_back(i, Object<ResponseMessageBase>());
-				result = result.then([&connection, &stream, queryStr] {
+				result = result.then([&connection, &stream, queryView] {
 					auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
-					prepareMessage->getQuery().set(queryStr.data(), queryStr.size());
+					prepareMessage->getQuery().set(queryView.data(), queryView.size());
 					return connection->sendMessage(std::move(prepareMessage), stream);
 				});
+			}
+			if (prepareResults->results.empty()) {
+				return result; // all queries need prepare prepared
 			}
 			// receive RESULTs
 			for (std::size_t k = 0, l = prepareResults->results.size(); k < l; ++k) {
@@ -170,26 +239,28 @@ namespace cql {
 				});
 			}
 			// handle RESULTs
-			result = result.then([&command, &maxRetries, &batchMessage, &prepareResults] {
+			result = result.then([&command, &retryFlow, &connection, &batchMessage, &prepareResults] {
+				auto& queries = command.getQueries();
+				auto& nodeConfiguration = connection->getNodeConfiguration();
 				for (auto& prepareResult : prepareResults->results) {
 					auto& queryIndex = prepareResult.first;
 					auto& message = prepareResult.second;
 					if (message->getHeader().getOpCode() == MessageType::Result) {
 						auto resultMessage = std::move(message).template cast<ResultMessage>();
 						if (resultMessage->getKind() == ResultKind::Prepared) {
+							// cache prepare result to node
+							nodeConfiguration.getPreparedQueryId(queries[queryIndex].queryStr) = (
+								resultMessage->getPreparedQueryId().get());
 							batchMessage->getPreparedQueryId(queryIndex) = (
 								std::move(resultMessage->getPreparedQueryId().get()));
 						} else {
-							maxRetries = 0;
-							return seastar::make_exception_future<>(LogicException(
-								CQL_CODEINFO, "unexpected result kind to prepare request",
-								resultMessage->toString()));
+							return retryFlow.handleUnexpectResultKind(std::move(resultMessage), "PREPARE");
 						}
 					} else if (message->getHeader().getOpCode() == MessageType::Error) {
 						auto errorMessage = std::move(message).template cast<ErrorMessage>();
-						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+						return retryFlow.handleErrorMessage(std::move(errorMessage), command, connection);
 					} else {
-						return handleUnexpectMessage(std::move(message), "PREPARE", maxRetries);
+						return retryFlow.handleUnexpectMessage(std::move(message), "PREPARE");
 					}
 				}
 				return seastar::make_ready_future<>();
@@ -209,17 +280,16 @@ namespace cql {
 			return seastar::make_exception_future<ResultSet>(
 				LogicException(CQL_CODEINFO, "invalid command"));
 		}
-		std::size_t maxRetries = command.getMaxRetries();
 		return seastar::do_with(
 			std::move(command),
 			data_->connectionPool,
-			maxRetries,
+			RetryFlow(command.getMaxRetries()),
 			seastar::lw_shared_ptr<Connection>(),
 			ConnectionStream(),
 			ResultSet(nullptr), [] (
 			auto& command,
 			auto& connectionPool,
-			auto& maxRetries,
+			auto& retryFlow,
 			auto& connection,
 			auto& stream,
 			auto& result) {
@@ -229,7 +299,7 @@ namespace cql {
 			return seastar::repeat([
 				&command,
 				&connectionPool,
-				&maxRetries,
+				&retryFlow,
 				&connection,
 				&stream,
 				&result] {
@@ -248,7 +318,7 @@ namespace cql {
 				}).then([&connection, &stream] {
 					// receive RESULT
 					return connection->waitNextMessage(stream);
-				}).then([&command, &maxRetries, &result] (auto message) {
+				}).then([&command, &retryFlow, &connection, &result] (auto message) {
 					// handle RESULT
 					if (message->getHeader().getOpCode() == MessageType::Result) {
 						auto resultMessage = std::move(message).template cast<ResultMessage>();
@@ -262,23 +332,16 @@ namespace cql {
 					// handle ERROR
 					if (message->getHeader().getOpCode() == MessageType::Error) {
 						auto errorMessage = std::move(message).template cast<ErrorMessage>();
-						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+						return retryFlow.handleErrorMessage(std::move(errorMessage), command, connection);
 					}
 					// unexpected message type
-					return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
+					return retryFlow.handleUnexpectMessage(std::move(message), "QUERY");
 				}).then([&connectionPool, &connection, &stream] {
 					// query successful
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&maxRetries] (std::exception_ptr ex) {
+				}).handle_exception([&retryFlow] (std::exception_ptr ex) {
 					// query failed
-					if (maxRetries > 0) {
-						--maxRetries;
-						return seastar::make_ready_future<
-							seastar::stop_iteration>(seastar::stop_iteration::no);
-					} else {
-						return seastar::make_exception_future<
-							seastar::stop_iteration>(std::move(ex));
-					}
+					return retryFlow.determinate(std::move(ex));
 				}).finally([&connectionPool, &connection, &stream] {
 					// return the connection
 					if (connection.get() != nullptr && stream.isValid()) {
@@ -301,16 +364,15 @@ namespace cql {
 			return seastar::make_exception_future<>(
 				LogicException(CQL_CODEINFO, "invalid command"));
 		}
-		std::size_t maxRetries = command.getMaxRetries();
 		return seastar::do_with(
 			std::move(command),
 			data_->connectionPool,
-			maxRetries,
+			RetryFlow(command.getMaxRetries()),
 			seastar::lw_shared_ptr<Connection>(),
 			ConnectionStream(), [] (
 			auto& command,
 			auto& connectionPool,
-			auto& maxRetries,
+			auto& retryFlow,
 			auto& connection,
 			auto& stream) {
 			// set default values in command
@@ -319,7 +381,7 @@ namespace cql {
 			return seastar::repeat([
 				&command,
 				&connectionPool,
-				&maxRetries,
+				&retryFlow,
 				&connection,
 				&stream] {
 				// get connection
@@ -337,7 +399,7 @@ namespace cql {
 				}).then([&connection, &stream] {
 					// receive RESULT
 					return connection->waitNextMessage(stream);
-				}).then([&command, &maxRetries] (auto message) {
+				}).then([&command, &retryFlow, &connection] (auto message) {
 					// handle RESULT
 					if (message->getHeader().getOpCode() == MessageType::Result) {
 						return seastar::make_ready_future<>();
@@ -345,23 +407,16 @@ namespace cql {
 					// handle ERROR
 					if (message->getHeader().getOpCode() == MessageType::Error) {
 						auto errorMessage = std::move(message).template cast<ErrorMessage>();
-						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+						return retryFlow.handleErrorMessage(std::move(errorMessage), command, connection);
 					}
 					// unexpected message type
-					return handleUnexpectMessage(std::move(message), "QUERY", maxRetries);
+					return retryFlow.handleUnexpectMessage(std::move(message), "QUERY");
 				}).then([&connectionPool, &connection, &stream] {
 					// execute successful
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&maxRetries] (std::exception_ptr ex) {
+				}).handle_exception([&retryFlow] (std::exception_ptr ex) {
 					// execute failed
-					if (maxRetries > 0) {
-						--maxRetries;
-						return seastar::make_ready_future<
-							seastar::stop_iteration>(seastar::stop_iteration::no);
-					} else {
-						return seastar::make_exception_future<
-							seastar::stop_iteration>(std::move(ex));
-					}
+					return retryFlow.determinate(std::move(ex));
 				}).finally([&connectionPool, &connection, &stream] {
 					// return the connection
 					if (connection.get() != nullptr && stream.isValid()) {
@@ -381,18 +436,17 @@ namespace cql {
 			// shortcut for empty batch
 			return seastar::make_ready_future<>();
 		}
-		std::size_t maxRetries = command.getMaxRetries();
 		return seastar::do_with(
 			std::move(command),
 			data_->connectionPool,
-			maxRetries,
+			RetryFlow(command.getMaxRetries()),
 			seastar::lw_shared_ptr<Connection>(),
 			ConnectionStream(),
 			Object<BatchMessage>(),
 			Object<PrepareResults>(), [] (
 			auto& command,
 			auto& connectionPool,
-			auto& maxRetries,
+			auto& retryFlow,
 			auto& connection,
 			auto& stream,
 			auto& batchMessage,
@@ -403,7 +457,7 @@ namespace cql {
 			return seastar::repeat([
 				&command,
 				&connectionPool,
-				&maxRetries,
+				&retryFlow,
 				&connection,
 				&stream,
 				&batchMessage,
@@ -413,44 +467,35 @@ namespace cql {
 					[&connection, &stream] (auto connectionVal, auto streamVal) {
 					connection = std::move(connectionVal);
 					stream = std::move(streamVal);
-				}).then([&command, &maxRetries, &connection, &stream, &batchMessage, &prepareResults] {
+				}).then([&command, &retryFlow, &connection, &stream, &batchMessage, &prepareResults] {
 					// prepare queries
 					batchMessage = RequestMessageFactory::makeRequestMessage<BatchMessage>();
 					batchMessage->getBatchParameters().setBatchCommandRef(command);
 					prepareResults = makeObject<PrepareResults>();
 					return prepareQueries(
-						command, maxRetries, connection, stream, batchMessage, prepareResults);
+						command, retryFlow, connection, stream, batchMessage, prepareResults);
 				}).then([&connection, &stream, &batchMessage] {
 					// send BATCH
 					return connection->sendMessage(std::move(batchMessage), stream);
 				}).then([&connection, &stream] {
 					// receive RESULT
 					return connection->waitNextMessage(stream);
-				}).then([&command, &maxRetries] (auto message) {
+				}).then([&command, &retryFlow, &connection] (auto message) {
 					// handle RESULT
 					if (message->getHeader().getOpCode() == MessageType::Result) {
 						return seastar::make_ready_future<>();
-					}
-					// handle ERROR
-					if (message->getHeader().getOpCode() == MessageType::Error) {
+					} else if (message->getHeader().getOpCode() == MessageType::Error) {
 						auto errorMessage = std::move(message).template cast<ErrorMessage>();
-						return handleErrorMessage(std::move(errorMessage), command, maxRetries);
+						return retryFlow.handleErrorMessage(std::move(errorMessage), command, connection);
+					} else {
+						return retryFlow.handleUnexpectMessage(std::move(message), "BATCH");
 					}
-					// unexpected message type
-					return handleUnexpectMessage(std::move(message), "BATCH", maxRetries);
 				}).then([] {
 					// batch execute successful
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&maxRetries] (std::exception_ptr ex) {
+				}).handle_exception([&retryFlow] (std::exception_ptr ex) {
 					// batch execute failed
-					if (maxRetries > 0) {
-						--maxRetries;
-						return seastar::make_ready_future<
-							seastar::stop_iteration>(seastar::stop_iteration::no);
-					} else {
-						return seastar::make_exception_future<
-							seastar::stop_iteration>(std::move(ex));
-					}
+					return retryFlow.determinate(std::move(ex));
 				}).finally([&connectionPool, &connection, &stream] {
 					// return the connection
 					if (connection.get() != nullptr && stream.isValid()) {
