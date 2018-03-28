@@ -282,7 +282,7 @@ namespace cql {
 			auto& queries = command.getQueries();
 			auto& nodeConfiguration = connection->getNodeConfiguration();
 			auto& logger = connection->getSessionConfiguration().getLogger();
-			seastar::future<> result = seastar::make_ready_future<>();
+			seastar::future<> result = seastar::make_ready_future();
 			// send PREPAREs
 			for (std::size_t i = 0, j = queries.size(); i < j; ++i) {
 				auto& query = queries[i];
@@ -347,7 +347,7 @@ namespace cql {
 						return retryFlow.handleUnexpectMessage(std::move(message), "PREPARE");
 					}
 				}
-				return seastar::make_ready_future<>();
+				return seastar::make_ready_future();
 			});
 			return result;
 		}
@@ -410,7 +410,7 @@ namespace cql {
 						} else {
 							result = getEmptyResultSet();
 						}
-						return seastar::make_ready_future<>();
+						return seastar::make_ready_future();
 					}
 					// handle ERROR
 					if (message->getHeader().getOpCode() == MessageType::Error) {
@@ -444,7 +444,7 @@ namespace cql {
 	/** Execute a single modification command */
 	seastar::future<> Session::execute(Command&& command) {
 		if (!command.isValid()) {
-			return seastar::make_exception_future<>(
+			return seastar::make_exception_future(
 				LogicException(CQL_CODEINFO, "invalid command"));
 		}
 		return seastar::do_with(
@@ -484,7 +484,7 @@ namespace cql {
 				}).then([&command, &retryFlow, &connection] (auto message) {
 					// handle RESULT
 					if (message->getHeader().getOpCode() == MessageType::Result) {
-						return seastar::make_ready_future<>();
+						return seastar::make_ready_future();
 					}
 					// handle ERROR
 					if (message->getHeader().getOpCode() == MessageType::Error) {
@@ -512,11 +512,11 @@ namespace cql {
 	/** Perform multiple modification commands in batch */
 	seastar::future<> Session::batchExecute(BatchCommand&& command) {
 		if (!command.isValid()) {
-			return seastar::make_exception_future<>(
+			return seastar::make_exception_future(
 				LogicException(CQL_CODEINFO, "invalid command"));
 		} else if (command.getQueries().empty()) {
 			// shortcut for empty batch
-			return seastar::make_ready_future<>();
+			return seastar::make_ready_future();
 		}
 		return seastar::do_with(
 			std::move(command),
@@ -565,7 +565,7 @@ namespace cql {
 				}).then([&command, &retryFlow, &connection] (auto message) {
 					// handle RESULT
 					if (message->getHeader().getOpCode() == MessageType::Result) {
-						return seastar::make_ready_future<>();
+						return seastar::make_ready_future();
 					} else if (message->getHeader().getOpCode() == MessageType::Error) {
 						auto errorMessage = std::move(message).template cast<ErrorMessage>();
 						return retryFlow.handleErrorMessage(std::move(errorMessage), command, connection);

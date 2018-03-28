@@ -71,7 +71,7 @@ TEST_FUTURE(TestSession, execute) {
 		}));
 	auto session = sessionFactory.getSession();
 	return seastar::do_with(std::move(session), [] (auto& session) {
-		return seastar::make_ready_future<>().then([&session] {
+		return seastar::make_ready_future().then([&session] {
 			return session.execute(cql::Command("drop keyspace if exists testkeyspace"));
 		}).then([&session] {
 			return session.execute(cql::Command(
@@ -148,7 +148,7 @@ TEST_FUTURE(TestSession, batchExecute) {
 		}));
 	auto session = sessionFactory.getSession();
 	return seastar::do_with(std::move(session), [] (auto& session) {
-		return seastar::make_ready_future<>().then([&session] {
+		return seastar::make_ready_future().then([&session] {
 			return session.execute(cql::Command("drop keyspace if exists testkeyspace"));
 		}).then([&session] {
 			return session.execute(cql::Command(
@@ -203,7 +203,7 @@ TEST_FUTURE(TestSession, batchExecuteError) {
 		}));
 	auto session = sessionFactory.getSession();
 	return seastar::do_with(std::move(session), [] (auto& session) {
-		return seastar::make_ready_future<>().then([&session] {
+		return seastar::make_ready_future().then([&session] {
 			return session.execute(cql::Command("drop keyspace if exists testkeyspace"));
 		}).then([&session] {
 			return session.batchExecute(cql::BatchCommand()
@@ -231,7 +231,7 @@ TEST_FUTURE(TestSession, batchExecutePipelinePrepareInterruption) {
 		}));
 	auto session = sessionFactory.getSession();
 	return seastar::do_with(std::move(session), 3, [] (auto& session, auto& count) {
-		return seastar::make_ready_future<>().then([&session] {
+		return seastar::make_ready_future().then([&session] {
 			return session.execute(cql::Command("drop keyspace if exists testkeyspace"));
 		}).then([&session] {
 			return session.execute(cql::Command(
@@ -242,7 +242,7 @@ TEST_FUTURE(TestSession, batchExecutePipelinePrepareInterruption) {
 				"create table testkeyspace.testtable (id int primary key, name text)"));
 		}).then([&session, &count] {
 			return seastar::repeat([&session, &count] {
-				return seastar::make_ready_future<>().then([&session] {
+				return seastar::make_ready_future().then([&session] {
 					// send PREPARE, send PREPARE, receive ERROR, receive ERROR
 					return session.batchExecute(cql::BatchCommand()
 						.addQuery("err insert into testkeyspace.testtable (id, name) values (?,?)")

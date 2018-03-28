@@ -20,7 +20,7 @@ namespace cql {
 	/** Initialize connection and wait until it's ready to send ordinary messages */
 	seastar::future<> Connection::ready() {
 		if (isReady_) {
-			return seastar::make_ready_future<>();
+			return seastar::make_ready_future();
 		}
 		auto self = shared_from_this();
 		return seastar::futurize_apply([self] {
@@ -80,7 +80,7 @@ namespace cql {
 			// set default keyspace
 			const auto& defaultkeySpace = self->sessionConfiguration_->getDefaultKeySpace();
 			if (defaultkeySpace.empty()) {
-				return seastar::make_ready_future<>();
+				return seastar::make_ready_future();
 			}
 			// send QUERY "use $keyspace;"
 			std::string query;
@@ -102,7 +102,7 @@ namespace cql {
 					return seastar::make_exception_future(LogicException(
 						CQL_CODEINFO, "unexpected kind of set keyspace result:", message->toString()));
 				}
-				return seastar::make_ready_future<>();
+				return seastar::make_ready_future();
 			});
 		}).then([self] {
 			// the connection is ready
@@ -297,7 +297,7 @@ namespace cql {
 		connectionInfo_(),
 		freeStreamIds_(seastar::make_lw_shared<decltype(freeStreamIds_)::element_type>()),
 		streamZero_(0, freeStreamIds_),
-		sendingFuture_(seastar::make_ready_future<>()),
+		sendingFuture_(seastar::make_ready_future()),
 		sendingBuffer_(),
 		receivingPromiseMap_(nodeConfiguration_->getMaxStreams()),
 		receivedMessageQueueMap_(),
