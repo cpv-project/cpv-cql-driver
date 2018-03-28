@@ -6,6 +6,7 @@
 #include <CQLDriver/Common/Exceptions/ResponseErrorException.hpp>
 #include "../LowLevel/RequestMessages/RequestMessageFactory.hpp"
 #include "../LowLevel/RequestMessages/QueryMessage.hpp"
+#include "../LowLevel/RequestMessages/ExecuteMessage.hpp"
 #include "../LowLevel/RequestMessages/PrepareMessage.hpp"
 #include "../LowLevel/RequestMessages/BatchMessage.hpp"
 #include "../LowLevel/ResponseMessages/ResultMessage.hpp"
@@ -34,7 +35,7 @@ namespace cql {
 		/** Used to control retry flow */
 		class RetryFlow {
 		public:
-			/** Determinate should do the retry for the specificed error code */
+			/** Determinate should perform the retry for the specificed error code */
 			static bool shouldRetryFor(ErrorCode errorCode) {
 				// should not retry errors like SyntaxError
 				std::size_t errorCodeValue = enumValue(errorCode);
@@ -43,8 +44,9 @@ namespace cql {
 				return !isUserError;
 			}
 
-			/** Handle error message for query and execute */
-			seastar::future<> handleErrorMessage(
+			/** Handle error message for "query" and "execute" */
+			template <class... Args>
+			seastar::future<Args...> handleErrorMessage(
 				Object<ErrorMessage>&& errorMessage,
 				Command& command,
 				seastar::lw_shared_ptr<Connection>& connection) {
@@ -62,17 +64,18 @@ namespace cql {
 					maxRetries_ = 0;
 				}
 				if (maxRetries_ > 0) {
-					return seastar::make_exception_future<>(RetryException());
+					return seastar::make_exception_future<Args...>(RetryException());
 				} else {
-					return seastar::make_exception_future<>(ResponseErrorException(
+					return seastar::make_exception_future<Args...>(ResponseErrorException(
 						CQL_CODEINFO, joinString("",
 						errorCode, ": ", errorMessage->getErrorMessage().get(),
 						", query: ", command.getQuery())));
 				}
 			}
 
-			/** Handle error message for batchExecute */
-			seastar::future<> handleErrorMessage(
+			/** Handle error message for "batchExecute" */
+			template <class... Args>
+			seastar::future<Args...> handleErrorMessage(
 				Object<ErrorMessage>&& errorMessage,
 				BatchCommand& command,
 				seastar::lw_shared_ptr<Connection>& connection) {
@@ -92,7 +95,7 @@ namespace cql {
 					maxRetries_ = 0;
 				}
 				if (maxRetries_ > 0) {
-					return seastar::make_exception_future<>(RetryException());
+					return seastar::make_exception_future<Args...>(RetryException());
 				} else {
 					std::string allQueries;
 					for (const auto& query : command.getQueries()) {
@@ -102,7 +105,7 @@ namespace cql {
 					if (!allQueries.empty()) {
 						allQueries.resize(allQueries.size()-1);
 					}
-					return seastar::make_exception_future<>(ResponseErrorException(
+					return seastar::make_exception_future<Args...>(ResponseErrorException(
 						CQL_CODEINFO, joinString("",
 						errorCode, ": ", errorMessage->getErrorMessage().get(),
 						", queries: ", allQueries)));
@@ -110,21 +113,23 @@ namespace cql {
 			}
 
 			/** Handle unexpected message */
-			seastar::future<> handleUnexpectMessage(
+			template <class... Args>
+			seastar::future<Args...> handleUnexpectMessage(
 				Object<ResponseMessageBase>&& message,
 				const char* requestType) {
 				maxRetries_ = 0;
-				return seastar::make_exception_future<>(LogicException(
+				return seastar::make_exception_future<Args...>(LogicException(
 					CQL_CODEINFO, "unexpected response to", requestType, "message:",
 					message->toString()));
 			}
 
 			/** Handle unexpected kind in result message */
-			seastar::future<> handleUnexpectResultKind(
+			template <class... Args>
+			seastar::future<Args...> handleUnexpectResultKind(
 				Object<ResultMessage>&& resultMessage,
 				const char* requestType) {
 				maxRetries_ = 0;
-				return seastar::make_exception_future<>(LogicException(
+				return seastar::make_exception_future<Args...>(LogicException(
 					CQL_CODEINFO, "unexpected result kind to", requestType, "message:",
 					resultMessage->toString()));
 			}
@@ -183,7 +188,85 @@ namespace cql {
 		}
 
 		/**
-		 * Prepare queries for batchExecute.
+		 * Prepare a single query for "query" and "execute".
+		 * Return an EXECUTE message if the query is prepared,
+		 * otherwise return a QUERY message.
+		 */
+		seastar::future<Object<RequestMessageBase>> prepareQuery(
+			Command& command,
+			RetryFlow& retryFlow,
+			seastar::lw_shared_ptr<Connection>& connection,
+			ConnectionStream& stream) {
+			if (!*command.getNeedPrepare()) {
+				// not require prepare
+				auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
+				auto& queryParameters = queryMessage->getQueryParameters();
+				queryParameters.setSkipMetadata(true);
+				queryParameters.setCommandRef(command);
+				return seastar::make_ready_future<Object<RequestMessageBase>>(
+					std::move(queryMessage).cast<RequestMessageBase>());
+			}
+			auto& nodeConfiguration = connection->getNodeConfiguration();
+			auto& logger = connection->getSessionConfiguration().getLogger();
+			auto& preparedQueryId = nodeConfiguration.getPreparedQueryId(command.getQuery());
+			if (!preparedQueryId.empty()) {
+				// prepared on this node before
+				if (logger->isEnabled(LogLevel::Debug)) {
+					logger->log(LogLevel::Debug, "hit prepared cache:", command.getQuery().get());
+				}
+				auto executeMessage = RequestMessageFactory::makeRequestMessage<ExecuteMessage>();
+				auto& queryParameters = executeMessage->getQueryParameters();
+				queryParameters.setSkipMetadata(true);
+				queryParameters.setCommandRef(command);
+				executeMessage->getPreparedQueryId().set(preparedQueryId);
+				return seastar::make_ready_future<Object<RequestMessageBase>>(
+					std::move(executeMessage).cast<RequestMessageBase>());
+			}
+			// send PREPARE
+			auto queryView = command.getQuery().get();
+			auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
+			prepareMessage->getQuery().set(queryView.data(), queryView.size());
+			if (logger->isEnabled(LogLevel::Debug)) {
+				logger->log(LogLevel::Debug, "prepare:", queryView);
+			}
+			return connection->sendMessage(std::move(prepareMessage), stream).then([&connection, &stream] {
+				// receive RESULT
+				return connection->waitNextMessage(stream);
+			}).then([&command, &retryFlow, &connection] (auto message) {
+				// handle RESULT
+				if (message->getHeader().getOpCode() == MessageType::Result) {
+					auto resultMessage = std::move(message).template cast<ResultMessage>();
+					if (resultMessage->getKind() == ResultKind::Prepared) {
+						// cache prepare result to node
+						auto& nodeConfiguration = connection->getNodeConfiguration();
+						nodeConfiguration.getPreparedQueryId(command.getQuery()) = (
+							resultMessage->getPreparedQueryId().get());
+						// return execute message
+						auto executeMessage = RequestMessageFactory::makeRequestMessage<ExecuteMessage>();
+						auto& queryParameters = executeMessage->getQueryParameters();
+						queryParameters.setSkipMetadata(true);
+						queryParameters.setCommandRef(command);
+						executeMessage->getPreparedQueryId().set(
+							std::move(resultMessage->getPreparedQueryId().get()));
+						return seastar::make_ready_future<Object<RequestMessageBase>>(
+							std::move(executeMessage).cast<RequestMessageBase>());
+					} else {
+						return retryFlow.handleUnexpectResultKind<Object<RequestMessageBase>>(
+							std::move(resultMessage), "PREPARE");
+					}
+				} else if (message->getHeader().getOpCode() == MessageType::Error) {
+					auto errorMessage = std::move(message).template cast<ErrorMessage>();
+					return retryFlow.handleErrorMessage<Object<RequestMessageBase>>(
+						std::move(errorMessage), command, connection);
+				} else {
+					return retryFlow.handleUnexpectMessage<Object<RequestMessageBase>>(
+						std::move(message), "PREPARE");
+				}
+			});
+		}
+
+		/**
+		 * Prepare queries for "batchExecute".
 		 * This function used pipeline feature of connection,
 		 * notice the max pending messages setting from SessionConfiguration,
 		 * if max pending messages is 100 and there 101 queries to prepare,
@@ -214,11 +297,11 @@ namespace cql {
 					batchMessage->getPreparedQueryId(i) = preparedQueryId;
 					continue; // use previous cached prepare result
 				}
-				if (logger->isEnabled(LogLevel::Debug)) {
-					logger->log(LogLevel::Debug, "prepare:", query.queryStr.get());
-				}
 				auto queryView = query.queryStr.get();
 				prepareResults->results.emplace_back(i, Object<ResponseMessageBase>());
+				if (logger->isEnabled(LogLevel::Debug)) {
+					logger->log(LogLevel::Debug, "prepare:", queryView);
+				}
 				result = result.then([&connection, &stream, queryView] {
 					auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
 					prepareMessage->getQuery().set(queryView.data(), queryView.size());
@@ -251,6 +334,7 @@ namespace cql {
 							// cache prepare result to node
 							nodeConfiguration.getPreparedQueryId(queries[queryIndex].queryStr) = (
 								resultMessage->getPreparedQueryId().get());
+							// store prepared id in batch message
 							batchMessage->getPreparedQueryId(queryIndex) = (
 								std::move(resultMessage->getPreparedQueryId().get()));
 						} else {
@@ -308,13 +392,12 @@ namespace cql {
 					[&connection, &stream] (auto connectionVal, auto streamVal) {
 					connection = std::move(connectionVal);
 					stream = std::move(streamVal);
-				}).then([&command, &connection, &stream] {
-					// send QUERY
-					auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
-					auto& queryParameters = queryMessage->getQueryParameters();
-					queryParameters.setSkipMetadata(true);
-					queryParameters.setCommandRef(command);
-					return connection->sendMessage(std::move(queryMessage), stream);
+				}).then([&command, &retryFlow, &connection, &stream] {
+					// prepare query
+					return prepareQuery(command, retryFlow, connection, stream);
+				}).then([&connection, &stream] (auto message) {
+					// send QUERY or EXECUTE
+					return connection->sendMessage(std::move(message), stream);
 				}).then([&connection, &stream] {
 					// receive RESULT
 					return connection->waitNextMessage(stream);
@@ -389,13 +472,12 @@ namespace cql {
 					[&connection, &stream] (auto connectionVal, auto streamVal) {
 					connection = std::move(connectionVal);
 					stream = std::move(streamVal);
-				}).then([&command, &connection, &stream] {
-					// send QUERY
-					auto queryMessage = RequestMessageFactory::makeRequestMessage<QueryMessage>();
-					auto& queryParameters = queryMessage->getQueryParameters();
-					queryParameters.setSkipMetadata(true);
-					queryParameters.setCommandRef(command);
-					return connection->sendMessage(std::move(queryMessage), stream);
+				}).then([&command, &retryFlow, &connection, &stream] {
+					// prepare query
+					return prepareQuery(command, retryFlow, connection, stream);
+				}).then([&connection, &stream] (auto message) {
+					// send QUERY or EXECUTE
+					return connection->sendMessage(std::move(message), stream);
 				}).then([&connection, &stream] {
 					// receive RESULT
 					return connection->waitNextMessage(stream);

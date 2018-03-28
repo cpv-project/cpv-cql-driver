@@ -20,6 +20,32 @@ TEST_FUTURE(TestSession, queryInSystem) {
 	});
 }
 
+TEST_FUTURE(TestSession, queryWithPrepare) {
+	cql::SessionFactory sessionFactory(
+		cql::SessionConfiguration()
+			.setDefaultKeySpace("system")
+			.setPrepareAllQueries(true),
+		cql::NodeCollection::create({
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
+		}));
+	auto session = sessionFactory.getSession();
+	return seastar::do_with(std::move(session), 15, [] (auto& session, auto& count) {
+		return seastar::repeat([&session, &count] {
+			auto command = cql::Command("select * from batchlog");
+			return session.query(std::move(command)).then([] (auto result) {
+				ASSERT_TRUE(result.isValid());
+			}).then([&count] {
+				if (--count == 0) {
+					return seastar::stop_iteration::yes;
+				} else {
+					return seastar::stop_iteration::no;
+				}
+			});
+		});
+	});
+}
+
 TEST_FUTURE(TestSession, queryError) {
 	cql::SessionFactory sessionFactory(
 		cql::SessionConfiguration()
@@ -70,6 +96,30 @@ TEST_FUTURE(TestSession, execute) {
 			ASSERT_EQ(id, 1);
 			ASSERT_EQ(name, "abc");
 			ASSERT_EQ(result.getDecodePtr(), result.getDecodeEnd());
+		});
+	});
+}
+
+TEST_FUTURE(TestSession, executeWithPrepare) {
+	cql::SessionFactory sessionFactory(
+		cql::SessionConfiguration()
+			.setDefaultKeySpace("system")
+			.setPrepareAllQueries(true),
+		cql::NodeCollection::create({
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
+		}));
+	auto session = sessionFactory.getSession();
+	return seastar::do_with(std::move(session), 15, [] (auto& session, auto& count) {
+		return seastar::repeat([&session, &count] {
+			auto command = cql::Command("select * from batchlog");
+			return session.execute(std::move(command)).then([&count] {
+				if (--count == 0) {
+					return seastar::stop_iteration::yes;
+				} else {
+					return seastar::stop_iteration::no;
+				}
+			});
 		});
 	});
 }
@@ -220,6 +270,38 @@ TEST_FUTURE(TestSession, batchExecutePipelinePrepareInterruption) {
 						return seastar::stop_iteration::no;
 					}
 				});
+			});
+		});
+	});
+}
+
+TEST_FUTURE(TestSession, retryFlow) {
+	// actually the retry logic used here is in ConnectionPool
+	// I should think a way to test the retry flow in Session
+	cql::SessionFactory sessionFactory(
+		cql::SessionConfiguration()
+			.setDefaultKeySpace("system"),
+		cql::NodeCollection::create({
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT+100),
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT+200),
+			cql::NodeConfiguration()
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
+		}));
+	auto session = sessionFactory.getSession();
+	return seastar::do_with(std::move(session), 15, [] (auto& session, auto& count) {
+		return seastar::repeat([&session, &count] {
+			auto command = cql::Command("select * from batchlog")
+				.setMaxRetries(3);
+			return session.query(std::move(command)).then([] (auto result) {
+				ASSERT_TRUE(result.isValid());
+			}).then([&count] {
+				if (--count == 0) {
+					return seastar::stop_iteration::yes;
+				} else {
+					return seastar::stop_iteration::no;
+				}
 			});
 		});
 	});
