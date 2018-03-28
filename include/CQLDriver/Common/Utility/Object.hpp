@@ -26,6 +26,10 @@ namespace cql {
 	class Object {
 	public:
 		/** Constructor */
+		explicit Object() noexcept :
+			Object(nullptr, [](void*) noexcept {}) { }
+
+		/** Constructor */
 		explicit Object(std::unique_ptr<T>&& ptr) noexcept :
 			Object(ptr.release(), [](void* ptr) noexcept {
 				std::unique_ptr<T> tPtr(reinterpret_cast<T*>(ptr));
