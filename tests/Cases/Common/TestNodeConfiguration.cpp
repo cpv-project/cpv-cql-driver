@@ -54,3 +54,22 @@ TEST(TestNodeConfiguration, all) {
 	}
 }
 
+TEST(TestNodeConfiguration, getPreparedQueryId) {
+	cql::NodeConfiguration configuration;
+	{
+		auto& a = configuration.getPreparedQueryId(cql::StringHolder("select * from a"));
+		auto& b = configuration.getPreparedQueryId(cql::StringHolder("select * from b"));
+		a = "id for a";
+		b = "id for b";
+	}
+	{
+		auto& a = configuration.getPreparedQueryId(cql::StringHolder("select * from a"));
+		auto& b = configuration.getPreparedQueryId(cql::StringHolder("select * from b"));
+		auto& c = configuration.getPreparedQueryId(cql::StringHolder("select * from c"));
+		ASSERT_EQ(a, "id for a");
+		ASSERT_EQ(b, "id for b");
+		ASSERT_EQ(c, "");
+	}
+	
+}
+

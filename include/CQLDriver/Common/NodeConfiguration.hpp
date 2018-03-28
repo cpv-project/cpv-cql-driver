@@ -4,6 +4,7 @@
 #include <chrono>
 #include <memory>
 #include <net/socket_defs.hh>
+#include "./Utility/StringHolder.hpp"
 
 namespace cql {
 	/** Defines members of NodeConfiguration */
@@ -62,6 +63,9 @@ namespace cql {
 
 		/** Update the resolved ip address */
 		void updateIpAddress(const seastar::socket_address& ipAddress);
+
+		/** Get the prepared query id cached in this node for the specificed query string */
+		std::string& getPreparedQueryId(const StringHolder& queryStr) &;
 
 		/** Constructor */
 		NodeConfiguration();

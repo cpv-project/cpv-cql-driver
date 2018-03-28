@@ -22,7 +22,8 @@ namespace cql {
 			ipAddress(),
 			ipAddressIsResolved(false),
 			ipAddressIsFixed(false),
-			ipAddressUpdatedTime() { }
+			ipAddressUpdatedTime(),
+			preparedQueryIds() { }
 
 		std::pair<std::string, std::uint16_t> address;
 		bool useSSL;
@@ -35,6 +36,7 @@ namespace cql {
 		bool ipAddressIsResolved;
 		bool ipAddressIsFixed;
 		std::chrono::system_clock::time_point ipAddressUpdatedTime;
+		std::unordered_map<StringHolder, std::string, StringHolder::Hash> preparedQueryIds;
 	};
 
 	/** Set the hostname and the port of this node */
@@ -164,6 +166,11 @@ namespace cql {
 		data_->ipAddress = ipAddress;
 		data_->ipAddressIsResolved = true;
 		data_->ipAddressUpdatedTime = std::chrono::system_clock::now();
+	}
+
+	/** Get the prepared query id cached in this node for the specificed query string */
+	std::string& NodeConfiguration::getPreparedQueryId(const StringHolder& queryStr) & {
+		return data_->preparedQueryIds[queryStr];
 	}
 
 	/** Constructor */
