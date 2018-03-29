@@ -198,8 +198,9 @@ namespace cql {
 						self->allConnections_.begin(),
 						self->allConnections_.end(),
 						[&existCount, &minCount] (const auto& connection) {
-							// drop connections that is not used at all, until reach min pool size
-							if (existCount > minCount && connection->isAllStreamsFree()) {
+							// drop closed or redundant connections
+							if (!connection->isReady() ||
+								(existCount > minCount && connection->isAllStreamsFree())) {
 								--existCount;
 								return true;
 							}
