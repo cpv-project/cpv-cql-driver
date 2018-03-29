@@ -143,7 +143,7 @@ TEST_FUTURE(TestConnection, prepareQuery) {
 			// receive RESULT
 			return connection->waitNextMessage(stream);
 		}).then([&queryId] (auto message) {
-			// parse RESULT
+			// handle RESULT
 			ASSERT_EQ(message->getHeader().getOpCode(), cql::MessageType::Result);
 			auto resultMessage = std::move(message).template cast<cql::ResultMessage>();
 			ASSERT_EQ(resultMessage->getKind(), cql::ResultKind::Prepared);
@@ -159,11 +159,41 @@ TEST_FUTURE(TestConnection, prepareQuery) {
 			// receive RESULT
 			return connection->waitNextMessage(stream);
 		}).then([&queryId] (auto message) {
-			// parse RESULT, check if the prepared query id is same
+			// handle RESULT, check if the prepared query id is same
 			ASSERT_EQ(message->getHeader().getOpCode(), cql::MessageType::Result);
 			auto resultMessage = std::move(message).template cast<cql::ResultMessage>();
 			ASSERT_EQ(resultMessage->getKind(), cql::ResultKind::Prepared);
 			ASSERT_EQ(queryId, resultMessage->getPreparedQueryId().get());
+		});
+	});
+}
+
+TEST_FUTURE(TestConnection, compression) {
+	auto connection = seastar::make_lw_shared<cql::Connection>(
+		seastar::make_lw_shared<cql::SessionConfiguration>(),
+		seastar::make_lw_shared<cql::NodeConfiguration>(
+			cql::NodeConfiguration()
+				.setUseCompression(true)
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+	auto stream = connection->openStream();
+	return seastar::do_with(
+		std::move(connection), std::move(stream),
+		[] (auto& connection, auto& stream) {
+		return connection->ready().then([&connection, &stream] {
+			// send PREPARE
+			auto prepareMessage = (
+				cql::RequestMessageFactory::makeRequestMessage<cql::PrepareMessage>());
+			prepareMessage->getQuery().set("use system;");
+			return connection->sendMessage(std::move(prepareMessage), stream);
+		}).then([&connection, &stream] {
+			// receive RESULT
+			return connection->waitNextMessage(stream);
+		}).then([] (auto message) {
+			// handle RESULT
+			ASSERT_EQ(message->getHeader().getOpCode(), cql::MessageType::Result);
+			auto resultMessage = std::move(message).template cast<cql::ResultMessage>();
+			ASSERT_EQ(resultMessage->getKind(), cql::ResultKind::Prepared);
+			ASSERT_FALSE(resultMessage->getPreparedQueryId().get().empty());
 		});
 	});
 }

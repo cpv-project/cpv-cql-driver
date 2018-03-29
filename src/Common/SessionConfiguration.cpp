@@ -25,7 +25,7 @@ namespace cql {
 		seastar::shared_ptr<Logger> logger;
 	};
 
-	/** Set the minimum database connection pool size.  */
+	/** Set the minimum database connection pool size */
 	SessionConfiguration& SessionConfiguration::setMinPoolSize(std::size_t minPoolSize) {
 		data_->minPoolSize = minPoolSize;
 		return *this;

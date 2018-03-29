@@ -3,13 +3,27 @@
 
 namespace cql {
 	namespace CompressorFactory {
+		namespace {
+			ProtocolString CompressionKey("COMPRESSION");
+		}
+
 		/** Get a suitable compressor supported by both client and server */
 		seastar::shared_ptr<CompressorBase> getCompressor(
 			const ProtocolStringMultiMap& options) {
-			// TODO
+			auto algorithmsIt = options.get().find(CompressionKey);
+			if (algorithmsIt == options.get().end()) {
+				return nullptr;
+			}
+			auto& algorithms = algorithmsIt->second.get();
+			for (const auto& algorithm : algorithmsIt->second.get()) {
+				if (algorithm.get() == "lz4") {
+					thread_local static seastar::shared_ptr<CompressorBase> compressor = (
+						seastar::make_shared<LZ4Compressor>());
+					return compressor;
+				}
+			}
 			return nullptr;
 		}
 	}
 }
-
 
