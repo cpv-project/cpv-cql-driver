@@ -26,7 +26,7 @@ namespace cql {
 		/** Get the message header */
 		const MessageHeader& getHeader() const&;
 
-		/** Get the message header */
+		/** Get the mutable message header */
 		MessageHeader& getHeader() &;
 
 		/** Get description of this message */

@@ -8,6 +8,7 @@
 #include <CQLDriver/Common/NodeConfiguration.hpp>
 #include "./Connectors/ConnectorBase.hpp"
 #include "./Authenticators/AuthenticatorBase.hpp"
+#include "./Compressors/CompressorFactory.hpp"
 #include "./RequestMessages/RequestMessageBase.hpp"
 #include "./ResponseMessages/ResponseMessageBase.hpp"
 #include "./ConnectionInfo.hpp"
@@ -97,13 +98,14 @@ namespace cql {
 
 	private:
 		/** Close the connection */
-		void close(const std::string& errorMessage);
+		void close(const std::string_view& errorMessage);
 
 	private:
 		seastar::lw_shared_ptr<SessionConfiguration> sessionConfiguration_;
 		seastar::lw_shared_ptr<NodeConfiguration> nodeConfiguration_;
 		seastar::shared_ptr<ConnectorBase> connector_;
 		seastar::shared_ptr<AuthenticatorBase> authenticator_;
+		seastar::shared_ptr<CompressorBase> compressor_;
 
 		SocketHolder socket_;
 		bool isReady_;
@@ -113,6 +115,7 @@ namespace cql {
 		ConnectionStream streamZero_;
 
 		seastar::future<> sendingFuture_;
+		std::string sendingBufferPreCompress_;
 		std::string sendingBuffer_;
 
 		std::vector<std::pair<bool, seastar::promise<Object<ResponseMessageBase>>>> receivingPromiseMap_;

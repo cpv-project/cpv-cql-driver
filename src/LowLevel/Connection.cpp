@@ -13,6 +13,7 @@
 #include "./RequestMessages/StartupMessage.hpp"
 #include "./RequestMessages/QueryMessage.hpp"
 #include "./ResponseMessages/ResponseMessageFactory.hpp"
+#include "./ResponseMessages/SupportedMessage.hpp"
 #include "./ResponseMessages/ResultMessage.hpp"
 #include "./Connection.hpp"
 
@@ -66,12 +67,25 @@ namespace cql {
 			// receive SUPPORTED
 			return self->waitNextMessage(self->streamZero_);
 		}).then([self] (auto message) {
-			// send STARTUP
+			// handle SUPPORTED
 			if (message->getHeader().getOpCode() != MessageType::Supported) {
 				return seastar::make_exception_future(LogicException(
 					CQL_CODEINFO, "unexpected response to OPTION message:", message->toString()));
 			}
+			// setup compression
+			if (self->nodeConfiguration_->getUseCompression()) {
+				auto supportedMessage = std::move(message).template cast<SupportedMessage>();
+				self->compressor_ = CompressorFactory::getCompressor(supportedMessage->getOptions());
+				if (self->compressor_ != nullptr) {
+					auto& logger = self->sessionConfiguration_->getLogger();
+					logger->log(LogLevel::Debug, "enable compression:", self->compressor_->name());
+				}
+			}
+			// send STARTUP
 			auto startupMessage = RequestMessageFactory::makeRequestMessage<StartupMessage>();
+			if (self->compressor_ != nullptr) {
+				startupMessage->setCompression(self->compressor_->name().c_str());
+			}
 			return self->sendMessage(std::move(startupMessage), self->streamZero_);
 		}).then([self] {
 			// perform authentication
@@ -92,7 +106,7 @@ namespace cql {
 				// receive RESULT
 				return self->waitNextMessage(self->streamZero_);
 			}).then([self] (auto message) {
-				// check RESULT
+				// handle RESULT
 				if (message->getHeader().getOpCode() != MessageType::Result) {
 					return seastar::make_exception_future(ResponseErrorException(
 						CQL_CODEINFO, "unexpected response to use keyspace query:", message->toString()));
@@ -108,10 +122,16 @@ namespace cql {
 			// the connection is ready
 			self->isReady_ = true;
 		}).handle_exception([self] (std::exception_ptr ex) {
-			// initialize failed
+			// initialize connection failed
+			auto& logger = self->sessionConfiguration_->getLogger();
+			if (logger->isEnabled(LogLevel::Info)) {
+				logger->log(LogLevel::Info, "initialize connection to",
+					self->nodeConfiguration_->getAddressAsString(), "failed:", ex);
+			}
+			self->close("initialize connection failed");
 			return seastar::make_exception_future(ConnectionInitializeException(
 				CQL_CODEINFO, "initialize connection to",
-				self->nodeConfiguration_->getAddress().first, "failed:\n", ex));
+				self->nodeConfiguration_->getAddressAsString(), "failed:\n", ex));
 		});
 	}
 
@@ -164,10 +184,22 @@ namespace cql {
 					logger->log(LogLevel::Debug, "send message:", message->toString());
 				}
 				// encode message to binary data
+				auto& header = message->getHeader();
 				self->sendingBuffer_.resize(0);
-				message->getHeader().encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
-				message->encodeBody(self->connectionInfo_, self->sendingBuffer_);
-				message->getHeader().encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
+				if (self->isReady_ && self->compressor_ != nullptr) {
+					// with compression
+					header.setFlags(header.getFlags() | MessageHeaderFlags::Compression);
+					header.encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
+					self->sendingBufferPreCompress_.resize(0);
+					message->encodeBody(self->connectionInfo_, self->sendingBufferPreCompress_);
+					self->compressor_->compress(self->sendingBufferPreCompress_, self->sendingBuffer_);
+					header.encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
+				} else {
+					// without compression
+					header.encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
+					message->encodeBody(self->connectionInfo_, self->sendingBuffer_);
+					header.encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
+				}
 				// send the encoded binary data
 				return self->socket_.out().write(self->sendingBuffer_).then([&self] {
 					return self->socket_.out().flush();
@@ -224,7 +256,20 @@ namespace cql {
 						.then([&self, header=std::move(header)] (
 							seastar::temporary_buffer<char>&& buf) mutable {
 							auto message = ResponseMessageFactory::makeResponseMessage(std::move(header));
-							message->decodeBody(self->connectionInfo_, std::move(buf));
+							// decode message
+							auto flags = message->getHeader().getFlags();
+							if (enumTrue(flags & MessageHeaderFlags::Compression)) {
+								// with compression
+								if (self->compressor_ == nullptr) {
+									self->close("server compressed the frame without client's consent");
+									return seastar::stop_iteration::yes;
+								}
+								auto output = self->compressor_->decompress(std::move(buf));
+								message->decodeBody(self->connectionInfo_, std::move(output));
+							} else {
+								// without compression
+								message->decodeBody(self->connectionInfo_, std::move(buf));
+							}
 							// log message
 							auto& logger = self->sessionConfiguration_->getLogger();
 							if (logger->isEnabled(LogLevel::Debug)) {
@@ -298,6 +343,7 @@ namespace cql {
 		freeStreamIds_(seastar::make_lw_shared<decltype(freeStreamIds_)::element_type>()),
 		streamZero_(0, freeStreamIds_),
 		sendingFuture_(seastar::make_ready_future()),
+		sendingBufferPreCompress_(),
 		sendingBuffer_(),
 		receivingPromiseMap_(nodeConfiguration_->getMaxStreams()),
 		receivedMessageQueueMap_(),
@@ -323,13 +369,17 @@ namespace cql {
 	}
 
 	/** Close the connection */
-	void Connection::close(const std::string& errorMessage) {
+	void Connection::close(const std::string_view& errorMessage) {
 		// log close
-		auto& logger = sessionConfiguration_->getLogger();
-		logger->log(LogLevel::Info, "close connection:", errorMessage);
+		if (isReady_) {
+			auto& logger = sessionConfiguration_->getLogger();
+			logger->log(LogLevel::Info, "close connection:", errorMessage);
+		}
 		// close the socket and reset the ready state
 		socket_ = SocketHolder();
 		isReady_ = false;
+		// reset compressor
+		compressor_ = nullptr;
 		// notify all message waiters
 		receivingPromiseCount_ = 0;
 		for (auto& slot : receivingPromiseMap_) {
