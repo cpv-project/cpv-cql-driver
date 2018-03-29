@@ -18,7 +18,9 @@ It's new and has not been extensively tested, you should use it carefully.<br/>
 - [Load balancing](./docs/Configuration.md#nodecollection)
 - [Authentication](./docs/Configuration.md#setpasswordauthenticationstdstring-stdstring)
 - [SSL](./docs/Configuration.md#setusesslbool)
-- [Batch Operation](./docs/BatchExecute.md)
+- [Batch operation](./docs/BatchExecute.md)
+- [Preparation](./docs/Prepare.md)
+- [Compression](./docs/Configuration.md#setusecompressionbool)
 
 # Documents
 
@@ -27,6 +29,7 @@ It's new and has not been extensively tested, you should use it carefully.<br/>
 - [Query](./docs/Query.md)
 - [Execute](./docs/Execute.md)
 - [Batch Execute](./docs/BatchExecute.md)
+- [Prepare](./docs/Prepare.md)
 - [Column Types](./docs/ColumnTypes.md)
 - [Logging](./docs/Logging.md)
 - [Benchmark](./docs/Benchmark.md)

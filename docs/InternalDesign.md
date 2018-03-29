@@ -16,6 +16,7 @@ LowLevel can include headers in Common, HighLevel can include headers in both Co
 - Define new logger
 - Define new node collection
 - Define new authenticator
+- Define new compressor
 - Define new connector
 - Define new column types
 - Define new request message

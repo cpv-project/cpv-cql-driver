@@ -56,6 +56,32 @@ The default value is 30000ms.<br/>
 
 Set the default keyspace of all connections created by this configuration.<br/>
 
+### setDefaultConsistency(ConsistencyLevel)
+
+Set the default consistency level.<br/>
+The default value is `ConsistencyLevel.Quorum`.<br/>
+This can be overridden by `setConsistency(...)` in [Command](./Query.md#setconsistencyconsistencylevel) and [BatchCommand](./BatchExecute.md#setconsistencyconsistencylevel).
+For more information see [this page](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html).<br/>
+Supported consistencies:<br/>
+
+- ConsistencyLevel::Any
+- ConsistencyLevel::One
+- ConsistencyLevel::Two
+- ConsistencyLevel::Three
+- ConsistencyLevel::Quorum
+- ConsistencyLevel::All
+- ConsistencyLevel::LocalQuorum
+- ConsistencyLevel::EachQuorum
+- ConsistencyLevel::Serial
+- ConsistencyLevel::LocalSerial
+- ConsistencyLevel::LocalOne
+
+### setPrepareAllQueries(bool)
+
+Set should prepare all queries by default.<br/>
+The default value is false.<br/>
+This can be overridden by `prepareQuery(bool)` in [Command](./Query.md#preparequerybool) and [BatchCommand](./BatchExecute.md#preparequerybool).
+
 ### setLogger(seastar::shared_ptr<Logger>&)
 
 Set the logger instance.<br/>
@@ -92,7 +118,7 @@ Set should connect this node with ssl connection, defaut value is false.<br/>
 ### setUseCompression(bool)
 
 Set should use frame compression if available, defaut value is false.<br/>
-**Compression is not implemented in 0.1**.
+For now only lz4 algorithm is supported and will be used if this option is set.
 
 ### setMaxStreams(std::size_t)
 
@@ -101,10 +127,15 @@ Set how many streams can hold in a single connection, default value is 20.<br/>
 ### setMaxPendingMessages(std::size_t)
 
 Set how many messages can hold in a received queue for a single stream, default value is 100.<br/>
+Notice this setting may cause batch execute with preparation failed,<br/>
+for example if max pending messages is 100 and there 101 queries to prepare,<br/>
+you may see an error like `max pending messages is reached`,<br/>
+the solution is increase this limitation if you have too many queries in a single batch.
 
 ### setPasswordAuthentication(std::string&&, std::string&&)
 
 Set to use password authentication for this node.<br/>
+The first argument is username, the second argument is password.
 
 # Create a session factory
 

@@ -67,7 +67,8 @@ Supported batch types:<br/>
 
 ### setConsistency(ConsistencyLevel)
 
-Set the consistency level of this query, default is "Quorum".<br/>
+Set the consistency level of this query.<br/>
+This will override the default setting in [SessionConfiguration](./Configuration.md#setdefaultconsistencyconsistencylevel).<br/>
 For more information see [this page](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html).<br/>
 Supported consistencies:<br/>
 
@@ -96,16 +97,15 @@ BatchCommand& addQuery(const char(&query)[Size]) &;
 ```
 
 Notice overload 2 and 3 won't copy the string to the internal buffer in `BatchCommand`,
-it can avoid the excess memory copy,
+it can avoid the unnecessary memory copy,
 but you have to ensure the string is alive until `Session::batchExecute` is finished.
 
-### prepareQuery()
+### prepareQuery(bool)
 
-Prepare the last query to reduce the message size.<br/>
-Notice it will increase one roundtrip.<br/>
-
-**For now this driver won't rememeber prepared query, the query will be prepared every time the batch command is executed.**<br/>
-I want to implement this feature but I don't know what to do if a node has restarted, detect it by receive events may be unreliable.
+Set should prepare the last query.<br/>
+This will override the default setting in [SessionConfiguration](./Configuration.md#setprepareallqueriesbool).<br/>
+The prepare request will only be sent if the query isn't prepared before.<br/>
+For more information see [Prepare](./Prepare.md).
 
 ### openParameterSet()
 
@@ -141,7 +141,7 @@ auto command = cql::BatchCommand()
 			.addParameters(cql::Int(3), cql::Text("c"));
 ```
 
-### addParameter(T&& parameter)
+### addParameter(T&&)
 
 Add single query parameter bound by position to the last parameter set.<br/>
 The position is incremental, when this function is called.<br/>

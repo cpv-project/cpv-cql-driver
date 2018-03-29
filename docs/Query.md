@@ -40,9 +40,17 @@ session.query(std::move(command)).then([] (cql::ResultSet result) {
 
 `Command` contains following options:
 
+### prepareQuery(bool)
+
+Set should prepare the last query.<br/>
+This will override the default setting in [SessionConfiguration](./Configuration.md#setprepareallqueriesbool).<br/>
+The prepare request will only be sent if the query isn't prepared before.<br/>
+For more information see [Prepare](./Prepare.md).
+
 ### setConsistency(ConsistencyLevel)
 
-Set the consistency level of this query, default is "Quorum".<br/>
+Set the consistency level of this query.<br/>
+This will override the default setting in [SessionConfiguration](./Configuration.md#setdefaultconsistencyconsistencylevel).<br/>
 For more information see [this page](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html).<br/>
 Supported consistencies:<br/>
 

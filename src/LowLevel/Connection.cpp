@@ -358,13 +358,12 @@ namespace cql {
 			sendingBufferPreCompress_.resize(0);
 			message->encodeBody(connectionInfo_, sendingBufferPreCompress_);
 			compressor_->compress(sendingBufferPreCompress_, sendingBuffer_);
-			header.encodeHeaderPost(connectionInfo_, sendingBuffer_);
 		} else {
 			// without compression
 			header.encodeHeaderPre(connectionInfo_, sendingBuffer_);
 			message->encodeBody(connectionInfo_, sendingBuffer_);
-			header.encodeHeaderPost(connectionInfo_, sendingBuffer_);
 		}
+		header.encodeHeaderPost(connectionInfo_, sendingBuffer_);
 	}
 
 	/** Decode message from temporary buffer */
