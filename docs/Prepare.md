@@ -3,7 +3,7 @@ The preparation can be enabled globally or for a single query.<br/>
 
 ### Enable preparation globally
 
-Use `setPrepareAllQueries(true)` in [SessionConfiguration](./SessionConfiguration.md#setprepareallqueriesbool), for example:
+Use `setPrepareAllQueries(true)` in [SessionConfiguration](./Configuration.md#setprepareallqueriesbool), for example:
 
 ``` c++
 auto configuration = cql::SessionConfiguration()
@@ -29,7 +29,7 @@ auto command = cql::BatchCommand()
 ### Enable preparation for a single query
 
 By default, the preparation is disabled for all queries.<br/>
-To enable preparation for a single query, use `prepareQuery(true)` just like above, for example:
+To enable preparation for a single query, use `prepareQuery()` just like above, for example:
 
 ``` c++
 auto command = cql::Command("select * from batchlog")
@@ -82,7 +82,7 @@ handle RESULT
 handle RESULT
 ```
 
-Notice inappropriate setting of `SessionConfiguration::setMaxPendingMessages` may cause `max pending messages is reached` error, see documents [in there](./SessionConfiguration.md#setmaxpendingmessagesstdsize_t).
+Notice inappropriate setting of `SessionConfiguration::setMaxPendingMessages` may cause `max pending messages is reached` error, see documents [in there](./Configuration.md#setmaxpendingmessagesstdsize_t).
 
 For more information about prepared statement see [this page](https://docs.datastax.com/en/developer/java-driver/3.1/manual/statements/prepared/).
 

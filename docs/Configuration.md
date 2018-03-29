@@ -60,7 +60,7 @@ Set the default keyspace of all connections created by this configuration.<br/>
 
 Set the default consistency level.<br/>
 The default value is `ConsistencyLevel.Quorum`.<br/>
-This can be overridden by `setConsistency(...)` in [Command](./Query.md#setconsistencyconsistencylevel) and [BatchCommand](./BatchExecute.md#setconsistencyconsistencylevel).
+This can be overridden by `setConsistency(...)` in [Command](./Query.md#setconsistencyconsistencylevel) and [BatchCommand](./BatchExecute.md#setconsistencyconsistencylevel).<br/>
 For more information see [this page](https://docs.datastax.com/en/cassandra/2.1/cassandra/dml/dml_config_consistency_c.html).<br/>
 Supported consistencies:<br/>
 
@@ -113,11 +113,11 @@ Set the hostname and the port of this node.<br/>
 
 ### setUseSSL(bool)
 
-Set should connect this node with ssl connection, defaut value is false.<br/>
+Set should connect this node with ssl connection, default value is false.<br/>
 
 ### setUseCompression(bool)
 
-Set should use frame compression if available, defaut value is false.<br/>
+Set should use frame compression if available, default value is false.<br/>
 For now only lz4 algorithm is supported and will be used if this option is set.
 
 ### setMaxStreams(std::size_t)
