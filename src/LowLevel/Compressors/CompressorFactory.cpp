@@ -14,7 +14,6 @@ namespace cql {
 			if (algorithmsIt == options.get().end()) {
 				return nullptr;
 			}
-			auto& algorithms = algorithmsIt->second.get();
 			for (const auto& algorithm : algorithmsIt->second.get()) {
 				if (algorithm.get() == "lz4") {
 					thread_local static seastar::shared_ptr<CompressorBase> compressor = (

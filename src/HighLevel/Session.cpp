@@ -147,7 +147,7 @@ namespace cql {
 			}
 
 			/** Constructor */
-			RetryFlow(std::size_t maxRetries) :
+			explicit RetryFlow(std::size_t maxRetries) :
 				maxRetries_(maxRetries), unPreparedErrorCount_(0) { }
 
 		private:

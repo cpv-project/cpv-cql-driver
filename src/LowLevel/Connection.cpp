@@ -8,6 +8,10 @@
 #include <CQLDriver/Common/Exceptions/ResponseErrorException.hpp>
 #include "./Connectors/ConnectorFactory.hpp"
 #include "./Authenticators/AuthenticatorFactory.hpp"
+#include "./Compressors/CompressorFactory.hpp"
+#include "./ProtocolTypes/ProtocolUUID.hpp"
+#include "./ProtocolTypes/ProtocolBytesMap.hpp"
+#include "./ProtocolTypes/ProtocolStringList.hpp"
 #include "./RequestMessages/RequestMessageFactory.hpp"
 #include "./RequestMessages/OptionsMessage.hpp"
 #include "./RequestMessages/StartupMessage.hpp"
@@ -183,23 +187,8 @@ namespace cql {
 				if (logger->isEnabled(LogLevel::Debug)) {
 					logger->log(LogLevel::Debug, "send message:", message->toString());
 				}
-				// encode message to binary data
-				auto& header = message->getHeader();
-				self->sendingBuffer_.resize(0);
-				if (self->isReady_ && self->compressor_ != nullptr) {
-					// with compression
-					header.setFlags(header.getFlags() | MessageHeaderFlags::Compression);
-					header.encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
-					self->sendingBufferPreCompress_.resize(0);
-					message->encodeBody(self->connectionInfo_, self->sendingBufferPreCompress_);
-					self->compressor_->compress(self->sendingBufferPreCompress_, self->sendingBuffer_);
-					header.encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
-				} else {
-					// without compression
-					header.encodeHeaderPre(self->connectionInfo_, self->sendingBuffer_);
-					message->encodeBody(self->connectionInfo_, self->sendingBuffer_);
-					header.encodeHeaderPost(self->connectionInfo_, self->sendingBuffer_);
-				}
+				// encode message
+				self->encodeMessage(message);
 				// send the encoded binary data
 				return self->socket_.out().write(self->sendingBuffer_).then([&self] {
 					return self->socket_.out().flush();
@@ -238,77 +227,66 @@ namespace cql {
 		if (receivingPromiseCount_++ == 0) {
 			// the first who made promise has responsibility to start the receiver
 			auto self = shared_from_this();
-			seastar::do_with(std::move(self), [](auto& self) {
-				return seastar::repeat([&self] {
+			seastar::do_with(
+				std::move(self),
+				Object<ResponseMessageBase>(), [] (
+				auto& self,
+				auto& message) {
+				return seastar::repeat([&self, &message] {
 					// receive message header
 					return self->socket_.in().read_exactly(self->connectionInfo_.getHeaderSize())
-					.then([&self] (seastar::temporary_buffer<char>&& buf) {
+					.then([&self, &message] (seastar::temporary_buffer<char>&& buf) {
+						// decode message header
 						MessageHeader header;
 						header.decodeHeader(self->connectionInfo_, std::move(buf));
 						auto bodyLength = header.getBodyLength();
 						if (bodyLength > self->connectionInfo_.getMaximumMessageBodySize()) {
-							self->close(joinString(" ", "message body too large:", bodyLength));
-							return seastar::make_ready_future<seastar::stop_iteration>(
-								seastar::stop_iteration::yes);
+							return seastar::make_exception_future<seastar::temporary_buffer<char>>(
+								LogicException(CQL_CODEINFO, "message body too large:", bodyLength));
 						}
+						message = ResponseMessageFactory::makeResponseMessage(std::move(header));
 						// receive message body
-						return self->socket_.in().read_exactly(bodyLength)
-						.then([&self, header=std::move(header)] (
-							seastar::temporary_buffer<char>&& buf) mutable {
-							auto message = ResponseMessageFactory::makeResponseMessage(std::move(header));
-							// decode message
-							auto flags = message->getHeader().getFlags();
-							if (enumTrue(flags & MessageHeaderFlags::Compression)) {
-								// with compression
-								if (self->compressor_ == nullptr) {
-									self->close("server compressed the frame without client's consent");
-									return seastar::stop_iteration::yes;
-								}
-								auto output = self->compressor_->decompress(
-									self->connectionInfo_, std::move(buf));
-								message->decodeBody(self->connectionInfo_, std::move(output));
-							} else {
-								// without compression
-								message->decodeBody(self->connectionInfo_, std::move(buf));
-							}
-							// log message
-							auto& logger = self->sessionConfiguration_->getLogger();
-							if (logger->isEnabled(LogLevel::Debug)) {
-								logger->log(LogLevel::Debug, "received message:", message->toString());
-							}
-							// find the corresponding promise
-							auto streamId = message->getHeader().getStreamId();
-							if (streamId >= self->receivedMessageQueueMap_.size()) {
-								self->close(joinString(" ",
-									"stream id of received message out of range:", streamId));
-								return seastar::stop_iteration::yes;
-							}
-							auto& promiseSlot = self->receivingPromiseMap_[streamId];
-							if (promiseSlot.first) {
-								// pass message directly to the promise
-								promiseSlot.first = false;
-								promiseSlot.second.set_value(std::move(message));
-								if (self->receivingPromiseCount_ == 0) {
-									self->close("incorrect receiving promise count, should be logic error");
-									return seastar::stop_iteration::yes;
-								}
-								--self->receivingPromiseCount_;
-							} else {
-								// enqueue message to received queue
-								if (!self->receivedMessageQueueMap_[streamId].push(std::move(message))) {
-									self->close(joinString(" ",
-										"max pending messages is reached, stream id:", streamId));
-									return seastar::stop_iteration::yes;
-								}
-							}
+						return self->socket_.in().read_exactly(bodyLength);
+					}).then([&self, &message] (seastar::temporary_buffer<char>&& buf) {
+						// decode message body
+						self->decodeMessage(message, std::move(buf));
+						// log message
+						auto& logger = self->sessionConfiguration_->getLogger();
+						if (logger->isEnabled(LogLevel::Debug)) {
+							logger->log(LogLevel::Debug, "received message:", message->toString());
+						}
+						// find the corresponding promise
+						auto streamId = message->getHeader().getStreamId();
+						if (streamId >= self->receivedMessageQueueMap_.size()) {
+							self->close(joinString(" ",
+								"stream id of received message out of range:", streamId));
+							return seastar::stop_iteration::yes;
+						}
+						auto& promiseSlot = self->receivingPromiseMap_[streamId];
+						if (promiseSlot.first) {
+							// pass message directly to the promise
+							promiseSlot.first = false;
+							promiseSlot.second.set_value(std::move(message));
 							if (self->receivingPromiseCount_ == 0) {
-								// no more message waiter is waiting, exit receiver
+								self->close("incorrect receiving promise count, should be logic error");
 								return seastar::stop_iteration::yes;
-							} else {
-								// continue to receive next message
-								return seastar::stop_iteration::no;
 							}
-						});
+							--self->receivingPromiseCount_;
+						} else {
+							// enqueue message to received queue
+							if (!self->receivedMessageQueueMap_[streamId].push(std::move(message))) {
+								self->close(joinString(" ",
+									"max pending messages is reached, stream id:", streamId));
+								return seastar::stop_iteration::yes;
+							}
+						}
+						if (self->receivingPromiseCount_ == 0) {
+							// no more message waiter is waiting, exit receiver
+							return seastar::stop_iteration::yes;
+						} else {
+							// continue to receive next message
+							return seastar::stop_iteration::no;
+						}
 					});
 				}).handle_exception([&self] (std::exception_ptr ex) {
 					self->close(joinString(" ", "receive message failed:", ex));
@@ -366,6 +344,70 @@ namespace cql {
 			close("close from destructor");
 		} catch (...) {
 			std::cerr << std::current_exception() << std::endl;
+		}
+	}
+
+	/** Encode message to sending buffer */
+	void Connection::encodeMessage(const Object<RequestMessageBase>& message) {
+		auto& header = message->getHeader();
+		sendingBuffer_.resize(0);
+		if (isReady_ && compressor_ != nullptr) {
+			// with compression
+			header.setFlags(header.getFlags() | MessageHeaderFlags::Compression);
+			header.encodeHeaderPre(connectionInfo_, sendingBuffer_);
+			sendingBufferPreCompress_.resize(0);
+			message->encodeBody(connectionInfo_, sendingBufferPreCompress_);
+			compressor_->compress(sendingBufferPreCompress_, sendingBuffer_);
+			header.encodeHeaderPost(connectionInfo_, sendingBuffer_);
+		} else {
+			// without compression
+			header.encodeHeaderPre(connectionInfo_, sendingBuffer_);
+			message->encodeBody(connectionInfo_, sendingBuffer_);
+			header.encodeHeaderPost(connectionInfo_, sendingBuffer_);
+		}
+	}
+
+	/** Decode message from temporary buffer */
+	void Connection::decodeMessage(
+		Object<ResponseMessageBase>& message,
+		seastar::temporary_buffer<char>&& buffer) const {
+		auto flags = message->getHeader().getFlags();
+		if (enumTrue(flags & MessageHeaderFlags::Tracing)) {
+			// discard tracing id
+			thread_local static ProtocolUUID tracingId;
+			auto ptr = buffer.get();
+			tracingId.decode(ptr, ptr + buffer.size());
+			buffer.trim_front(ptr - buffer.get());
+		}
+		if (enumTrue(flags & MessageHeaderFlags::CustomPayload)) {
+			// discard custom payload
+			thread_local static ProtocolBytesMap customPayload;
+			auto ptr = buffer.get();
+			customPayload.decode(ptr, ptr + buffer.size());
+			buffer.trim_front(ptr - buffer.get());
+		}
+		if (enumTrue(flags & MessageHeaderFlags::Warning)) {
+			// log and discard warnings
+			thread_local static ProtocolStringList warnings;
+			auto ptr = buffer.get();
+			warnings.decode(ptr, ptr + buffer.size());
+			buffer.trim_front(ptr - buffer.get());
+			auto& logger = sessionConfiguration_->getLogger();
+			for (const auto& warning : warnings.get()) {
+				logger->log(LogLevel::Warning, "server side warning:", warning.get());
+			}
+		}
+		if (enumTrue(flags & MessageHeaderFlags::Compression)) {
+			// with compression
+			if (compressor_ == nullptr) {
+				throw LogicException(CQL_CODEINFO,
+					"server compressed the frame without client's consent");
+			}
+			auto output = compressor_->decompress(connectionInfo_, std::move(buffer));
+			message->decodeBody(connectionInfo_, std::move(output));
+		} else {
+			// without compression
+			message->decodeBody(connectionInfo_, std::move(buffer));
 		}
 	}
 

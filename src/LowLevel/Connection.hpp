@@ -8,7 +8,7 @@
 #include <CQLDriver/Common/NodeConfiguration.hpp>
 #include "./Connectors/ConnectorBase.hpp"
 #include "./Authenticators/AuthenticatorBase.hpp"
-#include "./Compressors/CompressorFactory.hpp"
+#include "./Compressors/CompressorBase.hpp"
 #include "./RequestMessages/RequestMessageBase.hpp"
 #include "./ResponseMessages/ResponseMessageBase.hpp"
 #include "./ConnectionInfo.hpp"
@@ -97,6 +97,14 @@ namespace cql {
 		Connection& operator=(Connection&&) = delete;
 
 	private:
+		/** Encode message to sending buffer */
+		void encodeMessage(const Object<RequestMessageBase>& message);
+
+		/** Decode message from temporary buffer */
+		void decodeMessage(
+			Object<ResponseMessageBase>& message,
+			seastar::temporary_buffer<char>&& buffer) const;
+
 		/** Close the connection */
 		void close(const std::string_view& errorMessage);
 

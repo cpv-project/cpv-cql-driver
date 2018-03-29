@@ -21,6 +21,7 @@ namespace cql {
 		void encodeBody(const ConnectionInfo& info, std::string& data) const override;
 
 		/** Set the compression algorithm to use, support "lz4", "snappy", or nullptr */
+		// cppcheck-suppress functionConst
 		void setCompression(const char* algorithm);
 
 		/** Constructor */
