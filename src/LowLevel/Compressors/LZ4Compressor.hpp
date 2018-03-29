@@ -17,7 +17,8 @@ namespace cql {
 
 		/** Decompress the response frame's body */
 		virtual seastar::temporary_buffer<char> decompress(
-			seastar::temporary_buffer<char>&& source) override;	
+			const ConnectionInfo& connectionInfo,
+			seastar::temporary_buffer<char>&& source) override;
 	};
 }
 

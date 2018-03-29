@@ -41,17 +41,18 @@ namespace cql {
 
 	/** Decompress the response frame's body */
 	seastar::temporary_buffer<char> LZ4Compressor::decompress(
+		const ConnectionInfo& connectionInfo,
 		seastar::temporary_buffer<char>&& source) {
 		std::uint32_t outputSize = 0;
 		if (source.size() < sizeof(outputSize)) {
 			return seastar::temporary_buffer<char>();
 		}
 		std::memcpy(&outputSize, source.get(), sizeof(outputSize));
-		std::cout << +source.get()[0] << std::endl;
-		std::cout << +source.get()[1] << std::endl;
-		std::cout << +source.get()[2] << std::endl;
-		std::cout << +source.get()[3] << std::endl;
 		outputSize = seastar::be_to_cpu(outputSize);
+		if (outputSize > connectionInfo.getMaximumMessageBodySize()) {
+			throw LogicException(CQL_CODEINFO,
+				"uncompressed length of message body too large:", outputSize);
+		}
 		seastar::temporary_buffer<char> output(outputSize);
 		auto ret = LZ4_decompress_safe(
 			source.get() + sizeof(outputSize),

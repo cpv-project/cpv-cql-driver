@@ -264,7 +264,8 @@ namespace cql {
 									self->close("server compressed the frame without client's consent");
 									return seastar::stop_iteration::yes;
 								}
-								auto output = self->compressor_->decompress(std::move(buf));
+								auto output = self->compressor_->decompress(
+									self->connectionInfo_, std::move(buf));
 								message->decodeBody(self->connectionInfo_, std::move(output));
 							} else {
 								// without compression
