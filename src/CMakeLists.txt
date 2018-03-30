@@ -28,6 +28,10 @@ string(REPLACE "-Werror" "" SEASTAR_LDFLAGS "${SEASTAR_LDFLAGS}")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-unused-function -Wno-noexcept-type ${SEASTAR_CFLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -fuse-ld=gold ${SEASTAR_LDFLAGS}")
+if (CMAKE_BUILD_TYPE MATCHES Release)
+	string(REPLACE "-O3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+	string(REPLACE "-O2" "-O3 -march=native -mtune=native" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
 
 # generate pkgconfig file for cqldriver
 file(READ ../VERSION VERSION_NUMBER)

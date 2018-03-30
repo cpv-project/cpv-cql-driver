@@ -7,17 +7,37 @@
 
 namespace {
 	static const std::size_t LoopCount = 10000;
+	static bool EnableCompression = false;
+	static bool EnablePreparation = false;
+	static cql::ConsistencyLevel DefaultConsistencyLevel = cql::ConsistencyLevel::LocalOne;
+
+	void parseArguments(int argc, char** argv) {
+		for (int i = 1; i < argc; ++i) {
+			const char* arg = argv[i];
+			if (std::strcmp(arg, "-p") == 0) {
+				EnablePreparation = true;
+				std::cout << "preparation enabled" << std::endl;
+			} else if (std::strcmp(arg, "-c") == 0) {
+				EnableCompression = true;
+				std::cout << "compression enabled" << std::endl;
+			}
+		}
+	}
 }
 
 int main(int argc, char** argv) {
+	parseArguments(argc, argv);
 	seastar::app_template app;
-	app.run(argc, argv, [] {
+	app.run(1, argv, [] {
 		cql::SessionFactory sessionFactory(
 			cql::SessionConfiguration()
+				.setDefaultConsistency(DefaultConsistencyLevel)
+				.setPrepareAllQueries(EnablePreparation)
 				.setMinPoolSize(1),
 			cql::NodeCollection::create({
 				cql::NodeConfiguration()
 					.setAddress("127.0.0.1", 9043)
+					.setUseCompression(EnableCompression)
 			}));
 		cql::Session session = sessionFactory.getSession();
 		return seastar::do_with(
@@ -40,7 +60,6 @@ int main(int argc, char** argv) {
 				loopCount = 0;
 				return seastar::repeat([&session, &loopCount] {
 					auto command = cql::Command("insert into benchmark_ks.my_table (id, name) values (?, ?)")
-						.setConsistency(cql::ConsistencyLevel::Quorum)
 						.addParameters(cql::Int(loopCount), cql::MemRef("name"));
 					return session.execute(std::move(command)).then([&loopCount] {
 						loopCount += 1;

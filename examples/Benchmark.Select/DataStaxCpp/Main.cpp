@@ -1,10 +1,28 @@
 #include <cassandra.h>
+#include <cstring>
 #include <iostream>
 #include <chrono>
 
 namespace {
 	static const std::size_t LoopCount = 10000;
 	static const std::size_t SelectCount = 100;
+	static bool EnableCompression = false;
+	static bool EnablePreparation = false;
+	static CassConsistency DefaultConsistencyLevel = CASS_CONSISTENCY_LOCAL_ONE;
+
+	void parseArguments(int argc, char** argv) {
+		for (int i = 1; i < argc; ++i) {
+			const char* arg = argv[i];
+			if (std::strcmp(arg, "-p") == 0) {
+				EnablePreparation = true;
+				std::cout << "preparation enabled" << std::endl;
+			} else if (std::strcmp(arg, "-c") == 0) {
+				EnableCompression = true;
+				std::cout << "compression is unsupported yet" << std::endl;
+				exit(1);
+			}
+		}
+	}
 
 	int createSchema(CassSession* session) {
 		CassStatement* dropKeySpaceStatement = cass_statement_new(
@@ -48,7 +66,6 @@ namespace {
 
 	int insertRecords(CassSession* session) {
 		CassBatch* insertBatch = cass_batch_new(CASS_BATCH_TYPE_LOGGED);
-		cass_batch_set_consistency(insertBatch, CASS_CONSISTENCY_QUORUM);
 		for (std::size_t i = 0, j = SelectCount * 2; i < j; ++i) {
 			CassStatement* insertStatement = cass_statement_new(
 				"insert into benchmark_ks.my_table (id, name) values (?, ?)", 2);
@@ -70,8 +87,22 @@ namespace {
 	int queryRecords(CassSession* session) {
 		std::string selectQuery("select id, name from benchmark_ks.my_table limit ");
 		selectQuery.append(std::to_string(SelectCount));
-		CassStatement* selectStatement = cass_statement_new(selectQuery.c_str(), 0);
-		cass_statement_set_consistency(selectStatement, CASS_CONSISTENCY_QUORUM);
+		CassStatement* selectStatement;
+		if (EnablePreparation) {
+			CassFuture* prepareFuture = cass_session_prepare(session, selectQuery.c_str());
+			CassError prepareError = cass_future_error_code(prepareFuture);
+			if (prepareError != 0) {
+				std::cerr << "prepare statement error:" << cass_error_desc(prepareError) << std::endl;
+				cass_future_free(prepareFuture);
+				return -1;
+			}
+			const CassPrepared* prepared = cass_future_get_prepared(prepareFuture);
+			cass_future_free(prepareFuture);
+			selectStatement = cass_prepared_bind(prepared);
+			cass_prepared_free(prepared);
+		} else {
+			selectStatement = cass_statement_new(selectQuery.c_str(), 0);
+		}
 		cass_int32_t id;
 		const char* namePtr;
 		std::size_t nameLength;
@@ -98,11 +129,14 @@ namespace {
 	}
 }
 
-int main() {
+int main(int argc, char** argv) {
+	parseArguments(argc, argv);
+
 	CassCluster* cluster = cass_cluster_new();
 	CassSession* session = cass_session_new();
 	cass_cluster_set_contact_points(cluster, "127.0.0.1");
 	cass_cluster_set_port(cluster, 9043);
+	cass_cluster_set_consistency(cluster, DefaultConsistencyLevel);
 
 	CassFuture* connectFuture = cass_session_connect(session, cluster);
 	CassError connectError = cass_future_error_code(connectFuture);
