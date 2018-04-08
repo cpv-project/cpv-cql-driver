@@ -51,7 +51,7 @@ namespace cql {
 
 		/** Decode from binary data */
 		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
-			if (size < Int::EncodeSize) {
+			if (size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize)) {
 				throw DecodeException(CQL_CODEINFO,
 					"length of list size not enough, element type is:",
 					typeid(ValueType).name());
@@ -65,7 +65,7 @@ namespace cql {
 			const char* ptrStart = ptr + Int::EncodeSize;
 			const char* end = ptr + size;
 			value_.resize(0);
-			for (std::size_t index = 0; index < listSize; ++index) {
+			for (Int::UnderlyingType index = 0; index < listSize; ++index) {
 				value_.emplace_back();
 				ColumnTrait<ValueType>::decode(value_.back(), ptrStart, end);
 			}

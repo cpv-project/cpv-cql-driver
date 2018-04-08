@@ -44,7 +44,8 @@ namespace cql {
 			std::memcpy(&bodySize, ptr, sizeof(bodySize));
 			bodySize = seastar::be_to_cpu(bodySize);
 			if (bodySize >= 0) {
-				if (end < ptr || end - ptr < sizeof(bodySize) + bodySize) {
+				if (end < ptr || end - ptr <
+					static_cast<std::ptrdiff_t>(sizeof(bodySize) + bodySize)) {
 					throw DecodeException(CQL_CODEINFO,
 						"length of column body not enough, type:", typeid(T).name());
 				}
@@ -85,7 +86,8 @@ namespace cql {
 			std::memcpy(&bodySize, ptr, sizeof(bodySize));
 			bodySize = seastar::be_to_cpu(bodySize);
 			if (bodySize >= 0) {
-				if (end < ptr || end - ptr < sizeof(bodySize) + bodySize) {
+				if (end < ptr || end - ptr <
+					static_cast<std::ptrdiff_t>(sizeof(bodySize) + bodySize)) {
 					throw DecodeException(CQL_CODEINFO,
 						"length of column body not enough, type:", typeid(T).name());
 				}

@@ -92,7 +92,7 @@ namespace cql {
 			if (columnsCount_.get() < 0) {
 				throw LogicException(CQL_CODEINFO, "columns count < 0");
 			}
-			if (columns_.size() > columnsCount_.get()) {
+			if (columns_.size() > static_cast<std::size_t>(columnsCount_.get())) {
 				columns_.resize(columnsCount_.get());
 			}
 			for (std::size_t i = 0, j = columnsCount_.get(); i < j; ++i) {

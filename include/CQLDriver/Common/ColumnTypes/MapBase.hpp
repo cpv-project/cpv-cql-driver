@@ -56,7 +56,7 @@ namespace cql {
 
 		/** Decode from binary data */
 		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
-			if (size < Int::EncodeSize) {
+			if (size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize)) {
 				throw DecodeException(CQL_CODEINFO,
 					"length of map size not enough, element type is:",
 					typeid(ValueType).name());
@@ -70,7 +70,7 @@ namespace cql {
 			const char* ptrStart = ptr + Int::EncodeSize;
 			const char* end = ptr + size;
 			value_.clear();
-			for (std::size_t index = 0; index < mapSize; ++index) {
+			for (Int::UnderlyingType index = 0; index < mapSize; ++index) {
 				KeyType key;
 				MappedType value;
 				ColumnTrait<KeyType>::decode(key, ptrStart, end);

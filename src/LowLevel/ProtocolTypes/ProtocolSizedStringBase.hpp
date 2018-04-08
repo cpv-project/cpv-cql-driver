@@ -83,7 +83,7 @@ namespace cql {
 			size = seastar::be_to_cpu(size);
 			ptr += sizeof(size);
 			if (std::is_unsigned<LengthType>::value || size >= 0) {
-				if (end < ptr || end - ptr < static_cast<std::size_t>(size)) {
+				if (end < ptr || end - ptr < static_cast<std::ptrdiff_t>(size)) {
 					throw DecodeException(CQL_CODEINFO, "length not enough");
 				}
 				state_ = NormalState;

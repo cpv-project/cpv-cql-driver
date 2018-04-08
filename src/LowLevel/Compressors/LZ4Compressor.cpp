@@ -59,7 +59,7 @@ namespace cql {
 			output.get_write(),
 			source.size() - sizeof(outputSize),
 			output.size());
-		if (ret != outputSize) {
+		if (static_cast<std::size_t>(ret) != outputSize) {
 			throw LogicException(CQL_CODEINFO, "lz4 decompress failed, ret:", ret, "!=", outputSize);
 		}
 		return output;

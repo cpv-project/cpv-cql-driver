@@ -170,6 +170,9 @@ namespace cql {
 				});
 			}).finally([&self] {
 				self->findIdleConnectionTimerIsRunning_ = false;
+				if (!self->waiters_.empty()) {
+					self->findIdleConnectionTimer(); // avoid task race
+				}
 			});
 		});
 	}

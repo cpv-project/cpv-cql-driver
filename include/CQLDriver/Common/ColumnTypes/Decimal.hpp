@@ -68,7 +68,7 @@ namespace cql {
 		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
 			if (size == 0) {
 				reset(); // empty;
-			} else if (size < Int::EncodeSize + 1) {
+			} else if (size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize + 1)) {
 				throw DecodeException(CQL_CODEINFO,
 					"date length not enough, should be atleast", Int::EncodeSize + 1,
 					"but actual is", size);
