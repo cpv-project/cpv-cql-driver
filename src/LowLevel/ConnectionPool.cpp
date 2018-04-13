@@ -41,11 +41,12 @@ namespace cql {
 	/** Get a connection with idle stream, wait until they are available */
 	seastar::future<seastar::lw_shared_ptr<Connection>, ConnectionStream>
 		ConnectionPool::getConnection() {
-		// always create new connection until min pool size is reached
-		// call this function concurrently may creates more connections than min pool size,
-		// but it's acceptable for now
-		if (allConnections_.size() < sessionConfiguration_->getMinPoolSize()) {
-			return makeConnection();
+		// always spawn connection until min pool size is reached
+		if (allConnections_.size() + connectingCount_ < sessionConfiguration_->getMinPoolSize()) {
+			auto future = addWaiter();
+			spawnConnection();
+			findIdleConnectionTimer();
+			return future;
 		}
 		// use existing connections
 		auto result = tryGetConnection();
@@ -54,23 +55,25 @@ namespace cql {
 				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
 				result.first, std::move(result.second));
 		}
-		// create new connection if all existing connections is occupied until max pool size is reached
-		if (allConnections_.size() < sessionConfiguration_->getMaxPoolSize()) {
+		// spawn connection if no connection available until max pool size is reached
+		if (allConnections_.size() + connectingCount_ < sessionConfiguration_->getMaxPoolSize()) {
+			auto future = addWaiter();
+			spawnConnection();
+			findIdleConnectionTimer();
 			dropIdleConnectionTimer();
-			return makeConnection();
+			return future;
 		}
-		// wait until some connection is available
-		seastar::promise<seastar::lw_shared_ptr<Connection>, ConnectionStream> promise;
-		auto future = promise.get_future();
-		if (!waiters_.push(std::move(promise))) {
+		// wait until any connection is available
+		if (waiters_.size() >= sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()) {
 			return seastar::make_exception_future<
 				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
 				ConnectionNotAvailableException(CQL_CODEINFO, "no connections available"));
 		} else {
-			dropIdleConnectionTimer();
+			auto future = addWaiter();
 			findIdleConnectionTimer();
+			dropIdleConnectionTimer();
+			return future;
 		}
-		return future;
 	}
 
 	/** Return the connection to the pool manually, this is optional */
@@ -96,50 +99,78 @@ namespace cql {
 		sessionConfiguration_(sessionConfiguration),
 		nodeCollection_(nodeCollection),
 		allConnections_(),
-		waiters_(sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()),
+		connectingCount_(0),
+		waiters_(static_cast<std::size_t>(-1)),
 		findIdleConnectionTimerIsRunning_(false),
 		dropIdleConnectionTimerIsRunning_(false) { }
 
-	/** Make a new ready-to-use connection and return it with an idle stream */
-	seastar::future<seastar::lw_shared_ptr<Connection>, ConnectionStream>
-		ConnectionPool::makeConnection() {
-		seastar::promise<seastar::lw_shared_ptr<Connection>, ConnectionStream> promise;
-		auto future = promise.get_future();
+	/** Spawn a new connection */
+	void ConnectionPool::spawnConnection() {
+		++connectingCount_;
 		auto self = shared_from_this();
 		seastar::do_with(
-			std::move(promise), std::move(self), static_cast<std::size_t>(0U),
-			[] (auto& promise, auto& self, auto& count) {
-			return seastar::repeat([&promise, &self, &count] {
+			std::move(self),
+			static_cast<std::size_t>(0),
+			[] (auto& self, auto& count) {
+			return seastar::repeat([&self, &count] {
 				// choose one node and create connection
 				auto node = self->nodeCollection_->chooseOneNode();
 				auto connection = seastar::make_lw_shared<Connection>(
 					self->sessionConfiguration_, node);
 				// initialize connection
-				return connection->ready().then([&promise, &self, node, connection] {
+				return connection->ready().then([&self, node, connection] {
 					// initialize connection success
-					auto stream = connection->openStream();
-					if (!stream.isValid()) {
-						promise.set_exception(LogicException(CQL_CODEINFO,
-							"open stream form a newly created connection failed"));
-					} else {
-						self->nodeCollection_->reportSuccess(node);
-						self->allConnections_.emplace_back(connection);
-						promise.set_value(std::move(connection), std::move(stream));
-					}
+					self->nodeCollection_->reportSuccess(node);
+					self->allConnections_.emplace_back(connection);
+					self->feedWaiters();
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&promise, &self, &count, node] (std::exception_ptr ex) {
+				}).handle_exception([&self, &count, node] (std::exception_ptr ex) {
 					// initialize connection failed, try next node until all tried
 					self->nodeCollection_->reportFailure(node);
 					if (++count >= self->nodeCollection_->getNodesCount()) {
-						promise.set_exception(ex);
+						self->cleanWaiters(ex);
 						return seastar::stop_iteration::yes;
 					} else {
 						return seastar::stop_iteration::no;
 					}
 				});
+			}).finally([&self] {
+				--self->connectingCount_;
 			});
 		});
+	}
+
+	/** Add a new waiter */
+	seastar::future<seastar::lw_shared_ptr<Connection>, ConnectionStream>
+		ConnectionPool::addWaiter() {
+		seastar::promise<seastar::lw_shared_ptr<Connection>, ConnectionStream> promise;
+		auto future = promise.get_future();
+		if (!waiters_.push(std::move(promise))) {
+			return seastar::make_exception_future<
+				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
+				LogicException(CQL_CODEINFO, "push connection waiter to queue failed"));
+		}
 		return future;
+	}
+
+	/** Find idle connection and feed waiters */
+	void ConnectionPool::feedWaiters() {
+		while (!waiters_.empty()) {
+			auto result = tryGetConnection();
+			if (result.first.get() != nullptr) {
+				waiters_.pop().set_value(
+					std::move(result.first), std::move(result.second));
+			} else {
+				break;
+			}
+		}
+	}
+
+	/** Tell all waiters that an error has occurred */
+	void ConnectionPool::cleanWaiters(const std::exception_ptr& ex) {
+		while (!waiters_.empty()) {
+			waiters_.pop().set_exception(ex);
+		}
 	}
 
 	/** Timer used to find idle connection and feed waiters */
@@ -154,24 +185,22 @@ namespace cql {
 			return seastar::repeat([&self] {
 				return seastar::sleep(std::chrono::milliseconds(SleepInterval)).then([&self] {
 					// feed waiters
-					while (!self->waiters_.empty()) {
-						auto result = self->tryGetConnection();
-						if (result.first.get() != nullptr) {
-							self->waiters_.pop().set_value(
-								std::move(result.first), std::move(result.second));
-						} else {
-							break;
-						}
+					self->feedWaiters();
+					if (self->waiters_.empty()) {
+						// stop timer after no waiters
+						return seastar::stop_iteration::yes;
+					} else if (self->allConnections_.size() + self->connectingCount_ <
+						self->sessionConfiguration_->getMinPoolSize()) {
+						// spawn connection to prevent waiting indefinitely
+						self->spawnConnection();
 					}
-					// stop timer if no waiters
-					return self->waiters_.empty() ?
-						seastar::stop_iteration::yes :
-						seastar::stop_iteration::no;
+					return seastar::stop_iteration::no;
 				});
 			}).finally([&self] {
 				self->findIdleConnectionTimerIsRunning_ = false;
 				if (!self->waiters_.empty()) {
-					self->findIdleConnectionTimer(); // avoid task race
+					// prevent task race
+					self->findIdleConnectionTimer();
 				}
 			});
 		});
