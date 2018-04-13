@@ -8,8 +8,8 @@ import time
 
 LOOP_COUNT=10000
 SELECT_COUNT=100
-ENABLED_COMPRESSION="-c" in sys.argv
-ENABLED_PREPARATION="-p" in sys.argv
+ENABLED_COMPRESSION="--compress" in sys.argv
+ENABLED_PREPARATION="--prepare" in sys.argv
 DEFAULT_CONSISTENCY=ConsistencyLevel.LOCAL_ONE
 
 if __name__ == "__main__":

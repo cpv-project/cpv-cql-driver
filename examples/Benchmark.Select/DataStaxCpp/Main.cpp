@@ -13,10 +13,10 @@ namespace {
 	void parseArguments(int argc, char** argv) {
 		for (int i = 1; i < argc; ++i) {
 			const char* arg = argv[i];
-			if (std::strcmp(arg, "-p") == 0) {
+			if (std::strcmp(arg, "--prepare") == 0) {
 				EnablePreparation = true;
 				std::cout << "preparation enabled" << std::endl;
-			} else if (std::strcmp(arg, "-c") == 0) {
+			} else if (std::strcmp(arg, "--compress") == 0) {
 				EnableCompression = true;
 				std::cout << "compression is unsupported yet" << std::endl;
 				exit(1);
