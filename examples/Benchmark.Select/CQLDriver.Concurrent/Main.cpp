@@ -30,6 +30,7 @@ namespace {
 				cql::NodeConfiguration()
 					.setAddress("127.0.0.1", 9043)
 					.setUseCompression(EnableCompression)
+					.setMaxStreams(ParallelDegreePerCore+1)
 			}));
 		return sessionFactory;
 	}

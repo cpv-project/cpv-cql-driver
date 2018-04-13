@@ -42,10 +42,14 @@ namespace cql {
 	seastar::future<seastar::lw_shared_ptr<Connection>, ConnectionStream>
 		ConnectionPool::getConnection() {
 		// always spawn connection until min pool size is reached
-		if (allConnections_.size() + connectingCount_ < sessionConfiguration_->getMinPoolSize()) {
+		auto minPoolSize = sessionConfiguration_->getMinPoolSize();
+		if (allConnections_.size() < minPoolSize) {
 			auto future = addWaiter();
-			spawnConnection();
-			findIdleConnectionTimer();
+			if (allConnections_.size() + connectingCount_ < minPoolSize) {
+				spawnConnection();
+			} else {
+				findIdleConnectionTimer();
+			}
 			return future;
 		}
 		// use existing connections
@@ -56,22 +60,22 @@ namespace cql {
 				result.first, std::move(result.second));
 		}
 		// spawn connection if no connection available until max pool size is reached
-		if (allConnections_.size() + connectingCount_ < sessionConfiguration_->getMaxPoolSize()) {
-			auto future = addWaiter();
-			spawnConnection();
-			findIdleConnectionTimer();
-			dropIdleConnectionTimer();
-			return future;
-		}
-		// wait until any connection is available
-		if (waiters_.size() >= sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()) {
+		auto maxPoolSize = sessionConfiguration_->getMaxPoolSize();
+		auto poolIsFull = allConnections_.size() + connectingCount_ >= maxPoolSize;
+		if (poolIsFull && waiters_.size() >=
+			sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()) {
+			// can't spawn more connection and can't add more waiter
 			return seastar::make_exception_future<
 				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
 				ConnectionNotAvailableException(CQL_CODEINFO, "no connections available"));
 		} else {
 			auto future = addWaiter();
-			findIdleConnectionTimer();
-			dropIdleConnectionTimer();
+			if (!poolIsFull) {
+				spawnConnection();
+				dropIdleConnectionTimer();
+			} else {
+				findIdleConnectionTimer();
+			}
 			return future;
 		}
 	}
