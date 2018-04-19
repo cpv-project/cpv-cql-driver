@@ -110,10 +110,6 @@ namespace {
 	}
 
 	int queryRecords(CassCluster* cluster, CassStatement* selectStatement, std::atomic_size_t& loopCount) {
-		cass_int32_t id;
-		const char* namePtr;
-		std::size_t nameLength;
-
 		CassSession* session = cass_session_new();
 		CassFuture* connectFuture = cass_session_connect(session, cluster);
 		CassError connectError = cass_future_error_code(connectFuture);
@@ -123,26 +119,46 @@ namespace {
 			return -1;
 		}
 
+		std::atomic_int workingCount;
 		while (true) {
 			if (loopCount.fetch_add(1) >= LoopCount) {
 				break;
 			}
+			workingCount.fetch_add(1);
 			CassFuture* selectFuture = cass_session_execute(session, selectStatement);
-			const CassResult* selectResult = cass_future_get_result(selectFuture);
-			if (selectResult == nullptr) {
-				CassError error = cass_future_error_code(selectFuture);
-				std::cerr << "select records error:" << cass_error_desc(error) << std::endl;
-			} else {
-				CassIterator* iterator = cass_iterator_from_result(selectResult);
-				while (cass_iterator_next(iterator)) {
-					const CassRow* row = cass_iterator_get_row(iterator);
-					cass_value_get_int32(cass_row_get_column(row, 0), &id);
-					cass_value_get_string(cass_row_get_column(row, 1), &namePtr, &nameLength);
-					// std::cout << id << " " << namePtr << std::endl;
+			CassError callbackError = cass_future_set_callback(selectFuture, [](auto future, auto data) {
+				auto& workingCount = *reinterpret_cast<std::atomic_size_t*>(data);
+				const CassResult* selectResult = cass_future_get_result(future);
+				if (selectResult == nullptr) {
+					CassError error = cass_future_error_code(future);
+					std::cerr << "select records error:" << cass_error_desc(error) << std::endl;
+				} else {
+					cass_int32_t id;
+					const char* namePtr;
+					std::size_t nameLength;
+					CassIterator* iterator = cass_iterator_from_result(selectResult);
+					while (cass_iterator_next(iterator)) {
+						const CassRow* row = cass_iterator_get_row(iterator);
+						cass_value_get_int32(cass_row_get_column(row, 0), &id);
+						cass_value_get_string(cass_row_get_column(row, 1), &namePtr, &nameLength);
+						// std::cout << id << " " << namePtr << std::endl;
+					}
+					cass_iterator_free(iterator);
+					cass_result_free(selectResult);
 				}
-				cass_iterator_free(iterator);
-				cass_result_free(selectResult);
+				workingCount.fetch_add(-1);
+			}, &workingCount);
+			cass_future_free(selectFuture);
+			if (callbackError != 0) {
+				std::cerr << "set callback error:" << cass_error_desc(callbackError) << std::endl;
+				return -1;
 			}
+			while (workingCount > ParallelDegreePerCore) {
+				std::this_thread::sleep_for(std::chrono::microseconds(100));
+			}
+		}
+		while (workingCount > 0) {
+			std::this_thread::sleep_for(std::chrono::microseconds(100));
 		}
 		return 0;
 	}
@@ -176,7 +192,7 @@ int main(int argc, char** argv) {
 	CassStatement* selectStatement = getSelectStatement(session);
 	std::vector<std::thread> threads;
 	std::atomic_size_t loopCount(0);
-	for (std::size_t i = 0, j = get_nprocs() * ParallelDegreePerCore; i < j; ++i) {
+	for (std::size_t i = 0, j = get_nprocs(); i < j; ++i) {
 		threads.emplace_back([&cluster, selectStatement, &loopCount] {
 			queryRecords(cluster, selectStatement, loopCount);
 		});
