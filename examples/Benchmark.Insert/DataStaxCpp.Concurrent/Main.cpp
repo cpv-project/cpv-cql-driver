@@ -8,8 +8,7 @@
 #include <atomic>
 
 namespace {
-	static const std::size_t LoopCount = 20000;
-	static const std::size_t SelectCount = 100;
+	static const std::size_t LoopCount = 100000;
 	static const std::size_t ParallelDegreePerCore = 20;
 	static bool EnableCompression = false;
 	static bool EnablePreparation = false;
@@ -69,47 +68,25 @@ namespace {
 		return 0;
 	}
 
-	int insertRecords(CassSession* session) {
-		CassBatch* insertBatch = cass_batch_new(CASS_BATCH_TYPE_LOGGED);
-		for (std::size_t i = 0, j = SelectCount * 2; i < j; ++i) {
-			CassStatement* insertStatement = cass_statement_new(
-				"insert into benchmark_ks.my_table (id, name) values (?, ?)", 2);
-			cass_statement_bind_int32(insertStatement, 0, i);
-			cass_statement_bind_string(insertStatement, 1, "name");
-			cass_batch_add_statement(insertBatch, insertStatement);
-			cass_statement_free(insertStatement);
-		}
-		CassFuture* insertFuture = cass_session_execute_batch(session, insertBatch);
-		CassError error = cass_future_error_code(insertFuture);
-		cass_future_free(insertFuture);
-		if (error != 0) {
-			std::cerr << "insert records error:" << cass_error_desc(error) << std::endl;
-			return -1;
-		}
-		return 0;
-	}
-
-	CassStatement* getSelectStatement(CassSession* session) {
-		std::string selectQuery("select id, name from benchmark_ks.my_table limit ");
-		selectQuery.append(std::to_string(SelectCount));
-		if (EnablePreparation) {
-			CassFuture* prepareFuture = cass_session_prepare(session, selectQuery.c_str());
+	CassStatement* getInsertStatement(CassSession* session) {
+		const char* insertQuery = "insert into benchmark_ks.my_table (id, name) values (?, ?)";
+		static thread_local const CassPrepared* prepared = nullptr;
+		if (EnablePreparation && prepared == nullptr) {
+			CassFuture* prepareFuture = cass_session_prepare(session, insertQuery);
 			CassError prepareError = cass_future_error_code(prepareFuture);
 			if (prepareError != 0) {
 				std::cerr << "prepare statement error:" << cass_error_desc(prepareError) << std::endl;
 				cass_future_free(prepareFuture);
 			} else {
-				const CassPrepared* prepared = cass_future_get_prepared(prepareFuture);
+				prepared = cass_future_get_prepared(prepareFuture);
 				cass_future_free(prepareFuture);
-				CassStatement* selectStatement = cass_prepared_bind(prepared);
-				cass_prepared_free(prepared);
-				return selectStatement;
+				return cass_prepared_bind(prepared);
 			}
 		}
-		return cass_statement_new(selectQuery.c_str(), 0);
+		return cass_statement_new(insertQuery, 2);
 	}
 
-	int queryRecords(CassCluster* cluster, CassStatement* selectStatement, std::atomic_size_t& loopCount) {
+	int insertRecords(CassCluster* cluster, std::atomic_size_t& loopCount) {
 		CassSession* session = cass_session_new();
 		CassFuture* connectFuture = cass_session_connect(session, cluster);
 		CassError connectError = cass_future_error_code(connectFuture);
@@ -121,34 +98,25 @@ namespace {
 
 		std::atomic_int workingCount(0);
 		while (true) {
-			if (loopCount.fetch_add(1) >= LoopCount) {
+			std::size_t i = loopCount.fetch_add(1);
+			if (i >= LoopCount) {
 				break;
 			}
 			workingCount.fetch_add(1);
-			CassFuture* selectFuture = cass_session_execute(session, selectStatement);
-			CassError callbackError = cass_future_set_callback(selectFuture, [](auto future, auto data) {
+			CassStatement* insertStatement = getInsertStatement(session);
+			cass_statement_bind_int32(insertStatement, 0, i);
+			cass_statement_bind_string(insertStatement, 1, "name");
+			CassFuture* insertFuture = cass_session_execute(session, insertStatement);
+			cass_statement_free(insertStatement);
+			CassError callbackError = cass_future_set_callback(insertFuture, [](auto future, auto data) {
 				auto& workingCount = *reinterpret_cast<std::atomic_size_t*>(data);
-				const CassResult* selectResult = cass_future_get_result(future);
-				if (selectResult == nullptr) {
-					CassError error = cass_future_error_code(future);
-					std::cerr << "select records error:" << cass_error_desc(error) << std::endl;
-				} else {
-					cass_int32_t id;
-					const char* namePtr;
-					std::size_t nameLength;
-					CassIterator* iterator = cass_iterator_from_result(selectResult);
-					while (cass_iterator_next(iterator)) {
-						const CassRow* row = cass_iterator_get_row(iterator);
-						cass_value_get_int32(cass_row_get_column(row, 0), &id);
-						cass_value_get_string(cass_row_get_column(row, 1), &namePtr, &nameLength);
-						// std::cout << id << " " << namePtr << std::endl;
-					}
-					cass_iterator_free(iterator);
-					cass_result_free(selectResult);
+				CassError error = cass_future_error_code(future);
+				if (error != 0) {
+					std::cerr << "insert records error:" << cass_error_desc(error) << std::endl;
 				}
 				workingCount.fetch_add(-1);
 			}, &workingCount);
-			cass_future_free(selectFuture);
+			cass_future_free(insertFuture);
 			if (callbackError != 0) {
 				std::cerr << "set callback error:" << cass_error_desc(callbackError) << std::endl;
 				return -1;
@@ -175,7 +143,6 @@ int main(int argc, char** argv) {
 
 	CassFuture* connectFuture = cass_session_connect(session, cluster);
 	CassError connectError = cass_future_error_code(connectFuture);
-	cass_future_free(connectFuture);
 	if (connectError != 0) {
 		std::cerr << "connect error:" << cass_error_desc(connectError) << std::endl;
 		return -1;
@@ -184,17 +151,12 @@ int main(int argc, char** argv) {
 	if (createSchema(session) != 0) {
 		return -1;
 	}
-	if (insertRecords(session) != 0) {
-		return -1;
-	}
-
 	auto now = std::chrono::system_clock::now();
-	CassStatement* selectStatement = getSelectStatement(session);
 	std::vector<std::thread> threads;
 	std::atomic_size_t loopCount(0);
 	for (std::size_t i = 0, j = get_nprocs(); i < j; ++i) {
-		threads.emplace_back([&cluster, selectStatement, &loopCount] {
-			queryRecords(cluster, selectStatement, loopCount);
+		threads.emplace_back([&cluster, &loopCount] {
+			insertRecords(cluster, loopCount);
 		});
 	}
 	for (auto& thread : threads) {
@@ -204,7 +166,6 @@ int main(int argc, char** argv) {
 		std::chrono::system_clock::now() - now).count();
 	std::cout << "used seconds: " << usedTime / 1000.0 << std::endl;
 
-	cass_statement_free(selectStatement);
 	cass_session_free(session);
 	cass_cluster_free(cluster);
 	return 0;

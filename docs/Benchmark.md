@@ -3,13 +3,12 @@ Environment: VMware Player on i5-6400 2.7GHz.<br/>
 
 # Select
 
-Task: select 100 records from 200 records 10000 times.
+Task: select 100 records from 200 records 10000 times (single thread).
 
 | Driver                           | Cores | Time samples (seconds)                     | Average time |
 |----------------------------------|-------|--------------------------------------------|--------------|
 | DataStax C++ 2.8.1               | 1     | `[17.768, 19.647, 18.107, 19.646, 19.818]` | 18.997       |
 | DataStax C++ 2.8.1 (+Prepare)    | 1     | `[17.734, 17.590, 19.719, 19.857, 18.064]` | 18.592       |
-| DataStax C++ 2.8.1 (+Prepare)    | 4     | `[6.162, 6.267, 6.284, 6.002, 5.852]`      | 6.113        |
 | DataStax Python 3.13             | 1     | `[29.748, 29.028, 30.754, 31.047, 31.352]` | 30.385       |
 | DataStax Python 3.13 (+Prepare)  | 1     | `[29.747, 31.884, 27.989, 29.595, 31.187]` | 30.080       |
 | DataStax Python 3.13 (+Compress) | 1     | `[31.395, 33.454, 29.540, 32.949, 32.495]` | 31.966       |
@@ -17,11 +16,20 @@ Task: select 100 records from 200 records 10000 times.
 | CQLDriver 0.2                    | 1     | `[19.946, 20.090, 19.979, 19.951, 20.005]` | 19.994       |
 | CQLDriver 0.2 (+Prepare)         | 1     | `[19.737, 19.840, 19.548, 19.761, 19.734]` | 19.724       |
 | CQLDriver 0.2 (+Compress)        | 1     | `[19.752, 19.777, 19.941, 19.803, 19.822]` | 19.819       |
-| CQLDriver 0.3 (+Prepare)         | 4     | `[5.617, 5.987, 5.963, 5.993, 6.053]`      | 5.922        |
+| CQLDriver 0.3                    | 1     | `[25.033, 25.031, 24.750, 25.206, 25.037]` | 25.011       |
+| CQLDriver 0.3 (+Prepare)         | 1     | `[25.075, 24.788, 25.075, 25.357, 24.593]` | 24.977       |
+| CQLDriver 0.3 (+Compress)        | 1     | `[25.899, 25.498, 25.471, 25.351, 25.404]` | 25.524       |
+
+Task: select 100 records from 200 records 20000 times (multiple threads with concurrent tasks).
+
+| Driver                           | Cores | Time samples (seconds)                     | Average time |
+|----------------------------------|-------|--------------------------------------------|--------------|
+| DataStax C++ 2.8.1 (+Prepare)    | 4*20  | `[11.161, 11.644, 11.228, 11.079, 11.137]` | 11.249       |
+| CQLDriver 0.3 (+Prepare)         | 4*20  | `[9.373, 9.787, 9.784, 9.770, 9.600]`      | 9.662        |
 
 # Insert
 
-Task: insert a single record 10000 times.
+Task: insert a single record 10000 times (single thread).
 
 | Driver                           | Cores | Time samples (seconds)                 | Average time |
 |----------------------------------|-------|----------------------------------------|--------------|
@@ -34,10 +42,20 @@ Task: insert a single record 10000 times.
 | CQLDriver 0.2                    | 1     | `[6.334, 6.654, 6.654, 6.401, 6.388]`  | 6.486        |
 | CQLDriver 0.2 (+Prepare)         | 1     | `[6.162, 6.082, 6.008, 6.104, 6.112]`  | 6.093        |
 | CQLDriver 0.2 (+Compress)        | 1     | `[6.602, 6.650, 6.575, 6.381, 6.779]`  | 6.597        |
+| CQLDriver 0.3                    | 1     | `[6.417, 6.479, 6.535, 6.419, 6.344]`  | 6.438        |
+| CQLDriver 0.3 (+Prepare)         | 1     | `[6.409, 6.133, 5.943, 6.226, 6.244]`  | 6.191        |
+| CQLDriver 0.3 (+Compress)        | 1     | `[6.549, 6.483, 6.739, 6.655, 6.590]`  | 6.603        |
+
+Task: insert a single record 100000 times (multiple threads with concurrent tasks).
+
+| Driver                           | Cores | Time samples (seconds)                     | Average time |
+|----------------------------------|-------|--------------------------------------------|--------------|
+| DataStax C++ 2.8.1 (+Prepare)    | 4*20  | `[4.812, 4.496, 4.347, 4.770, 4.270]`      | 4.539        |
+| CQLDriver 0.3 (+Prepare)         | 4*20  | `[3.614, 3.680, 3.385, 3.699, 3.702]`      | 3.615        |
 
 # Batch Insert
 
-Task: batch insert 100 records 1000 times.
+Task: batch insert 100 records 1000 times (single thread).
 
 | Driver                           | Cores | Time samples (seconds)                     | Average time |
 |----------------------------------|-------|--------------------------------------------|--------------|

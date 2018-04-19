@@ -13,8 +13,7 @@
 #include <CQLDriver/CQLDriver.hpp>
 
 namespace {
-	static const std::size_t LoopCount = 20000;
-	static const std::size_t SelectCount = 100;
+	static const std::size_t LoopCount = 100000;
 	static const std::size_t ParallelDegreePerCore = 20;
 	static bool EnableCompression = false;
 	static bool EnablePreparation = false;
@@ -48,24 +47,11 @@ namespace {
 			}).then([&session] {
 				return session.execute(cql::Command(
 					"create table benchmark_ks.my_table (id int primary key, name text)"));
-			}).then([&session] {
-				cql::BatchCommand command;
-				command.addQuery("insert into benchmark_ks.my_table (id, name) values (?, ?)");
-				cql::Int id;
-				cql::MemRef name("name");
-				for (std::size_t i = 0, j = SelectCount*2; i < j; ++i) {
-					id = i;
-					command.openParameterSet();
-					command.addParameters(id, name);
-				}
-				return session.batchExecute(std::move(command));
 			});
 		});
 	}
 
 	seastar::future<> benchmark(std::atomic_size_t& loopCount) {
-		thread_local static const std::string selectQuery(
-			"select id, name from benchmark_ks.my_table limit " + std::to_string(SelectCount));
 		auto sessionFactory = makeSessionFactory();
 		cql::Session session = sessionFactory.getSession();
 		return seastar::do_with(
@@ -74,23 +60,19 @@ namespace {
 			sessionFactory,
 			[&loopCount] (auto& limit, auto& gate, auto& sessionFactory) {
 			return seastar::repeat([&loopCount, &limit, &gate, &sessionFactory] {
-				if (loopCount.fetch_add(1) >= LoopCount) {
+				std::size_t id = loopCount.fetch_add(1);
+				if (id >= LoopCount) {
 					return seastar::make_ready_future<seastar::stop_iteration>(
 						seastar::stop_iteration::yes);
 				}
 				return seastar::get_units(limit, 1).then(
-					[&gate, &sessionFactory] (auto units) {
+					[&gate, &sessionFactory, id] (auto units) {
 					gate.enter();
 					auto session = sessionFactory.getSession();
-					auto command = cql::Command(selectQuery.data(), selectQuery.size());
-					session.query(std::move(command)).then([] (auto result) {
-						cql::Int id;
-						cql::MemRef name;
-						for (std::size_t i = 0, j = result.getRowsCount(); i < j; ++i) {
-							result.fill(id, name);
-							// std::cout << id << " " << name << std::endl;
-						}
-					}).finally([&gate, units = std::move(units)] {
+					auto command = cql::Command("insert into benchmark_ks.my_table (id, name) values (?, ?)")
+						.addParameters(cql::Int(id), cql::MemRef("name"));
+					session.execute(std::move(command))
+					.finally([&gate, units = std::move(units)] {
 						gate.leave();
 					});
 					return seastar::stop_iteration::no;
