@@ -75,6 +75,13 @@ Task: batch insert 100 records 1000 times (single thread).
 | CQLDriver 0.3 (+Compress)        | 1     | `[5.146, 5.634, 5.887, 5.126, 4.500]`      | 5.258        |
 | CQLDriver 0.3 (+P+C)             | 1     | `[3.662, 5.279, 4.225, 4.138, 4.767]`      | 4.414        |
 
+Task: batch insert 100 records 10000 times (multiple threads with concurrent tasks).
+
+| Driver                           | Cores | Time samples (seconds)                     | Average time |
+|----------------------------------|-------|--------------------------------------------|--------------|
+| DataStax C++ 2.8.1 (+Prepare)    | 4*20  | `[33.697, 31.958, 30.513, 30.336, 33.915]` | 32.083       |
+| CQLDriver 0.3 (+Prepare)         | 4*20  | `[30.219, 28.663, 28.507, 27.618, 26.074]` | 28.216       |
+| CQLDriver 0.3 (+P+C)             | 4*20  | `[24.043, 22.687, 23.060, 23.902, 21.607]` | 23.059       |
 
 # Performance analysis (live-profiler)
 
