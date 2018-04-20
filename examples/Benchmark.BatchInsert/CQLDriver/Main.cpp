@@ -12,24 +12,7 @@ namespace {
 	static bool EnablePreparation = false;
 	static cql::ConsistencyLevel DefaultConsistencyLevel = cql::ConsistencyLevel::LocalOne;
 
-	void parseArguments(int argc, char** argv) {
-		for (int i = 1; i < argc; ++i) {
-			const char* arg = argv[i];
-			if (std::strcmp(arg, "-p") == 0) {
-				EnablePreparation = true;
-				std::cout << "preparation enabled" << std::endl;
-			} else if (std::strcmp(arg, "-c") == 0) {
-				EnableCompression = true;
-				std::cout << "compression enabled" << std::endl;
-			}
-		}
-	}
-}
-
-int main(int argc, char** argv) {
-	parseArguments(argc, argv);
-	seastar::app_template app;
-	app.run(1, argv, [] {
+	cql::SessionFactory makeSessionFactory() {
 		cql::SessionFactory sessionFactory(
 			cql::SessionConfiguration()
 				.setDefaultConsistency(DefaultConsistencyLevel)
@@ -40,47 +23,76 @@ int main(int argc, char** argv) {
 					.setAddress("127.0.0.1", 9043)
 					.setUseCompression(EnableCompression)
 			}));
+		return sessionFactory;
+	}
+
+	seastar::future<> initDatabase(cql::SessionFactory sessionFactory) {
 		cql::Session session = sessionFactory.getSession();
-		return seastar::do_with(
-			std::move(session),
-			std::chrono::system_clock::time_point(),
-			static_cast<size_t>(0),
-			[] (auto& session, auto& start, auto& loopCount) {
-			return seastar::make_ready_future<>().then([&session] {
-				return session.execute(cql::Command(
-					"drop keyspace if exists benchmark_ks"));
-			}).then([&session] {
+		return seastar::do_with(std::move(session), [] (auto& session) {
+			return session.execute(cql::Command(
+					"drop keyspace if exists benchmark_ks"))
+			.then([&session] {
 				return session.execute(cql::Command(
 					"create keyspace benchmark_ks with replication = "
 					"{ 'class': 'SimpleStrategy', 'replication_factor': 1 }"));
 			}).then([&session] {
 				return session.execute(cql::Command(
 					"create table benchmark_ks.my_table (id int primary key, name text)"));
-			}).then([&session, &start, &loopCount] {
-				start = std::chrono::system_clock::now();
-				loopCount = 0;
-				return seastar::repeat([&session, &loopCount] {
-					cql::BatchCommand command;
-					command.setConsistency(cql::ConsistencyLevel::Quorum);
-					command.addQuery("insert into benchmark_ks.my_table (id, name) values (?, ?)");
-					cql::Int id;
-					cql::MemRef name("name");
-					for (std::size_t i = 0; i < InsertCount; ++i) {
-						id = loopCount*InsertCount+i;
-						command.openParameterSet();
-						command.addParameters(id, name);
-					}
-					return session.batchExecute(std::move(command)).then([&loopCount] {
-						loopCount += 1;
-						return loopCount < LoopCount ?
-							seastar::stop_iteration::no :
-							seastar::stop_iteration::yes;
-					});
-				}).then([&start] {
-					auto usedTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-						std::chrono::system_clock::now() - start).count();
-					std::cout << "used seconds: " << usedTime / 1000.0 << std::endl;
+			});
+		});
+	}
+
+	seastar::future<> benchmark(cql::SessionFactory sessionFactory) {
+		cql::Session session = sessionFactory.getSession();
+		return seastar::do_with(
+			std::move(session),
+			static_cast<size_t>(0),
+			[] (auto& session, auto& loopCount) {
+			return seastar::repeat([&session, &loopCount] {
+				cql::BatchCommand command;
+				command.addQuery("insert into benchmark_ks.my_table (id, name) values (?, ?)");
+				cql::Int id;
+				cql::MemRef name("name");
+				for (std::size_t i = 0; i < InsertCount; ++i) {
+					id = loopCount*InsertCount+i;
+					command.openParameterSet();
+					command.addParameters(id, name);
+				}
+				return session.batchExecute(std::move(command)).then([&loopCount] {
+					loopCount += 1;
+					return loopCount < LoopCount ?
+						seastar::stop_iteration::no :
+						seastar::stop_iteration::yes;
 				});
+			});
+		});
+	}
+}
+
+int main(int argc, char** argv) {
+	namespace bpo = boost::program_options;
+	seastar::app_template app;
+	app.add_options()("prepare", "enabled preparation");
+	app.add_options()("compress", "enabled compression");
+
+	app.run(argc, argv, [&app] {
+		auto& config = app.configuration();
+		EnablePreparation = config.count("prepare") > 0;
+		EnableCompression = config.count("compress") > 0;
+		if (EnablePreparation) {
+			std::cout << "preparation enabled" << std::endl;
+		}
+		if (EnableCompression) {
+			std::cout << "compression enabled" << std::endl;
+		}
+
+		auto sessionFactory = makeSessionFactory();
+		return initDatabase(sessionFactory).then([sessionFactory] {
+			auto start = std::chrono::system_clock::now();
+			return benchmark(sessionFactory).then([start] {
+				auto usedTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+					std::chrono::system_clock::now() - start).count();
+				std::cout << "used seconds: " << usedTime / 1000.0 << std::endl;
 			});
 		});
 	});

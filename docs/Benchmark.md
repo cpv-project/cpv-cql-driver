@@ -70,6 +70,11 @@ Task: batch insert 100 records 1000 times (single thread).
 | CQLDriver 0.2 (+Prepare)         | 1     | `[4.795, 4.982, 5.063, 5.050, 5.587]`      | 5.095        |
 | CQLDriver 0.2 (+Compress)        | 1     | `[5.474, 5.233, 5.177, 5.079, 5.591]`      | 5.310        |
 | CQLDriver 0.2 (+P+C)             | 1     | `[3.574, 4.466, 4.604, 4.495, 4.372]`      | 4.302        |
+| CQLDriver 0.3                    | 1     | `[5.129, 5.518, 7.443, 6.999, 5.754]`      | 6.168        |
+| CQLDriver 0.3 (+Prepare)         | 1     | `[4.455, 4.305, 4.616, 4.376, 5.052]`      | 4.560        |
+| CQLDriver 0.3 (+Compress)        | 1     | `[5.146, 5.634, 5.887, 5.126, 4.500]`      | 5.258        |
+| CQLDriver 0.3 (+P+C)             | 1     | `[3.662, 5.279, 4.225, 4.138, 4.767]`      | 4.414        |
+
 
 # Performance analysis (live-profiler)
 
