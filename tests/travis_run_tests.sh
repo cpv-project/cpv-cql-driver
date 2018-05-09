@@ -8,7 +8,7 @@
 set -e
 
 # prepare docker
-docker pull ubuntu:17.10
+docker pull ubuntu:18.04
 
 # copy ca certificate
 cp -f ~/scylla-keys/cadb.pem .
@@ -33,6 +33,6 @@ docker run \
   --privileged \
   --net "host" \
   --volume "$(realpath ../):/project" \
-  ubuntu:17.10 \
+  ubuntu:18.04 \
   bash -c "$Command"
 
