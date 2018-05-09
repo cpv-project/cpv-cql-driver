@@ -8,7 +8,7 @@ namespace cql {
 
 	protected:
 		/** The implmentation of log, writes to console */
-		virtual void logImpl(LogLevel logLevel, const std::string& message) override;
+		void logImpl(LogLevel logLevel, const std::string& message) override;
 	};
 }
 

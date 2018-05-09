@@ -9,7 +9,7 @@ namespace cql {
 
 	protected:
 		/** The implmentation of log, do nothing */
-		virtual void logImpl(LogLevel, const std::string&) override;
+		void logImpl(LogLevel, const std::string&) override;
 	};
 }
 
