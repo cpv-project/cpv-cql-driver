@@ -77,6 +77,7 @@ TEST(TestObject, moveAssignment) {
 			auto a = cql::makeObject<Derived>(record);
 			auto b = cql::Object<Derived>(nullptr).cast<Base>();
 			cql::Object<Derived> c(nullptr);
+			// cppcheck-suppress redundantAssignment
 			b = std::move(a).cast<Base>();
 			b = std::move(b);
 			c = std::move(b).cast<Derived>();

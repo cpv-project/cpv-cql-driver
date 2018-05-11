@@ -23,7 +23,7 @@ namespace cql {
 
 		/** Constructor */
 		ConnectionStream(
-			IdType streamId,
+			const IdType& streamId,
 			const seastar::lw_shared_ptr<std::vector<IdType>>& freeStreamIds);
 
 		/** Disallow copy */

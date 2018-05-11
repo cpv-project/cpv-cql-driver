@@ -8,6 +8,7 @@ namespace cql {
 	}
 
 	/** Get how many rows present in this result */
+	// cppcheck-suppress unusedFunction
 	std::size_t ResultSet::getRowsCount() const {
 		return data_->rowsCount;
 	}

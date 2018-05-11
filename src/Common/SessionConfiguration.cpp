@@ -68,6 +68,7 @@ namespace cql {
 	}
 
 	/** Set the logger instance */
+	// cppcheck-suppress unusedFunction
 	SessionConfiguration& SessionConfiguration::setLogger(const seastar::shared_ptr<Logger>& logger) {
 		if (logger == nullptr) {
 			throw LogicException(CQL_CODEINFO, "logger is nullptr");

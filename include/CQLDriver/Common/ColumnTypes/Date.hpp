@@ -38,7 +38,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
+		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
 			std::uint32_t dbValue = 0;
 			if (size == 0) {
 				reset(); // empty

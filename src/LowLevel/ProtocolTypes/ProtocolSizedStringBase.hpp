@@ -82,6 +82,7 @@ namespace cql {
 			std::memcpy(&size, ptr, sizeof(size));
 			size = seastar::be_to_cpu(size);
 			ptr += sizeof(size);
+			// cppcheck-suppress unsignedPositive
 			if (std::is_unsigned<LengthType>::value || size >= 0) {
 				if (end < ptr || end - ptr < static_cast<std::ptrdiff_t>(size)) {
 					throw DecodeException(CQL_CODEINFO, "length not enough");

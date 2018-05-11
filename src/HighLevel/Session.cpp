@@ -442,6 +442,7 @@ namespace cql {
 	}
 
 	/** Execute a single modification command */
+	// cppcheck-suppress unusedFunction
 	seastar::future<> Session::execute(Command&& command) {
 		if (!command.isValid()) {
 			return seastar::make_exception_future(
@@ -510,6 +511,7 @@ namespace cql {
 	}
 
 	/** Perform multiple modification commands in batch */
+	// cppcheck-suppress unusedFunction
 	seastar::future<> Session::batchExecute(BatchCommand&& command) {
 		if (!command.isValid()) {
 			return seastar::make_exception_future(

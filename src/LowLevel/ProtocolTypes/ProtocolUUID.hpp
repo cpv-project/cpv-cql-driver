@@ -13,7 +13,7 @@ namespace cql {
 		UUIDDataType get() const { return value_; }
 
 		/** Set the binary value of uuid */
-		void set(UUIDDataType value) { value_ = value; }
+		void set(const UUIDDataType& value) { value_ = value; }
 
 		/** Reset to initial state */
 		void reset() { value_ = {}; }

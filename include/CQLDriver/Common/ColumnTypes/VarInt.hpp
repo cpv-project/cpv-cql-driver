@@ -48,7 +48,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* str, ColumnEncodeDecodeSizeType size) {
+		void decodeBody(const char* str, const ColumnEncodeDecodeSizeType& size) {
 			if (size == 0) {
 				value_ = 0; // empty
 			} else if (static_cast<std::size_t>(size) > sizeof(value_)) {

@@ -43,7 +43,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
+		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
 			static const constexpr std::size_t length = sizeof(value_.first) + sizeof(value_.second);
 			if (size == 0) {
 				reset(); // empty

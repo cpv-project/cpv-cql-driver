@@ -37,7 +37,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
+		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
 			std::int64_t dbValue = 0;
 			if (size == 0) {
 				reset(); // empty
@@ -58,6 +58,7 @@ namespace cql {
 		/** Constructors */
 		Timestamp() : DateTimeBase() { }
 		template <class... Args>
+		// cppcheck-suppress noExplicitConstructor
 		Timestamp(Args&&... args) : DateTimeBase() {
 			set(std::forward<Args>(args)...);
 		}

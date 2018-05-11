@@ -65,7 +65,7 @@ namespace cql {
 		}
 
 		/** Decode from binary data */
-		void decodeBody(const char* ptr, ColumnEncodeDecodeSizeType size) {
+		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
 			if (size == 0) {
 				reset(); // empty;
 			} else if (size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize + 1)) {
