@@ -11,7 +11,8 @@ TEST_FUTURE(TestConnection, waitForReadySimple) {
 		seastar::make_lw_shared<cql::SessionConfiguration>(),
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
-				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready();
 }
 
@@ -23,7 +24,8 @@ TEST_FUTURE(TestConnection, waitForReadySSL) {
 				.setAddress(DB_SSL_1_IP, DB_SSL_1_PORT)
 				.setUseSSL(true)
 				.setUseCompression(true)
-				.setPasswordAuthentication("cassandra", "cassandra")));
+				.setPasswordAuthentication("cassandra", "cassandra")),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready();
 }
 
@@ -32,7 +34,8 @@ TEST_FUTURE(TestConnection, waitForReadyConnectFailed) {
 		seastar::make_lw_shared<cql::SessionConfiguration>(),
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
-				.setAddress("host.not.exist", 123)));
+				.setAddress("host.not.exist", 123)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready().then_wrapped([] (auto&& f) {
 		ASSERT_THROWS_CONTAINS(
 			cql::ConnectionInitializeException, f.get(),
@@ -46,7 +49,8 @@ TEST_FUTURE(TestConnection, waitForReadyAllowAllAuthenticateFailed) {
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
 				.setAddress(DB_SSL_1_IP, DB_SSL_1_PORT)
-				.setUseSSL(true)));
+				.setUseSSL(true)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready().then_wrapped([] (auto&& f) {
 		ASSERT_THROWS_CONTAINS(
 			cql::ConnectionInitializeException, f.get(),
@@ -62,7 +66,8 @@ TEST_FUTURE(TestConnection, waitForReadyPasswordAuthenticateFailed) {
 				.setAddress(DB_SSL_1_IP, DB_SSL_1_PORT)
 				.setUseSSL(true)
 				.setUseCompression(true)
-				.setPasswordAuthentication("cassandra", "cassandra_")));
+				.setPasswordAuthentication("cassandra", "cassandra_")),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready().then_wrapped([] (auto&& f) {
 		ASSERT_THROWS_CONTAINS(
 			cql::ConnectionInitializeException, f.get(),
@@ -77,7 +82,8 @@ TEST_FUTURE(TestConnection, waitForReadySetKeySpace) {
 				.setDefaultKeySpace("system")),
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
-				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready();
 }
 
@@ -88,7 +94,8 @@ TEST_FUTURE(TestConnection, waitForReadySetKeySpaceNotExists) {
 				.setDefaultKeySpace("notExistskeySpaceQWERT")),
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
-				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	return connection->ready().then_wrapped([] (auto&& f) {
 		ASSERT_THROWS_CONTAINS(
 			cql::ConnectionInitializeException, f.get(),
@@ -103,7 +110,8 @@ TEST(TestConnection, openStream) {
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
 				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)
-				.setMaxStreams(testMaxStream)));
+				.setMaxStreams(testMaxStream)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	for (std::size_t i = 0; i < 3; ++i) {
 		// test 3 round
 		std::vector<cql::ConnectionStream> streams;
@@ -128,7 +136,8 @@ TEST_FUTURE(TestConnection, prepareQuery) {
 		seastar::make_lw_shared<cql::SessionConfiguration>(),
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
-				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	auto stream = connection->openStream();
 	return seastar::do_with(
 		std::move(connection), std::move(stream), std::string(),
@@ -174,7 +183,8 @@ TEST_FUTURE(TestConnection, compression) {
 		seastar::make_lw_shared<cql::NodeConfiguration>(
 			cql::NodeConfiguration()
 				.setUseCompression(true)
-				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)));
+				.setAddress(DB_SIMPLE_IP, DB_SIMPLE_PORT)),
+		seastar::make_lw_shared<cql::MetricsData>());
 	auto stream = connection->openStream();
 	return seastar::do_with(
 		std::move(connection), std::move(stream),

@@ -132,6 +132,7 @@ namespace cql {
 				logger->log(LogLevel::Info, "initialize connection to",
 					self->nodeConfiguration_->getAddressAsString(), "failed:", ex);
 			}
+			self->metricsData_->connection_initialize_errors += 1;
 			self->close("initialize connection failed");
 			return seastar::make_exception_future(ConnectionInitializeException(
 				CQL_CODEINFO, "initialize connection to",
@@ -196,9 +197,11 @@ namespace cql {
 			}).then([&self, &sendingPromise] {
 				// this message is successful, allow next message to start sending
 				sendingPromise.set_value();
+				self->metricsData_->connection_messages_sent += 1;
 			}).handle_exception([&self, &sendingPromise] (std::exception_ptr ex) {
 				// this message is failed, report the error to both waiters
 				sendingPromise.set_exception(ex);
+				self->metricsData_->connection_send_message_errors += 1;
 				self->close(joinString("send message failed:", ex));
 				return seastar::make_exception_future(NetworkException(
 					CQL_CODEINFO, "send message to",
@@ -255,6 +258,7 @@ namespace cql {
 						if (logger->isEnabled(LogLevel::Debug)) {
 							logger->log(LogLevel::Debug, "received message:", message->toString());
 						}
+						self->metricsData_->connection_messages_received += 1;
 						// find the corresponding promise
 						auto streamId = message->getHeader().getStreamId();
 						if (streamId >= self->receivedMessageQueueMap_.size()) {
@@ -289,6 +293,7 @@ namespace cql {
 						}
 					});
 				}).handle_exception([&self] (std::exception_ptr ex) {
+					self->metricsData_->connection_receive_message_errors += 1;
 					self->close(joinString(" ", "receive message failed:", ex));
 				});
 			});
@@ -299,10 +304,12 @@ namespace cql {
 	/** Constructor */
 	Connection::Connection(
 		const seastar::lw_shared_ptr<SessionConfiguration>& sessionConfiguration,
-		const seastar::lw_shared_ptr<NodeConfiguration>& nodeConfiguration) :
+		const seastar::lw_shared_ptr<NodeConfiguration>& nodeConfiguration,
+		const seastar::lw_shared_ptr<MetricsData>& metricsData) :
 		Connection(
 			sessionConfiguration,
 			nodeConfiguration,
+			metricsData,
 			ConnectorFactory::getConnector(*nodeConfiguration),
 			AuthenticatorFactory::getAuthenticator(*nodeConfiguration)) { }
 
@@ -310,10 +317,12 @@ namespace cql {
 	Connection::Connection(
 		const seastar::lw_shared_ptr<SessionConfiguration>& sessionConfiguration,
 		const seastar::lw_shared_ptr<NodeConfiguration>& nodeConfiguration,
+		const seastar::lw_shared_ptr<MetricsData>& metricsData,
 		const seastar::shared_ptr<ConnectorBase>& connector,
 		const seastar::shared_ptr<AuthenticatorBase>& authenticator) :
 		sessionConfiguration_(sessionConfiguration),
 		nodeConfiguration_(nodeConfiguration),
+		metricsData_(metricsData),
 		connector_(connector),
 		authenticator_(authenticator),
 		socket_(),

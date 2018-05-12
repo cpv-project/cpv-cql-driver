@@ -419,11 +419,13 @@ namespace cql {
 					}
 					// unexpected message type
 					return retryFlow.handleUnexpectMessage(std::move(message), "QUERY");
-				}).then([&connectionPool, &connection, &stream] {
+				}).then([&connectionPool] {
 					// query successful
+					connectionPool->getMetricsData().session_command_successful += 1;
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&retryFlow] (std::exception_ptr ex) {
+				}).handle_exception([&connectionPool, &retryFlow] (std::exception_ptr ex) {
 					// query failed
+					connectionPool->getMetricsData().session_command_failed += 1;
 					return retryFlow.determinate(std::move(ex));
 				}).finally([&connectionPool, &connection, &stream] {
 					// return the connection
@@ -494,11 +496,13 @@ namespace cql {
 					}
 					// unexpected message type
 					return retryFlow.handleUnexpectMessage(std::move(message), "QUERY");
-				}).then([&connectionPool, &connection, &stream] {
+				}).then([&connectionPool] {
 					// execute successful
+					connectionPool->getMetricsData().session_command_successful += 1;
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&retryFlow] (std::exception_ptr ex) {
+				}).handle_exception([&connectionPool, &retryFlow] (std::exception_ptr ex) {
 					// execute failed
+					connectionPool->getMetricsData().session_command_failed += 1;
 					return retryFlow.determinate(std::move(ex));
 				}).finally([&connectionPool, &connection, &stream] {
 					// return the connection
@@ -574,11 +578,13 @@ namespace cql {
 					} else {
 						return retryFlow.handleUnexpectMessage(std::move(message), "BATCH");
 					}
-				}).then([] {
+				}).then([&connectionPool] {
 					// batch execute successful
+					connectionPool->getMetricsData().session_batch_command_successful += 1;
 					return seastar::stop_iteration::yes;
-				}).handle_exception([&retryFlow] (std::exception_ptr ex) {
+				}).handle_exception([&connectionPool, &retryFlow] (std::exception_ptr ex) {
 					// batch execute failed
+					connectionPool->getMetricsData().session_batch_command_failed += 1;
 					return retryFlow.determinate(std::move(ex));
 				}).finally([&connectionPool, &connection, &stream] {
 					// return the connection

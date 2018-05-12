@@ -6,6 +6,7 @@
 #include <CQLDriver/Common/Utility/SocketHolder.hpp>
 #include <CQLDriver/Common/SessionConfiguration.hpp>
 #include <CQLDriver/Common/NodeConfiguration.hpp>
+#include "../Common/MetricsData.hpp"
 #include "./Connectors/ConnectorBase.hpp"
 #include "./Authenticators/AuthenticatorBase.hpp"
 #include "./Compressors/CompressorBase.hpp"
@@ -78,12 +79,14 @@ namespace cql {
 		/** Constructor */
 		Connection(
 			const seastar::lw_shared_ptr<SessionConfiguration>& sessionConfiguration,
-			const seastar::lw_shared_ptr<NodeConfiguration>& nodeConfiguration);
+			const seastar::lw_shared_ptr<NodeConfiguration>& nodeConfiguration,
+			const seastar::lw_shared_ptr<MetricsData>& metricsData);
 
 		/** Constructor */
 		Connection(
 			const seastar::lw_shared_ptr<SessionConfiguration>& sessionConfiguration,
 			const seastar::lw_shared_ptr<NodeConfiguration>& nodeConfiguration,
+			const seastar::lw_shared_ptr<MetricsData>& metricsData,
 			const seastar::shared_ptr<ConnectorBase>& connector,
 			const seastar::shared_ptr<AuthenticatorBase>& authenticator);
 
@@ -111,6 +114,7 @@ namespace cql {
 	private:
 		seastar::lw_shared_ptr<SessionConfiguration> sessionConfiguration_;
 		seastar::lw_shared_ptr<NodeConfiguration> nodeConfiguration_;
+		seastar::lw_shared_ptr<MetricsData> metricsData_;
 		seastar::shared_ptr<ConnectorBase> connector_;
 		seastar::shared_ptr<AuthenticatorBase> authenticator_;
 		seastar::shared_ptr<CompressorBase> compressor_;

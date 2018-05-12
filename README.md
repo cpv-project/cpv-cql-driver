@@ -32,6 +32,7 @@ It's new and has not been extensively tested, you should use it carefully.<br/>
 - [Prepare](./docs/Prepare.md)
 - [Column Types](./docs/ColumnTypes.md)
 - [Logging](./docs/Logging.md)
+- [Metrics](./docs/Metrics.md)
 - [Benchmark](./docs/Benchmark.md)
 
 # Running tests

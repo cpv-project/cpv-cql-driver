@@ -27,6 +27,7 @@ namespace cql {
 			} else {
 				// found a closed connection
 				allConnections_.erase(it);
+				metricsData_->pool_connections_current = allConnections_.size();
 			}
 		}
 		// get stream from the connection
@@ -102,6 +103,7 @@ namespace cql {
 		const seastar::shared_ptr<NodeCollection>& nodeCollection) :
 		sessionConfiguration_(sessionConfiguration),
 		nodeCollection_(nodeCollection),
+		metricsData_(seastar::make_lw_shared<MetricsData>()),
 		allConnections_(),
 		connectingCount_(0),
 		waiters_(static_cast<std::size_t>(-1)),
@@ -120,13 +122,15 @@ namespace cql {
 				// choose one node and create connection
 				auto node = self->nodeCollection_->chooseOneNode();
 				auto connection = seastar::make_lw_shared<Connection>(
-					self->sessionConfiguration_, node);
+					self->sessionConfiguration_, node, self->metricsData_);
 				// initialize connection
 				return connection->ready().then([&self, node, connection] {
 					// initialize connection success
 					self->nodeCollection_->reportSuccess(node);
 					self->allConnections_.emplace_back(connection);
 					self->feedWaiters();
+					self->metricsData_->pool_connections_total += 1;
+					self->metricsData_->pool_connections_current = self->allConnections_.size();
 					return seastar::stop_iteration::yes;
 				}).handle_exception([&self, &count, node] (std::exception_ptr ex) {
 					// initialize connection failed, try next node until all tried
@@ -243,6 +247,7 @@ namespace cql {
 							return false;
 						}),
 						self->allConnections_.end());
+					self->metricsData_->pool_connections_current = self->allConnections_.size();
 					// stop timer if can't drop any connection more
 					return existCount <= minCount ?
 						seastar::stop_iteration::yes :

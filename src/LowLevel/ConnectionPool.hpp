@@ -3,6 +3,7 @@
 #include <core/future.hh>
 #include <core/queue.hh>
 #include <CQLDriver/Common/SessionConfiguration.hpp>
+#include "../Common/MetricsData.hpp"
 #include "./ConnectionStream.hpp"
 
 namespace cql {
@@ -15,6 +16,10 @@ namespace cql {
 	public:
 		/** Get the session configuration used by this pool */
 		const SessionConfiguration& getSessionConfiguration() const& { return *sessionConfiguration_; }
+
+		/** Get the metrics data */
+		const MetricsData& getMetricsData() const& { return *metricsData_; }
+		MetricsData& getMetricsData() & { return *metricsData_; }
 
 		/** Try to get a connection with idle stream, may return (nullptr, {}) if not available */
 		std::pair<seastar::lw_shared_ptr<Connection>, ConnectionStream> tryGetConnection();
@@ -59,6 +64,7 @@ namespace cql {
 	private:
 		seastar::lw_shared_ptr<SessionConfiguration> sessionConfiguration_;
 		seastar::shared_ptr<NodeCollection> nodeCollection_;
+		seastar::lw_shared_ptr<MetricsData> metricsData_;
 		std::vector<seastar::lw_shared_ptr<Connection>> allConnections_;
 		std::size_t connectingCount_;
 		seastar::queue<seastar::promise<
