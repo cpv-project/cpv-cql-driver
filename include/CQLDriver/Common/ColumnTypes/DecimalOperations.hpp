@@ -8,13 +8,13 @@
 namespace cql {
 	using DecimalDataType = std::pair<Int, VarInt>;
 
-#define CQLDefineDecimalBinaryOperation(op) \
+#define CQLDefineDecimalBinaryOperation(op, opAssign) \
 	template <class T, \
 		std::enable_if_t<std::is_same< \
 			typename T::UnderlyingType, DecimalDataType>::value, int> = 0> \
 	T operator op(const T& a, const T& b) { \
 		auto result = T(a); \
-		result op##= b; \
+		result opAssign b; \
 		return result; \
 	} \
 	template <class T, \
@@ -30,10 +30,10 @@ namespace cql {
 		return T(a) op b; \
 	}
 
-	CQLDefineDecimalBinaryOperation(+)
-	CQLDefineDecimalBinaryOperation(-)
-	CQLDefineDecimalBinaryOperation(*)
-	CQLDefineDecimalBinaryOperation(/)
+	CQLDefineDecimalBinaryOperation(+, +=)
+	CQLDefineDecimalBinaryOperation(-, -=)
+	CQLDefineDecimalBinaryOperation(*, *=)
+	CQLDefineDecimalBinaryOperation(/, /=)
 
 #undef CQLDefineDecimalBinaryOperation 
 

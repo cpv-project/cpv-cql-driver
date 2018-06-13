@@ -105,7 +105,7 @@ namespace {
 		if (prepared != nullptr) {
 			cass_prepared_free(prepared);
 		}
-		return 0;
+		return ret;
 	}
 }
 
