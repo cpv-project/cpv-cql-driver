@@ -75,7 +75,7 @@ sh run.sh
 
 ### Running tests
 
-Please check [travis_run_tests.sh](../tests/travis_run_tests.sh),
+Please check [travis_run_tests.sh](./tests/travis_run_tests.sh),
 tests are written with google test and require 3 scylla or cassandra instances to work.
 
 ### Contribution
