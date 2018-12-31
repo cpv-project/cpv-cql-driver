@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstring>
-#include <net/inet_address.hh>
+#include <seastar/net/inet_address.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "./ColumnDefinitions.hpp"
 

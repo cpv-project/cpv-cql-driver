@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstring>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 
 namespace cql {

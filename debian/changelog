@@ -1,0 +1,7 @@
+cqldriver (0.5.0.1) bionic; urgency=low
+
+  * Update build script and cmake files, build as shared library
+  * Reference seastar from pkg-config
+  * Provide ubuntu package
+
+ -- compiv <compiv@tutanota.com>  Sun, 30 Dec 2018 08:19:10 +0000

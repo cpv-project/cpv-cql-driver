@@ -1,5 +1,5 @@
 #pragma once
-#include <core/temporary_buffer.hh>
+#include <seastar/core/temporary_buffer.hh>
 #include "./LowLevelDefinitions.hpp"
 #include "./ConnectionInfo.hpp"
 #include "./ProtocolTypes/ProtocolByte.hpp"

@@ -1,5 +1,5 @@
-#include <core/do_with.hh>
-#include <core/future-util.hh>
+#include <seastar/core/do_with.hh>
+#include <seastar/core/future-util.hh>
 #include <CQLDriver/HighLevel/Session.hpp>
 #include <CQLDriver/Common/Exceptions/NotImplementedException.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>

@@ -1,5 +1,5 @@
 #pragma once
-#include <core/future.hh>
+#include <seastar/core/future.hh>
 #include "../Common/Utility/Object.hpp"
 #include "../Common/Command.hpp"
 #include "../Common/BatchCommand.hpp"

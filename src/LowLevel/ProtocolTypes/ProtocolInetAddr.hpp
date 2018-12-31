@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <net/inet_address.hh>
+#include <seastar/net/inet_address.hh>
 
 namespace cql {
 	/**

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <core/temporary_buffer.hh>
+#include <seastar/core/temporary_buffer.hh>
 #include "../ConnectionInfo.hpp"
 
 namespace cql {

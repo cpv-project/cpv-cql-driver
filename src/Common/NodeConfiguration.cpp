@@ -5,7 +5,7 @@
 #include <CQLDriver/Common/Utility/StringUtils.hpp>
 #include <CQLDriver/Common/CommonDefinitions.hpp>
 #include <stdexcept>
-#include <net/inet_address.hh>
+#include <seastar/net/inet_address.hh>
 
 namespace cql {
 	/** Defines members of NodeConfiguration */

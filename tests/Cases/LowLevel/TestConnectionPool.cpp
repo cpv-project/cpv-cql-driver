@@ -1,4 +1,4 @@
-#include <core/sleep.hh>
+#include <seastar/core/sleep.hh>
 #include <CQLDriver/Common/Exceptions/ConnectionNotAvailableException.hpp>
 #include <Common/NodeCollectionImpl.hpp>
 #include <LowLevel/ConnectionPool.hpp>

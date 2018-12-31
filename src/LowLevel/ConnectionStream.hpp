@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include <core/shared_ptr.hh>
+#include <seastar/core/shared_ptr.hh>
 
 namespace cql {
 	/** RAII class that hold an in use stream id for the database connection */

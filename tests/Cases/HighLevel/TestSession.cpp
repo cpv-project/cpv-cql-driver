@@ -1,5 +1,5 @@
-#include <core/do_with.hh>
-#include <core/future-util.hh>
+#include <seastar/core/do_with.hh>
+#include <seastar/core/future-util.hh>
 #include <CQLDriver/Common/ColumnTypes/Int.hpp>
 #include <CQLDriver/Common/ColumnTypes/Text.hpp>
 #include <CQLDriver/Common/Exceptions/ResponseErrorException.hpp>

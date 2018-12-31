@@ -1,6 +1,6 @@
 #include <limits>
-#include <net/dns.hh>
-#include <core/reactor.hh>
+#include <seastar/net/dns.hh>
+#include <seastar/core/reactor.hh>
 #include <CQLDriver/Common/Exceptions/NotImplementedException.hpp>
 #include <CQLDriver/Common/Exceptions/NetworkException.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>

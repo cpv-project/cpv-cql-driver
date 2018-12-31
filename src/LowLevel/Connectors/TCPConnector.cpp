@@ -1,4 +1,4 @@
-#include <core/reactor.hh>
+#include <seastar/core/reactor.hh>
 #include "./TCPConnector.hpp"
 
 namespace cql {

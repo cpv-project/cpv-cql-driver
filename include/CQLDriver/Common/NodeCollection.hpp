@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <core/shared_ptr.hh>
+#include <seastar/core/shared_ptr.hh>
 #include "./NodeConfiguration.hpp"
 
 namespace cql {

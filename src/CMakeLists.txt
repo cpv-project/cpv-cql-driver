@@ -1,49 +1,61 @@
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.8)
+include(FindPkgConfig)
+include(GNUInstallDirs)
+
 project (CQLDriver)
 
+# add target and source files
 FILE(GLOB_RECURSE Files ./*.cpp)
 FILE(GLOB_RECURSE PublicHeaders ../include/*.hpp)
 FILE(GLOB_RECURSE InternalHeaders ../src/*.hpp)
-add_library(${PROJECT_NAME} STATIC ${Files} ${PublicHeaders} ${InternalHeaders})
+add_library(${PROJECT_NAME} SHARED ${Files} ${PublicHeaders} ${InternalHeaders})
+
+# find dependencies
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SEASTAR REQUIRED seastar)
+pkg_check_modules(SEASTAR_DEBUG REQUIRED seastar-debug)
 
 # set compile options
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-include_directories(../include)
-target_link_libraries(${PROJECT_NAME})
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_include_directories(${PROJECT_NAME} PRIVATE ../include)
+target_compile_options(${PROJECT_NAME} PRIVATE
+	-Wall -Wextra
+	-Wno-unused-variable -Wno-unused-function)
 
-# get flags from seastar pkgconfig
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-	set(SEASTAR_PC_PATH ${CMAKE_SOURCE_DIR}/../3rd-party/seastar/build/debug/seastar.pc)
-else()
-	set(SEASTAR_PC_PATH ${CMAKE_SOURCE_DIR}/../3rd-party/seastar/build/release/seastar.pc)
-endif()
-execute_process(COMMAND pkg-config --cflags ${SEASTAR_PC_PATH} OUTPUT_VARIABLE SEASTAR_CFLAGS)
-execute_process(COMMAND pkg-config --libs ${SEASTAR_PC_PATH} OUTPUT_VARIABLE SEASTAR_LDFLAGS)
-string(STRIP "${SEASTAR_CFLAGS}" SEASTAR_CFLAGS)
-string(STRIP "${SEASTAR_LDFLAGS}" SEASTAR_LDFLAGS)
-string(REPLACE "-Werror" "" SEASTAR_CFLAGS "${SEASTAR_CFLAGS}")
-string(REPLACE "-Werror" "" SEASTAR_LDFLAGS "${SEASTAR_LDFLAGS}")
-
-# set compiler and link flags
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-unused-function -Wno-noexcept-type ${SEASTAR_CFLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -fuse-ld=gold ${SEASTAR_LDFLAGS}")
-if (CMAKE_BUILD_TYPE MATCHES Release)
-	string(REPLACE "-O3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	string(REPLACE "-O2" "-O3 -march=native -mtune=native" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# set compile options dependent on build type
+if (CMAKE_BUILD_TYPE MATCHES Release OR
+	CMAKE_BUILD_TYPE MATCHES RelWithDebInfo OR
+	CMAKE_BUILD_TYPE MATCHES MinSizeRel)
+	target_compile_options(${PROJECT_NAME} PRIVATE
+		${SEASTAR_CFLAGS} -march=native -mtune=native)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		${SEASTAR_LDFLAGS} -flto -fuse-ld=gold)
+elseif (CMAKE_BUILD_TYPE MATCHES Debug)
+	target_compile_options(${PROJECT_NAME} PRIVATE
+		${SEASTAR_DEBUG_CFLAGS})
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		${SEASTAR_DEBUG_LDFLAGS})
 endif()
 
 # generate pkgconfig file for cqldriver
-file(READ ../VERSION VERSION_NUMBER)
-string(STRIP "${VERSION_NUMBER}" VERSION_NUMBER)
+execute_process(COMMAND
+	sh ${CMAKE_SOURCE_DIR}/../debian/scripts/get_version.sh
+	OUTPUT_VARIABLE VERSION_NUMBER
+	OUTPUT_STRIP_TRAILING_WHITESPACE)
 string(TIMESTAMP BUILD_DATE)
-set(PC_PATH "${CMAKE_BINARY_DIR}/cqldriver.pc")
-get_filename_component(TOP_PATH ${CMAKE_SOURCE_DIR} PATH)
+set(PC_PATH "${CMAKE_CURRENT_BINARY_DIR}/cqldriver.pc")
 file(REMOVE ${PC_PATH})
 file(APPEND ${PC_PATH} "Name: CQLDriver\n")
 file(APPEND ${PC_PATH} "URL: https://github.com/cpv-project/cpv-cql-driver\n")
 file(APPEND ${PC_PATH} "Description: C++ database driver for cassandra and scylla, build date: ${BUILD_DATE}\n")
 file(APPEND ${PC_PATH} "Version: ${VERSION_NUMBER}\n")
-file(APPEND ${PC_PATH} "Cflags: ${CMAKE_CXX_FLAGS} -I'${TOP_PATH}/include'\n")
-file(APPEND ${PC_PATH} "Libs: ${CMAKE_SHARED_LINKER_FLAGS} -L'${CMAKE_BINARY_DIR}' -lCQLDriver\n")
+file(APPEND ${PC_PATH} "Cflags:\n")
+file(APPEND ${PC_PATH} "Libs: -lCQLDriver\n")
+
+# add install rules
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY ../include/CQLDriver DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${PC_PATH} DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(FILES ../LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/licenses/CQLDriver)
 

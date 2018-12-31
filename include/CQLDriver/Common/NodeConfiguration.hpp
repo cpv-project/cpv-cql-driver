@@ -3,7 +3,7 @@
 #include <utility>
 #include <chrono>
 #include <memory>
-#include <net/socket_defs.hh>
+#include <seastar/net/socket_defs.hh>
 #include "./Utility/StringHolder.hpp"
 
 namespace cql {

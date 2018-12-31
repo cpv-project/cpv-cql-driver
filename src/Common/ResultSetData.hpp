@@ -1,7 +1,7 @@
 #pragma once
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include <cstdint>
-#include <core/temporary_buffer.hh>
+#include <seastar/core/temporary_buffer.hh>
 
 namespace cql {
 	/** Defines members of ResultSet */

@@ -1,5 +1,5 @@
 #pragma once
-#include <core/metrics_registration.hh>
+#include <seastar/core/metrics_registration.hh>
 
 namespace cql {
 	/** Define metrics targets */

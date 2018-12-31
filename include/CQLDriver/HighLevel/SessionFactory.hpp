@@ -1,5 +1,5 @@
 #pragma once
-#include <core/shared_ptr.hh>
+#include <seastar/core/shared_ptr.hh>
 #include "../Common/SessionConfiguration.hpp"
 #include "../Common/NodeCollection.hpp"
 #include "./Session.hpp"

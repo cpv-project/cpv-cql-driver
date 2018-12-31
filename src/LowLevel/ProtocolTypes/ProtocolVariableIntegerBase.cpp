@@ -1,5 +1,5 @@
 #include <array>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 #include "./ProtocolVariableIntegerBase.hpp"
 

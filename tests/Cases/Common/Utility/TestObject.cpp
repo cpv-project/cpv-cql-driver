@@ -1,6 +1,6 @@
 #include <CQLDriver/Common/Utility/Object.hpp>
 #include <TestUtility/GTestUtils.hpp>
-#include <core/shared_ptr.hh>
+#include <seastar/core/shared_ptr.hh>
 
 namespace {
 	struct Foo {

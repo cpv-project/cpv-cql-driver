@@ -1,7 +1,7 @@
 #pragma once
 #include <cstring>
 #include <unordered_map>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/EncodeException.hpp>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 

@@ -3,7 +3,7 @@
 #include <cstring>
 #include <limits>
 #include <string>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 #include <CQLDriver/Common/Exceptions/EncodeException.hpp>
 

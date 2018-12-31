@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
-#include <util/log.hh>
+#include <seastar/util/log.hh>
 #include "../Exceptions/LogicException.hpp"
 
 namespace cql {
@@ -72,7 +72,8 @@ namespace cql {
 			std::is_base_of<T, U>::value ||
 			std::is_base_of<U, T>::value, int> = 0>
 		Object<U> cast() && {
-			if (static_cast<U*>(reinterpret_cast<T*>(1)) != reinterpret_cast<U*>(1)) {
+			if (reinterpret_cast<U*>(ptr_) !=
+				static_cast<U*>(reinterpret_cast<T*>(ptr_))) {
 				// store the original pointer would solve this problem
 				// but that will make Object to be 3 pointer size
 				throw cql::LogicException(CQL_CODEINFO,

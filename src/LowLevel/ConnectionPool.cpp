@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <core/sleep.hh>
+#include <seastar/core/sleep.hh>
 #include <CQLDriver/Common/Exceptions/NotImplementedException.hpp>
 #include <CQLDriver/Common/Exceptions/ConnectionNotAvailableException.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>

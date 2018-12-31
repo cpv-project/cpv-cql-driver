@@ -4,7 +4,7 @@
 #include <LowLevel/ResponseMessages/ResultMessage.hpp>
 #include <LowLevel/Connection.hpp>
 #include <TestUtility/GTestUtils.hpp>
-#include <core/sleep.hh>
+#include <seastar/core/sleep.hh>
 
 TEST_FUTURE(TestConnection, waitForReadySimple) {
 	auto connection = seastar::make_lw_shared<cql::Connection>(

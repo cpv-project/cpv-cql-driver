@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include <core/sharded.hh>
-#include <core/future.hh>
-#include <core/shared_future.hh>
-#include <net/api.hh>
-#include <net/tls.hh>
+#include <seastar/core/sharded.hh>
+#include <seastar/core/future.hh>
+#include <seastar/core/shared_future.hh>
+#include <seastar/net/api.hh>
+#include <seastar/net/tls.hh>
 #include "./ConnectorBase.hpp"
 
 namespace cql {

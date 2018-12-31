@@ -1,5 +1,5 @@
 #include <vector>
-#include <core/metrics.hh>
+#include <seastar/core/metrics.hh>
 #include <CQLDriver/Common/Utility/StringUtils.hpp>
 #include "MetricsData.hpp"
 

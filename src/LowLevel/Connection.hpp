@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <utility>
-#include <core/queue.hh>
+#include <seastar/core/queue.hh>
 #include <CQLDriver/Common/Utility/Object.hpp>
 #include <CQLDriver/Common/Utility/SocketHolder.hpp>
 #include <CQLDriver/Common/SessionConfiguration.hpp>

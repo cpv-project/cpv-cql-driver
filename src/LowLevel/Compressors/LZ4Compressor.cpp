@@ -1,7 +1,7 @@
 #include <lz4.h>
 #include <cstdint>
 #include <cstring>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include "LZ4Compressor.hpp"
 

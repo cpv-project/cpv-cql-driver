@@ -1,5 +1,5 @@
 #include <random>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/FormatException.hpp>
 #include <CQLDriver/Common/Exceptions/UUIDConflictException.hpp>
 #include <CQLDriver/Common/Utility/StringUtils.hpp>

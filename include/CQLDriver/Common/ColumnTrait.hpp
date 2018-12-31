@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cstring>
 #include <type_traits>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include "./ColumnTypes/Nullable.hpp"
 #include "./Exceptions/DecodeException.hpp"
 

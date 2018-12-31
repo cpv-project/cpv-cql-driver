@@ -1,6 +1,6 @@
 #pragma once
-#include <core/future.hh>
-#include <net/api.hh>
+#include <seastar/core/future.hh>
+#include <seastar/net/api.hh>
 #include <CQLDriver/Common/NodeConfiguration.hpp>
 
 namespace cql {

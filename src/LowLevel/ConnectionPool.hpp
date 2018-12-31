@@ -1,7 +1,7 @@
 #pragma once
-#include <core/shared_ptr.hh>
-#include <core/future.hh>
-#include <core/queue.hh>
+#include <seastar/core/shared_ptr.hh>
+#include <seastar/core/future.hh>
+#include <seastar/core/queue.hh>
 #include <CQLDriver/Common/SessionConfiguration.hpp>
 #include "../Common/MetricsData.hpp"
 #include "./ConnectionStream.hpp"

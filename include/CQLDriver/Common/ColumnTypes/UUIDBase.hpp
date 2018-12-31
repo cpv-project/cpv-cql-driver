@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstring>
-#include <core/byteorder.hh>
+#include <seastar/core/byteorder.hh>
 #include "../Exceptions/DecodeException.hpp"
 #include "./ColumnDefinitions.hpp"
 #include "./UUIDOperations.hpp"
