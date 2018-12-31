@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.8)
+project (CQLDriver)
+
 include(FindPkgConfig)
 include(GNUInstallDirs)
-
-project (CQLDriver)
 
 # add target and source files
 FILE(GLOB_RECURSE Files ./*.cpp)

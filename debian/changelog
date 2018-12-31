@@ -1,4 +1,4 @@
-cqldriver (0.5.0.1) bionic; urgency=low
+cqldriver (0.5.0.2) bionic; urgency=low
 
   * Update build script and cmake files, build as shared library
   * Reference seastar from pkg-config
