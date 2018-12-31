@@ -36,7 +36,7 @@ cp -f ~/.scylla/keys/ca.pem .
 Command=$(cat <<"EOF"
   apt-get update && \
   apt-get install -y ca-certificates software-properties-common && \
-  add-apt-repository ppa:compiv/cpv-project
+  add-apt-repository -y ppa:compiv/cpv-project
   apt-get update
   apt-get install -y seastar
   cd /project/tests && \
