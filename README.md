@@ -1,6 +1,6 @@
 # C++ driver for Cassandra/Scylla based on seastar framework
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ef5c262ba1674ccc9427630a09d4681a)](https://www.codacy.com/app/303248153/cpv-cql-driver?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cpv-project/cpv-cql-driver&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a5c9af91941a4b8d8131068d8dfb76f1)](https://www.codacy.com/app/compiv/cpv-cql-driver?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cpv-project/cpv-cql-driver&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.org/cpv-project/cpv-cql-driver.svg?branch=master)](https://travis-ci.org/cpv-project/cpv-cql-driver)
 [![license](https://img.shields.io/github/license/cpv-project/cpv-manage-scripts.svg)]() 
 [![GitHub release](https://img.shields.io/github/release/cpv-project/cpv-cql-driver.svg)]()
