@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-PKGCONFIG_PATH="../../../bin/release/cqldriver.pc"
-BIN_PATH="../../../bin/benchmark"
-set -e
-g++ $(pkg-config --cflags $PKGCONFIG_PATH) Main.cpp $(pkg-config --libs $PKGCONFIG_PATH) -o $BIN_PATH
-echo "$BIN_PATH [--prepare] [--compress]"
+BIN_PATH="../../../build/example-benchmark-batch-insert-concurrent/Main"
+mkdir -p $(dirname "${BIN_PATH}")
+g++ $(pkg-config --cflags seastar) \
+	$(pkg-config --cflags cqldriver) \
+	Main.cpp \
+	$(pkg-config --libs seastar) \
+	$(pkg-config --libs cqldriver) \
+	-o ${BIN_PATH}
+echo "$BIN_PATH --reactor-backend epoll [--prepare] [--compress]"
+
 

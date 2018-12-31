@@ -1,9 +1,9 @@
 #include <cstring>
 #include <iostream>
 #include <chrono>
-#include <core/do_with.hh>
-#include <core/future-util.hh>
-#include <core/app-template.hh>
+#include <seastar/core/do_with.hh>
+#include <seastar/core/future-util.hh>
+#include <seastar/core/app-template.hh>
 #include <boost/program_options.hpp>
 #include <CQLDriver/CQLDriver.hpp>
 

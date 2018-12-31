@@ -1,29 +1,18 @@
 This document will teach you how to write a simple program that use this driver to manipulate a cassandra/scylla database.<br/>
 First, if you don't known about seastar framework, you should read [this](https://github.com/scylladb/seastar/blob/master/doc/tutorial.md) before continue.
 
-# Download and compile
+# Install cqldriver
 
-The first thing we need to do is download this library, use this command:
+Please follow the installation instructions on [README.md](../README.md),
+to complete this tutorial, you should ensure following commands work.
 
-``` text
-git clone --recurse-submodules https://github.com/cpv-project/cpv-cql-driver
-```
+- `pkg-config --cflags seastar`
+- `pkg-config --libs seastar`
+- `pkg-config --cflags cqldriver`
+- `pkg-config --libs cqldriver`
 
-Then install the packages that required to build it:
-
-``` text
-cd cpv-cql-driver
-sudo sh install-dependencies.sh
-```
-
-To start the build, use this command:
-
-``` text
-sh build-release.sh
-```
-
-After the build is completed you should see `libCQLDriver.a` and `cqldriver.pc` under `bin/release`.<br/>
-That's the files we need to use this library.
+If you install cqldriver from ubuntu ppa then both seastar and cqldriver will available as shared library,
+static library from custom build should work too but I didn't test.
 
 # A hello world program
 
@@ -31,7 +20,7 @@ Here is the source code of a hello world program:
 
 ``` c++
 #include <iostream>
-#include <core/app-template.hh>
+#include <seastar/core/app-template.hh>
 #include <CQLDriver/CQLDriver.hpp>
 
 int main(int argc, char** argv) {
@@ -55,11 +44,20 @@ int main(int argc, char** argv) {
 }
 ```
 
-To compile and run it, use these commands, replace `/path/to/cqldriver.pc` to the actual path:
+To compile and run it, use following commands.
+
+Notice the latest version (at 20181231) of seastar enables aio by default,
+so if your environment doesn't support aio (like inside docker),
+you should preserve the command line argument `--reactor-backend epoll`,
+otherwise you could remove it.
 
 ``` text
-g++ $(pkg-config --cflags /path/to/cqldriver.pc) Main.cpp $(pkg-config --libs /path/to/cqldriver.pc)
-./a.out
+g++ $(pkg-config --cflags seastar) \
+	$(pkg-config --cflags cqldriver) \
+	Main.cpp \
+	$(pkg-config --libs seastar) \
+	$(pkg-config --libs cqldriver)
+./a.out --reactor-backend epoll
 ```
 
 If you can see the following output that means you have successfully compile and run this program.
@@ -73,10 +71,11 @@ Now let's see what's in the source code.
 
 ### Include headers
 
-The header `<core/app-template.hh>` is for running a seastar application, a basic seastar application should like this:
+The header `<seastar/core/app-template.hh>` is for running a seastar application,
+a basic seastar application should like this:
 
 ``` c++
-#include <core/app-template.hh>
+#include <seastar/core/app-template.hh>
 
 int main(int argc, char** argv) {
 	seastar::app_template app;

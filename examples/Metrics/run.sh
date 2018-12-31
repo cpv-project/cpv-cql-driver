@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-PKGCONFIG_PATH="../../bin/debug/cqldriver.pc"
-BIN_PATH="../../bin/example"
-g++ $(pkg-config --cflags $PKGCONFIG_PATH) Main.cpp $(pkg-config --libs $PKGCONFIG_PATH) -o $BIN_PATH && \
-	echo "visit http://127.0.0.1:8000/metrics" && \
-	$BIN_PATH
+BIN_PATH="../../build/example-metrics/Main"
+mkdir -p $(dirname "${BIN_PATH}")
+g++ $(pkg-config --cflags seastar) \
+	$(pkg-config --cflags cqldriver) \
+	Main.cpp \
+	$(pkg-config --libs seastar) \
+	$(pkg-config --libs cqldriver) \
+	-o ${BIN_PATH} && \
+	${BIN_PATH} --reactor-backend epoll
+
 

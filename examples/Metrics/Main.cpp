@@ -1,8 +1,8 @@
 #include <iostream>
 #include <atomic>
-#include <core/app-template.hh>
-#include <core/sleep.hh>
-#include <core/prometheus.hh>
+#include <seastar/core/app-template.hh>
+#include <seastar/core/sleep.hh>
+#include <seastar/core/prometheus.hh>
 #include <CQLDriver/CQLDriver.hpp>
 
 namespace {

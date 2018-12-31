@@ -1,5 +1,5 @@
 #include <iostream>
-#include <core/app-template.hh>
+#include <seastar/core/app-template.hh>
 #include <CQLDriver/CQLDriver.hpp>
 
 int main(int argc, char** argv) {
