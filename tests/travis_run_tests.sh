@@ -38,7 +38,7 @@ Command=$(cat <<"EOF"
   apt-get install -y ca-certificates software-properties-common && \
   add-apt-repository -y ppa:compiv/cpv-project
   apt-get update
-  apt-get install -y seastar
+  apt-get install -y seastar libgtest-dev
   cd /project/tests && \
   cp -f ca.pem /usr/local/share/ca-certificates/ca.crt && \
   update-ca-certificates && \
