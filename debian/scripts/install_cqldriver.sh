@@ -14,9 +14,6 @@ cp -f ${ROOTDIR_DEBUG}/usr/lib/x86_64-linux-gnu/pkgconfig/cqldriver.pc \
 	${ROOTDIR}/usr/lib/x86_64-linux-gnu/pkgconfig/cqldriver-debug.pc
 strip ${ROOTDIR}/usr/lib/x86_64-linux-gnu/*.so
 
-mkdir -p ${ROOTDIR}/usr/share/licenses/cqldriver
-cp ${SRCDIR}/../LICENSE ${ROOTDIR}/usr/share/licenses/cqldriver/
-
 sed -i "s#-lCQLDriver#-lCQLDriver_debug#g" \
   ${ROOTDIR}/usr/lib/x86_64-linux-gnu/pkgconfig/cqldriver-debug.pc
 
