@@ -93,6 +93,6 @@ You should follow these rules when contributing code, pull request or patch is w
 # License
 
 LICENSE: MIT LICENSE<br/>
-Copyright © 2017-2018 303248153@github<br/>
+Copyright © 2017-2019 303248153@github<br/>
 If you have any license issue please contact 303248153@qq.com.
 
