@@ -4,6 +4,9 @@ project (CQLDriver)
 include(FindPkgConfig)
 include(GNUInstallDirs)
 
+# define options
+option(CQL_ENABLE_DEBUG_LOGGER_BY_DEFAULT "" OFF)
+
 # add target and source files
 FILE(GLOB_RECURSE Files ./*.cpp)
 FILE(GLOB_RECURSE PublicHeaders ../include/*.hpp)
@@ -23,6 +26,12 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 	-Wall -Wextra
 	-Wno-unused-variable -Wno-unused-function
 	-ftls-model=initial-exec -fPIC -fvisibility=default)
+
+# set compile options dependent on cmake options
+if (CQL_ENABLE_DEBUG_LOGGER_BY_DEFAULT)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE
+		CQL_ENABLE_DEBUG_LOGGER_BY_DEFAULT)
+endif()
 
 # set compile options dependent on build type
 if (CMAKE_BUILD_TYPE MATCHES Release OR

@@ -45,7 +45,7 @@ namespace cql {
 		data_->address = std::make_pair(hostname, port);
 		try {
 			seastar::net::inet_address inetAddress(hostname);
-			if (inetAddress.in_family() == seastar::net::inet_address::family::INET) {
+			if (CQL_LIKELY(inetAddress.in_family() == seastar::net::inet_address::family::INET)) {
 				data_->ipAddress = seastar::socket_address(seastar::ipv4_addr(inetAddress, port));
 				data_->ipAddressIsResolved = true;
 				data_->ipAddressIsFixed = true;
@@ -75,7 +75,7 @@ namespace cql {
 
 	/** Set how many streams can hold in a single connection */
 	NodeConfiguration& NodeConfiguration::setMaxStreams(std::size_t value) {
-		if (!(value >= 2 && value <= 255)) {
+		if (CQL_UNLIKELY(!(value >= 2 && value <= 255))) {
 			throw FormatException(CQL_CODEINFO,
 				"invalid max streams value, it should >= 2 and <= 255");
 		}
@@ -85,7 +85,7 @@ namespace cql {
 
 	/** Set how many messages can hold in a received queue for a single stream */
 	NodeConfiguration& NodeConfiguration::setMaxPendingMessages(std::size_t value) {
-		if (!(value >= 1)) {
+		if (CQL_UNLIKELY(!(value >= 1))) {
 			throw FormatException(CQL_CODEINFO,
 				"invalid max pending messages value, it should >= 1");
 		}
@@ -160,7 +160,7 @@ namespace cql {
 
 	/** Update the resolved ip address */
 	void NodeConfiguration::updateIpAddress(const seastar::socket_address& ipAddress) {
-		if (data_->ipAddressIsFixed) {
+		if (CQL_UNLIKELY(data_->ipAddressIsFixed)) {
 			throw LogicException(CQL_CODEINFO, "should not update a fixed ip address");
 		}
 		data_->ipAddress = ipAddress;

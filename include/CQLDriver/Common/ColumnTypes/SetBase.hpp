@@ -51,14 +51,14 @@ namespace cql {
 
 		/** Decode from binary data */
 		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
-			if (size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize)) {
+			if (CQL_UNLIKELY(size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize))) {
 				throw DecodeException(CQL_CODEINFO,
 					"length of set size not enough, element type is:",
 					typeid(ValueType).name());
 			}
 			Int setSize;
 			setSize.decodeBody(ptr, Int::EncodeSize);
-			if (setSize < 0) {
+			if (CQL_UNLIKELY(setSize < 0)) {
 				throw DecodeException(CQL_CODEINFO,
 					"set size can't be negative:", setSize);
 			}

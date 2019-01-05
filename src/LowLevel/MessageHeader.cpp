@@ -7,7 +7,7 @@ namespace cql {
 	/** Encode message header to binary data */
 	void MessageHeader::encodeHeaderPre(
 		const ConnectionInfo& info, std::string& data) const {
-		if (!data.empty()) {
+		if (CQL_UNLIKELY(!data.empty())) {
 			throw LogicException(CQL_CODEINFO, "data should be empty");
 		}
 		// assume it's version 4
@@ -26,7 +26,7 @@ namespace cql {
 		// assume it's version 4
 		// direction should always be response
 		auto headerSize = info.getHeaderSize();
-		if (data.size() < headerSize) {
+		if (CQL_UNLIKELY(data.size() < headerSize)) {
 			throw LogicException(CQL_CODEINFO, "please call encodeHeaderPre first");
 		}
 		static thread_local decltype(bodyLength_) bodyLength;
@@ -79,7 +79,7 @@ namespace cql {
 	/** Get the length of message body (aka frame payload) */
 	std::size_t MessageHeader::getBodyLength() const {
 		auto bodyLength = bodyLength_.get();
-		if (std::is_signed<decltype(bodyLength)>::value && bodyLength < 0) {
+		if (CQL_UNLIKELY(std::is_signed<decltype(bodyLength)>::value && bodyLength < 0)) {
 			throw LogicException(CQL_CODEINFO, "body length < 0");
 		}
 		return static_cast<std::size_t>(bodyLength);
@@ -93,7 +93,7 @@ namespace cql {
 	/** Set the stream id of message */
 	void MessageHeader::setStreamId(std::size_t streamId) {
 		streamId_.set(static_cast<decltype(streamId_.get())>(streamId));
-		if (streamId_.get() != streamId) {
+		if (CQL_UNLIKELY(streamId_.get() != streamId)) {
 			throw LogicException(CQL_CODEINFO, "stream id overflow");
 		}
 	}

@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <seastar/util/log.hh>
 #include "../Exceptions/LogicException.hpp"
+#include "../CommonDefinitions.hpp"
 
 namespace cql {
 	/** Class used to determinate the free list size of the specified type */
@@ -72,8 +73,8 @@ namespace cql {
 			std::is_base_of<T, U>::value ||
 			std::is_base_of<U, T>::value, int> = 0>
 		Object<U> cast() && {
-			if (reinterpret_cast<U*>(ptr_) !=
-				static_cast<U*>(reinterpret_cast<T*>(ptr_))) {
+			if (CQL_UNLIKELY(reinterpret_cast<U*>(ptr_) !=
+				static_cast<U*>(reinterpret_cast<T*>(ptr_)))) {
 				// store the original pointer would solve this problem
 				// but that will make Object to be 3 pointer size
 				throw cql::LogicException(CQL_CODEINFO,

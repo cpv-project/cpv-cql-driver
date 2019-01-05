@@ -47,7 +47,7 @@ namespace cql {
 			static const constexpr std::size_t length = sizeof(value_.first) + sizeof(value_.second);
 			if (size == 0) {
 				reset(); // empty
-			} else if (size != length) {
+			} else if (CQL_UNLIKELY(size != length)) {
 				throw DecodeException(CQL_CODEINFO,
 					"uuid length not matched, expected to be", length,
 					"but actual is", size);

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "LZ4Compressor.hpp"
 
 namespace cql {
@@ -31,7 +32,7 @@ namespace cql {
 			&output[outputPreviousSize + sizeof(sourceSize)],
 			sourceSize,
 			outputAdditionSize - sizeof(sourceSize));
-		if (ret <= 0) {
+		if (CQL_UNLIKELY(ret <= 0)) {
 			throw LogicException(CQL_CODEINFO, "lz4 compress failed, ret:", ret);
 		}
 		output.resize(outputPreviousSize + sizeof(sourceSize) + ret);
@@ -49,7 +50,7 @@ namespace cql {
 		}
 		std::memcpy(&outputSize, source.get(), sizeof(outputSize));
 		outputSize = seastar::be_to_cpu(outputSize);
-		if (outputSize > connectionInfo.getMaximumMessageBodySize()) {
+		if (CQL_UNLIKELY(outputSize > connectionInfo.getMaximumMessageBodySize())) {
 			throw LogicException(CQL_CODEINFO,
 				"uncompressed length of message body too large:", outputSize);
 		}
@@ -59,7 +60,7 @@ namespace cql {
 			output.get_write(),
 			source.size() - sizeof(outputSize),
 			output.size());
-		if (static_cast<std::size_t>(ret) != outputSize) {
+		if (CQL_UNLIKELY(static_cast<std::size_t>(ret) != outputSize)) {
 			throw LogicException(CQL_CODEINFO, "lz4 decompress failed, ret:", ret, "!=", outputSize);
 		}
 		return output;

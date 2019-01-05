@@ -13,6 +13,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 	-DDB_SSL_2_IP=localhost \
 	-DDB_SSL_2_PORT=9045 \
 	-DGTEST_SOURCE_DIR=/usr/src/gtest \
+	-DCQL_ENABLE_DEBUG_LOGGER_BY_DEFAULT=ON \
 	../../tests
 make V=1
 

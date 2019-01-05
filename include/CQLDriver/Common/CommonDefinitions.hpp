@@ -2,6 +2,10 @@
 #include <ostream>
 #include "./Utility/EnumUtils.hpp"
 
+// Branch prediction hints
+#define CQL_LIKELY(expr) __builtin_expect((expr), 1)
+#define CQL_UNLIKELY(expr) __builtin_expect((expr), 0)
+
 namespace cql {
 	/**
 	 * Consistency level for cql query

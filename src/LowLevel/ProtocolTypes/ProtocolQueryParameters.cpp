@@ -35,9 +35,9 @@ namespace cql {
 	/** Set the command contains query and parameters */
 	void ProtocolQueryParameters::setCommandRef(Command& command) {
 		// this function won't take the ownership of the command
-		if (!command.isValid()) {
+		if (CQL_UNLIKELY(!command.isValid())) {
 			throw LogicException(CQL_CODEINFO, "can't set a invalid command to query parameters");
-		} else if (!command.getConsistency().has_value()) {
+		} else if (CQL_UNLIKELY(!command.getConsistency().has_value())) {
 			throw LogicException(CQL_CODEINFO, "can't set a command with empty consistency");
 		}
 		auto flags = getFlags();
@@ -64,7 +64,7 @@ namespace cql {
 	/** Encode to binary data */
 	void ProtocolQueryParameters::encode(std::string& data) const {
 		auto& command = commandRef_.get();
-		if (!command.isValid()) {
+		if (CQL_UNLIKELY(!command.isValid())) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
 		ProtocolConsistency consistency(*command.getConsistency());
@@ -73,7 +73,7 @@ namespace cql {
 		auto flags = getFlags();
 		if (enumTrue(flags & QueryParametersFlags::WithValues)) {
 			ProtocolShort parameterCount(command.getParameterCount());
-			if (parameterCount.get() != command.getParameterCount()) {
+			if (CQL_UNLIKELY(parameterCount.get() != command.getParameterCount())) {
 				throw LogicException(CQL_CODEINFO, "too many parameters");
 			}
 			parameterCount.encode(data);
@@ -110,7 +110,7 @@ namespace cql {
 		flags_.decode(ptr, end);
 		auto flags = getFlags();
 		if (enumTrue(flags & QueryParametersFlags::WithValues)) {
-			if (enumTrue(flags & QueryParametersFlags::WithNamesForValue)) {
+			if (CQL_UNLIKELY(enumTrue(flags & QueryParametersFlags::WithNamesForValue))) {
 				throw NotImplementedException(CQL_CODEINFO,
 					"decode named parameters is unsupported");
 			}
@@ -125,7 +125,7 @@ namespace cql {
 				if (parameterSize.get() <= 0) {
 					continue;
 				}
-				if (end < ptr || end - ptr < parameterSize.get()) {
+				if (CQL_UNLIKELY(end < ptr || end - ptr < parameterSize.get())) {
 					throw DecodeException(CQL_CODEINFO, "length not enough");
 				}
 				encodedParameters.append(ptr, parameterSize.get());

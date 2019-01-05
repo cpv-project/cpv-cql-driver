@@ -65,7 +65,7 @@ namespace cql {
 				globalTable_.encode(data);
 				columnContainsTableSpec = false;
 			}
-			if (getColumnsCount() != columns_.size()) {
+			if (CQL_UNLIKELY(getColumnsCount() != columns_.size())) {
 				throw LogicException(CQL_CODEINFO, "columns count != columns.size()");
 			}
 			for (const auto& column : columns_) {
@@ -89,7 +89,7 @@ namespace cql {
 				globalTable_.decode(ptr, end);
 				columnContainsTableSpec = false;
 			}
-			if (columnsCount_.get() < 0) {
+			if (CQL_UNLIKELY(columnsCount_.get() < 0)) {
 				throw LogicException(CQL_CODEINFO, "columns count < 0");
 			}
 			if (columns_.size() > static_cast<std::size_t>(columnsCount_.get())) {

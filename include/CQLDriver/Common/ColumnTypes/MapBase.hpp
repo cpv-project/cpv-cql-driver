@@ -56,14 +56,14 @@ namespace cql {
 
 		/** Decode from binary data */
 		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
-			if (size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize)) {
+			if (CQL_UNLIKELY(size < static_cast<ColumnEncodeDecodeSizeType>(Int::EncodeSize))) {
 				throw DecodeException(CQL_CODEINFO,
 					"length of map size not enough, element type is:",
 					typeid(ValueType).name());
 			}
 			Int mapSize;
 			mapSize.decodeBody(ptr, Int::EncodeSize);
-			if (mapSize < 0) {
+			if (CQL_UNLIKELY(mapSize < 0)) {
 				throw DecodeException(CQL_CODEINFO,
 					"map size can't be negative:", mapSize);
 			}

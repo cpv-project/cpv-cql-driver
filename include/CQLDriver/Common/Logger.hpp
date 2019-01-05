@@ -19,7 +19,7 @@ namespace cql {
 		/** Log message with specified log level, it may do nothing if the level is not enabled */
 		template <class... Args>
 		void log(LogLevel logLevel, const Args&... args) {
-			if (isEnabled(logLevel)) {
+			if (CQL_UNLIKELY(isEnabled(logLevel))) {
 				logImpl(logLevel, joinString("",
 					"<CQL:", logLevel, "> ", joinString(" ", args...), '\n'));
 			}

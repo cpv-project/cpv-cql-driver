@@ -18,7 +18,7 @@ namespace cql {
 
 	/** Get the payload of custom column type */
 	ProtocolColumnOptionCustomPayload ProtocolColumnOption::getCustomPayload() const {
-		if (type_ != ColumnType::Custom) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Custom)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		ProtocolColumnOptionCustomPayload payload;
@@ -29,7 +29,7 @@ namespace cql {
 
 	/** Set the payload of custom column type */
 	void ProtocolColumnOption::setCustomPayload(const ProtocolColumnOptionCustomPayload& payload) {
-		if (type_ != ColumnType::Custom) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Custom)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		payload_.resize(0);
@@ -38,7 +38,7 @@ namespace cql {
 
 	/** Get the payload of list column type */
 	ProtocolColumnOptionListPayload ProtocolColumnOption::getListPayload() const {
-		if (type_ != ColumnType::List) {
+		if (CQL_UNLIKELY(type_ != ColumnType::List)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		ProtocolColumnOptionListPayload payload;
@@ -49,7 +49,7 @@ namespace cql {
 
 	/** Set the payload of list column type */
 	void ProtocolColumnOption::setListPayload(const ProtocolColumnOptionListPayload& payload) {
-		if (type_ != ColumnType::List) {
+		if (CQL_UNLIKELY(type_ != ColumnType::List)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		payload_.resize(0);
@@ -58,7 +58,7 @@ namespace cql {
 
 	/** Get the payload of map column type */
 	ProtocolColumnOptionMapPayload ProtocolColumnOption::getMapPayload() const {
-		if (type_ != ColumnType::Map) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Map)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		ProtocolColumnOptionMapPayload payload;
@@ -69,7 +69,7 @@ namespace cql {
 
 	/** Set the payload of map column type */
 	void ProtocolColumnOption::setMapPayload(const ProtocolColumnOptionMapPayload& payload) {
-		if (type_ != ColumnType::Map) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Map)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		payload_.resize(0);
@@ -78,7 +78,7 @@ namespace cql {
 
 	/** Get the payload of set column type */
 	ProtocolColumnOptionSetPayload ProtocolColumnOption::getSetPayload() const {
-		if (type_ != ColumnType::Set) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Set)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		ProtocolColumnOptionSetPayload payload;
@@ -89,7 +89,7 @@ namespace cql {
 
 	/** Set the payload of set column type */
 	void ProtocolColumnOption::setSetPayload(const ProtocolColumnOptionSetPayload& payload) {
-		if (type_ != ColumnType::Set) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Set)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		payload_.resize(0);
@@ -98,7 +98,7 @@ namespace cql {
 
 	/** Get the payload of UDT column type */
 	ProtocolColumnOptionUDTPayload ProtocolColumnOption::getUDTPayload() const {
-		if (type_ != ColumnType::UDT) {
+		if (CQL_UNLIKELY(type_ != ColumnType::UDT)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		ProtocolColumnOptionUDTPayload payload;
@@ -109,7 +109,7 @@ namespace cql {
 
 	/** Set the payload of UDT column type */
 	void ProtocolColumnOption::setUDTPayload(const ProtocolColumnOptionUDTPayload& payload) {
-		if (type_ != ColumnType::UDT) {
+		if (CQL_UNLIKELY(type_ != ColumnType::UDT)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		payload_.resize(0);
@@ -118,7 +118,7 @@ namespace cql {
 
 	/** Get the payload of tuple column type */
 	ProtocolColumnOptionTuplePayload ProtocolColumnOption::getTuplePayload() const {
-		if (type_ != ColumnType::Tuple) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Tuple)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		ProtocolColumnOptionTuplePayload payload;
@@ -129,7 +129,7 @@ namespace cql {
 
 	/** Set the payloda of tuple column type */
 	void ProtocolColumnOption::setTuplePayload(const ProtocolColumnOptionTuplePayload& payload) {
-		if (type_ != ColumnType::Tuple) {
+		if (CQL_UNLIKELY(type_ != ColumnType::Tuple)) {
 			throw LogicException(CQL_CODEINFO, "type not matched");
 		}
 		payload_.resize(0);
@@ -138,13 +138,14 @@ namespace cql {
 
 	/** Encode to binary data */
 	void ProtocolColumnOption::encode(std::string& data) const {
-		if ((type_ == ColumnType::Custom ||
+		if (CQL_UNLIKELY(
+			(type_ == ColumnType::Custom ||
 			type_ == ColumnType::List ||
 			type_ == ColumnType::Map ||
 			type_ == ColumnType::Set ||
 			type_ == ColumnType::UDT ||
 			type_ == ColumnType::Tuple) &&
-			payload_.empty()) {
+			payload_.empty())) {
 			throw EncodeException(CQL_CODEINFO, "this column type require payload presented");
 		}
 		ProtocolShort type(static_cast<std::uint16_t>(type_));
@@ -230,7 +231,7 @@ namespace cql {
 	/** Encode to binary data */
 	void ProtocolColumnOptionUDTPayload::encode(std::string& data) const {
 		ProtocolShort fieldsLength(fields_.size());
-		if (fieldsLength.get() != fields_.size()) {
+		if (CQL_UNLIKELY(fieldsLength.get() != fields_.size())) {
 			throw LogicException(CQL_CODEINFO, "too many udt fields cause overflow");
 		}
 		keySpace_.encode(data);
@@ -259,7 +260,7 @@ namespace cql {
 	/** Encode to binary data */
 	void ProtocolColumnOptionTuplePayload::encode(std::string& data) const {
 		ProtocolShort fieldsLength(types_.size());
-		if (fieldsLength.get() != types_.size()) {
+		if (CQL_UNLIKELY(fieldsLength.get() != types_.size())) {
 			throw LogicException(CQL_CODEINFO, "too many tuple types cause overflow");
 		}
 		fieldsLength.encode(data);

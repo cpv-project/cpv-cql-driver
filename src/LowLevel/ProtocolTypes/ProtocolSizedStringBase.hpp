@@ -6,6 +6,7 @@
 #include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
 #include <CQLDriver/Common/Exceptions/EncodeException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 
 namespace cql {
 	/** Base class of sized string types */
@@ -64,7 +65,8 @@ namespace cql {
 				LengthType size = seastar::cpu_to_be(static_cast<LengthType>(state_));
 				data.append(reinterpret_cast<const char*>(&size), sizeof(size));
 			} else {
-				if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {
+				if (CQL_UNLIKELY(value_.size() >
+					static_cast<std::size_t>(std::numeric_limits<LengthType>::max()))) {
 					throw EncodeException(CQL_CODEINFO, "length too long");
 				}
 				LengthType size = seastar::cpu_to_be(static_cast<LengthType>(value_.size()));
@@ -76,7 +78,7 @@ namespace cql {
 		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			LengthType size = 0;
-			if (ptr + sizeof(size) > end) {
+			if (CQL_UNLIKELY(ptr + sizeof(size) > end)) {
 				throw DecodeException(CQL_CODEINFO, "length not enough");
 			}
 			std::memcpy(&size, ptr, sizeof(size));
@@ -84,7 +86,7 @@ namespace cql {
 			ptr += sizeof(size);
 			// cppcheck-suppress unsignedPositive
 			if (std::is_unsigned<LengthType>::value || size >= 0) {
-				if (end < ptr || end - ptr < static_cast<std::ptrdiff_t>(size)) {
+				if (CQL_UNLIKELY(end < ptr || end - ptr < static_cast<std::ptrdiff_t>(size))) {
 					throw DecodeException(CQL_CODEINFO, "length not enough");
 				}
 				state_ = NormalState;

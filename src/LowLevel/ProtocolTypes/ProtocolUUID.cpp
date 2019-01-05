@@ -2,6 +2,7 @@
 #include <cstring>
 #include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "./ProtocolUUID.hpp"
 
 namespace cql {
@@ -16,7 +17,7 @@ namespace cql {
 	/** Decode from binary data */
 	void ProtocolUUID::decode(const char*& ptr, const char* end) {
 		static const constexpr std::size_t length = sizeof(value_.first) + sizeof(value_.second);
-		if (ptr + length > end) {
+		if (CQL_UNLIKELY(ptr + length > end)) {
 			throw DecodeException(CQL_CODEINFO, "length not enough");
 		}
 		std::memcpy(&value_.first, ptr, sizeof(value_.first));

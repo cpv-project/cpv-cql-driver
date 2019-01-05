@@ -24,7 +24,7 @@ namespace cql {
 		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			ProtocolSizedStringBase::decode(ptr, end);
-			if (state_ != ProtocolLongStringState::Normal) {
+			if (CQL_UNLIKELY(state_ != ProtocolLongStringState::Normal)) {
 				throw DecodeException(CQL_CODEINFO, "string length is negative");
 			}
 		}

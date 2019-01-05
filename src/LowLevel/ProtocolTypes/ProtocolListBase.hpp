@@ -6,6 +6,7 @@
 #include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/EncodeException.hpp>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 
 namespace cql {
 	/**
@@ -30,7 +31,8 @@ namespace cql {
 
 		/** Encode to binary data */
 		void encode(std::string& data) const {
-			if (value_.size() > static_cast<std::size_t>(std::numeric_limits<LengthType>::max())) {
+			if (CQL_UNLIKELY(value_.size() >
+				static_cast<std::size_t>(std::numeric_limits<LengthType>::max()))) {
 				throw EncodeException(CQL_CODEINFO, "length too long");
 			}
 			LengthType size = seastar::cpu_to_be(static_cast<LengthType>(value_.size()));
@@ -43,7 +45,7 @@ namespace cql {
 		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
 			LengthType size = 0;
-			if (ptr + sizeof(size) > end) {
+			if (CQL_UNLIKELY(ptr + sizeof(size) > end)) {
 				throw DecodeException(CQL_CODEINFO, "length not enough");
 			}
 			std::memcpy(&size, ptr, sizeof(size));

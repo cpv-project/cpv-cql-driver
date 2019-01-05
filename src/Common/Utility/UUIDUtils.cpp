@@ -4,6 +4,7 @@
 #include <CQLDriver/Common/Exceptions/UUIDConflictException.hpp>
 #include <CQLDriver/Common/Utility/StringUtils.hpp>
 #include <CQLDriver/Common/Utility/UUIDUtils.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 
 namespace cql {
 	namespace {
@@ -41,7 +42,7 @@ namespace cql {
 	/** Set the uuid by it's string representation */
 	UUIDDataType strToUUID(const std::string& str) {
 		// example: 00112233-4455-6677-8899-aabbccddeeff
-		if (str.size() != 36) {
+		if (CQL_UNLIKELY(str.size() != 36)) {
 			throw cql::FormatException(CQL_CODEINFO,
 				"invalid uuid string: size should be 36, str is", str);
 		}
@@ -51,12 +52,13 @@ namespace cql {
 		std::uint16_t d = 0;
 		std::uint16_t e = 0;
 		std::uint32_t f = 0;
-		if (!loadIntFromHex(str.c_str(), a) ||
+		if (CQL_UNLIKELY(
+			!loadIntFromHex(str.c_str(), a) ||
 			!loadIntFromHex(str.c_str() + 9, b) ||
 			!loadIntFromHex(str.c_str() + 14, c) ||
 			!loadIntFromHex(str.c_str() + 19, d) ||
 			!loadIntFromHex(str.c_str() + 24, e) ||
-			!loadIntFromHex(str.c_str() + 28, f)) {
+			!loadIntFromHex(str.c_str() + 28, f))) {
 			throw cql::FormatException(CQL_CODEINFO,
 				"invalid uuid string: contains non-hex character, str is", str);
 		}
@@ -125,7 +127,7 @@ namespace cql {
 		thread_local static std::uint64_t staticNodeId = 0;
 		thread_local static std::uint64_t staticLastTimestamp = 0;
 		thread_local static std::uint32_t staticClockId = 0;
-		if (staticNodeId == 0) {
+		if (CQL_UNLIKELY(staticNodeId == 0)) {
 			// use random value as mac address because each core won't share clock id
 			staticNodeId = (static_cast<std::uint64_t>(URandom()) << 32) | URandom();
 		}
@@ -133,7 +135,7 @@ namespace cql {
 		if (timeStamp != staticLastTimestamp) {
 			staticLastTimestamp = timeStamp;
 			staticClockId = 0;
-		} else if (staticClockId > MaxClockId) {
+		} else if (CQL_UNLIKELY(staticClockId > MaxClockId)) {
 			throw UUIDConflictException(CQL_CODEINFO,
 				"generate time uuid failed, clock id is exhausted in this 100 nanoseconds");
 		}
@@ -160,7 +162,7 @@ namespace cql {
 
 	/** Extract time stamp from verion 1 uuid */
 	std::chrono::system_clock::time_point getTimeFromUUID(const UUIDDataType& uuid) {
-		if (getVersionFromUUID(uuid) != TimeUUIDVersion) {
+		if (CQL_UNLIKELY(getVersionFromUUID(uuid) != TimeUUIDVersion)) {
 			// version 2 is unsupported yet
 			throw FormatException(CQL_CODEINFO,
 				"get time from uuid failed: version should be 1, uuid is", uuidToStr(uuid));

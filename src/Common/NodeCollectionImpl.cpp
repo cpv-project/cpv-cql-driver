@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "./NodeCollectionImpl.hpp"
 
 namespace cql {
@@ -34,7 +35,7 @@ namespace cql {
 	/** Report connect to this node has failed */
 	void NodeCollectionImpl::reportFailure(const seastar::lw_shared_ptr<NodeConfiguration>& node) {
 		auto nodeRecord = getNodeRecord(node);
-		if (nodeRecord == allNodes_.end()) {
+		if (CQL_UNLIKELY(nodeRecord == allNodes_.end())) {
 			throw LogicException(CQL_CODEINFO, "node does not exist in this collection");
 		}
 		if (!nodeRecord->isFault) {
@@ -47,7 +48,7 @@ namespace cql {
 	/** Report connect to this node has been successful */
 	void NodeCollectionImpl::reportSuccess(const seastar::lw_shared_ptr<NodeConfiguration>& node) {
 		auto nodeRecord = getNodeRecord(node);
-		if (nodeRecord == allNodes_.end()) {
+		if (CQL_UNLIKELY(nodeRecord == allNodes_.end())) {
 			throw LogicException(CQL_CODEINFO, "node does not exist in this collection");
 		}
 		if (nodeRecord->isFault) {
@@ -68,7 +69,7 @@ namespace cql {
 		nextIndex_(0),
 		faultNodeIndexes_(initialNodes.size()) {
 		// prepare nodes array and sort by the pointer address
-		if (initialNodes.empty()) {
+		if (CQL_UNLIKELY(initialNodes.empty())) {
 			throw LogicException(CQL_CODEINFO, "initial nodes can't be empty");
 		}
 		for (const auto& node : initialNodes) {

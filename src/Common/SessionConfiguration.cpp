@@ -1,6 +1,15 @@
 #include <CQLDriver/Common/SessionConfiguration.hpp>
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
 
+namespace {
+/** Provide a predefined macro to enable debug logger by default for testing */
+#if defined(CQL_ENABLE_DEBUG_LOGGER_BY_DEFAULT)
+	static const constexpr bool CQLEnableDebugLoggerByDefault = true;
+#else
+	static const constexpr bool CQLEnableDebugLoggerByDefault = false;
+#endif
+}
+
 namespace cql {
 	/** Defines members of SessionConfiguration */
 	class SessionConfigurationData {
@@ -13,7 +22,9 @@ namespace cql {
 			defaultKeySpace(),
 			defaultConsistency(ConsistencyLevel::Quorum),
 			prepareAllQueries(false),
-			logger(Logger::createNoop()) { }
+			logger(CQLEnableDebugLoggerByDefault ?
+				Logger::createConsole(LogLevel::Debug) :
+				Logger::createNoop()) { }
 
 		std::size_t minPoolSize;
 		std::size_t maxPoolSize;
@@ -70,7 +81,7 @@ namespace cql {
 	/** Set the logger instance */
 	// cppcheck-suppress unusedFunction
 	SessionConfiguration& SessionConfiguration::setLogger(const seastar::shared_ptr<Logger>& logger) {
-		if (logger == nullptr) {
+		if (CQL_UNLIKELY(logger == nullptr)) {
 			throw LogicException(CQL_CODEINFO, "logger is nullptr");
 		}
 		data_->logger = logger;

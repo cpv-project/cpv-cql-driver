@@ -36,7 +36,7 @@ namespace cql {
 		// <batch_parameters> which is:
 		//   <consistency><flags>[<serial_consistency>][<timestamp>]
 		auto& batchCommand = batchParameters_.getBatchCommand();
-		if (!batchCommand.isValid()) {
+		if (CQL_UNLIKELY(!batchCommand.isValid())) {
 			throw LogicException(CQL_CODEINFO, "invalid(moved) command");
 		}
 		// <type>
@@ -54,7 +54,7 @@ namespace cql {
 			}
 		}
 		ProtocolShort queryCount(queryCountValue);
-		if (queryCount.get() != queryCountValue) {
+		if (CQL_UNLIKELY(queryCount.get() != queryCountValue)) {
 			throw LogicException(CQL_CODEINFO, "too many queries");
 		}
 		queryCount.encode(data);
@@ -108,7 +108,7 @@ namespace cql {
 				data.append(stringOrId);
 				// <n>, parameters count
 				parameterCount.set(parameterSet.first);
-				if (parameterCount.get() != parameterSet.first) {
+				if (CQL_UNLIKELY(parameterCount.get() != parameterSet.first)) {
 					throw LogicException(CQL_CODEINFO, "too many parameters");
 				}
 				parameterCount.encode(data);
@@ -117,7 +117,7 @@ namespace cql {
 				++queryCountVerify;
 			}
 		}
-		if (queryCountValue != queryCountVerify) {
+		if (CQL_UNLIKELY(queryCountValue != queryCountVerify)) {
 			throw LogicException(CQL_CODEINFO, "incorrect query count calculation");
 		}
 		// <batch_parameters>

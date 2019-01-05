@@ -36,7 +36,7 @@ namespace cql {
 		void decodeBody(const char* ptr, const ColumnEncodeDecodeSizeType& size) {
 			if (size == 0) {
 				value_ = 0; // empty
-			} else if (size != sizeof(value_)) {
+			} else if (CQL_UNLIKELY(size != sizeof(value_))) {
 				throw DecodeException(CQL_CODEINFO,
 					"integer length not matched, expected to be", sizeof(value_),
 					"but actual is", size);

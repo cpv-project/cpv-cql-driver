@@ -1,6 +1,7 @@
 #include <array>
 #include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "./ProtocolVariableIntegerBase.hpp"
 
 namespace cql {
@@ -48,7 +49,7 @@ namespace cql {
 
 	/** Decode from binary data */
 	void ProtocolVariableIntegerBase::decode(const char*& ptr, const char* end) {
-		if (ptr + sizeof(char) > end) {
+		if (CQL_UNLIKELY(ptr + sizeof(char) > end)) {
 			throw DecodeException(CQL_CODEINFO, "length not enough");
 		}
 		// read header
@@ -68,7 +69,7 @@ namespace cql {
 #endif
 		++ptr;
 		// read extra bytes
-		if (ptr + extraBytes > end) {
+		if (CQL_UNLIKELY(ptr + extraBytes > end)) {
 			throw DecodeException(CQL_CODEINFO, "length not enough");
 		}
 		value_ = header;

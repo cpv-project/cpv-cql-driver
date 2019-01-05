@@ -43,10 +43,10 @@ elseif (CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 
 # add predefined macros
-add_definitions(-DDB_SIMPLE_IP="${DB_SIMPLE_IP}")
-add_definitions(-DDB_SIMPLE_PORT=${DB_SIMPLE_PORT})
-add_definitions(-DDB_SSL_1_IP="${DB_SSL_1_IP}")
-add_definitions(-DDB_SSL_1_PORT=${DB_SSL_1_PORT})
-add_definitions(-DDB_SSL_2_IP="${DB_SSL_2_IP}")
-add_definitions(-DDB_SSL_2_PORT=${DB_SSL_2_PORT})
-
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+	DB_SIMPLE_IP="${DB_SIMPLE_IP}"
+	DB_SIMPLE_PORT=${DB_SIMPLE_PORT}
+	DB_SSL_1_IP="${DB_SSL_1_IP}"
+	DB_SSL_1_PORT=${DB_SSL_1_PORT}
+	DB_SSL_2_IP="${DB_SSL_2_IP}"
+	DB_SSL_2_PORT=${DB_SSL_2_PORT})

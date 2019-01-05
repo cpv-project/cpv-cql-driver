@@ -5,6 +5,7 @@
 #include <seastar/core/byteorder.hh>
 #include "./ColumnTypes/Nullable.hpp"
 #include "./Exceptions/DecodeException.hpp"
+#include "./CommonDefinitions.hpp"
 
 namespace cql {
 	/** Trait class for cql column types */
@@ -37,15 +38,15 @@ namespace cql {
 		/** Decode from binary data with size information */
 		static void decode(T& value, const char*& ptr, const char* end) {
 			ColumnEncodeDecodeSizeType bodySize;
-			if (ptr + sizeof(bodySize) > end) {
+			if (CQL_UNLIKELY(ptr + sizeof(bodySize) > end)) {
 				throw DecodeException(CQL_CODEINFO,
 					"length of column body size not enough, type:", typeid(T).name());
 			}
 			std::memcpy(&bodySize, ptr, sizeof(bodySize));
 			bodySize = seastar::be_to_cpu(bodySize);
 			if (bodySize >= 0) {
-				if (end < ptr || end - ptr <
-					static_cast<std::ptrdiff_t>(sizeof(bodySize) + bodySize)) {
+				if (CQL_UNLIKELY(end < ptr || end - ptr <
+					static_cast<std::ptrdiff_t>(sizeof(bodySize) + bodySize))) {
 					throw DecodeException(CQL_CODEINFO,
 						"length of column body not enough, type:", typeid(T).name());
 				}
@@ -79,15 +80,15 @@ namespace cql {
 		/** Decode from binary data with size information */
 		static void decode(Nullable<T>& value, const char*& ptr, const char* end) {
 			ColumnEncodeDecodeSizeType bodySize;
-			if (ptr + sizeof(bodySize) > end) {
+			if (CQL_UNLIKELY(ptr + sizeof(bodySize) > end)) {
 				throw DecodeException(CQL_CODEINFO,
 					"length of column body size not enough, type:", typeid(T).name());
 			}
 			std::memcpy(&bodySize, ptr, sizeof(bodySize));
 			bodySize = seastar::be_to_cpu(bodySize);
 			if (bodySize >= 0) {
-				if (end < ptr || end - ptr <
-					static_cast<std::ptrdiff_t>(sizeof(bodySize) + bodySize)) {
+				if (CQL_UNLIKELY(end < ptr || end - ptr <
+					static_cast<std::ptrdiff_t>(sizeof(bodySize) + bodySize))) {
 					throw DecodeException(CQL_CODEINFO,
 						"length of column body not enough, type:", typeid(T).name());
 				}

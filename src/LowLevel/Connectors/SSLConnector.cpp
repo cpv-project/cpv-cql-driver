@@ -1,3 +1,4 @@
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "./SSLConnector.hpp"
 
 namespace cql {
@@ -5,7 +6,7 @@ namespace cql {
 	seastar::future<seastar::connected_socket> SSLConnector::connect(
 		const NodeConfiguration&,
 		const seastar::socket_address& address) const {
-		if (initialized_.available() && !initialized_.failed()) {
+		if (CQL_LIKELY(initialized_.available() && !initialized_.failed())) {
 			// fast path
 			return seastar::tls::connect(certificates_, address, "");
 		} else {

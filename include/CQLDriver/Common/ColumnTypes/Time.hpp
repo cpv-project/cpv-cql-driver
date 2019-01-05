@@ -51,7 +51,7 @@ namespace cql {
 			std::uint64_t dbValue = 0;
 			if (size == 0) {
 				reset(); // empty
-			} else if (size != sizeof(dbValue)) {
+			} else if (CQL_UNLIKELY(size != sizeof(dbValue))) {
 				throw DecodeException(CQL_CODEINFO,
 					"time length not matched, expected to be", sizeof(dbValue),
 					"but actual is", size);

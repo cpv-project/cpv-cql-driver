@@ -211,7 +211,7 @@ namespace cql {
 			auto& preparedQueryId = nodeConfiguration.getPreparedQueryId(command.getQuery());
 			if (!preparedQueryId.empty()) {
 				// prepared on this node before
-				if (logger->isEnabled(LogLevel::Debug)) {
+				if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 					logger->log(LogLevel::Debug, "hit prepared cache:", command.getQuery().get());
 				}
 				auto executeMessage = RequestMessageFactory::makeRequestMessage<ExecuteMessage>();
@@ -226,7 +226,7 @@ namespace cql {
 			auto queryView = command.getQuery().get();
 			auto prepareMessage = RequestMessageFactory::makeRequestMessage<PrepareMessage>();
 			prepareMessage->getQuery().set(queryView.data(), queryView.size());
-			if (logger->isEnabled(LogLevel::Debug)) {
+			if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 				logger->log(LogLevel::Debug, "prepare:", queryView);
 			}
 			return connection->sendMessage(std::move(prepareMessage), stream).then([&connection, &stream] {
@@ -291,7 +291,7 @@ namespace cql {
 				}
 				auto& preparedQueryId = nodeConfiguration.getPreparedQueryId(query.queryStr);
 				if (!preparedQueryId.empty()) {
-					if (logger->isEnabled(LogLevel::Debug)) {
+					if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 						logger->log(LogLevel::Debug, "hit prepared cache:", query.queryStr.get());
 					}
 					batchMessage->getPreparedQueryId(i) = preparedQueryId;
@@ -299,7 +299,7 @@ namespace cql {
 				}
 				auto queryView = query.queryStr.get();
 				prepareResults->results.emplace_back(i, Object<ResponseMessageBase>());
-				if (logger->isEnabled(LogLevel::Debug)) {
+				if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 					logger->log(LogLevel::Debug, "prepare:", queryView);
 				}
 				result = result.then([&connection, &stream, queryView] {

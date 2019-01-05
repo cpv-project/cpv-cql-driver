@@ -21,10 +21,10 @@ namespace cql {
 	/** Set the batch command contains queries and parameters */
 	void ProtocolBatchParameters::setBatchCommandRef(BatchCommand& batchCommand) {
 		// this function won't take the ownership of the command
-		if (!batchCommand.isValid()) {
+		if (CQL_UNLIKELY(!batchCommand.isValid())) {
 			throw LogicException(CQL_CODEINFO,
 				"can't set a invalid batch command to batch parameters");
-		} else if (!batchCommand.getConsistency().has_value()) {
+		} else if (CQL_UNLIKELY(!batchCommand.getConsistency().has_value())) {
 			throw LogicException(CQL_CODEINFO,
 				"can't set a batch command with empty consistency");
 		}

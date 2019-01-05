@@ -1,7 +1,8 @@
 #pragma once
-#include <CQLDriver/Common/Exceptions/LogicException.hpp>
 #include <cstdint>
 #include <seastar/core/temporary_buffer.hh>
+#include <CQLDriver/Common/Exceptions/LogicException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 
 namespace cql {
 	/** Defines members of ResultSet */
@@ -40,15 +41,15 @@ namespace cql {
 			pagingState = std::move(pagingStateRef);
 			buffer = std::move(bufferRef);
 			const char* ptr = buffer.begin();
-			if (ptr == nullptr) {
+			if (CQL_UNLIKELY(ptr == nullptr)) {
 				throw LogicException(CQL_CODEINFO, "invalid buffer");
 			}
 			decodePtr = ptr + decodeFromOffset;
 			decodeEnd = ptr + decodeToOffset;
-			if (decodeEnd > buffer.end()) {
+			if (CQL_UNLIKELY(decodeEnd > buffer.end())) {
 				freeResources();
 				throw LogicException(CQL_CODEINFO, "invalid to offset");
-			} else if (decodePtr > decodeEnd) {
+			} else if (CQL_UNLIKELY(decodePtr > decodeEnd)) {
 				freeResources();
 				throw LogicException(CQL_CODEINFO, "invalid from offset");
 			}

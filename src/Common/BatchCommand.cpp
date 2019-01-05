@@ -64,7 +64,7 @@ namespace cql {
 
 	/** Set should prepare the last query */
 	BatchCommand& BatchCommand::prepareQuery(bool value) & {
-		if (data_->queries.empty()) {
+		if (CQL_UNLIKELY(data_->queries.empty())) {
 			throw cql::LogicException(CQL_CODEINFO,
 				"please call addQuery before prepareQuery");
 		}
@@ -74,7 +74,7 @@ namespace cql {
 
 	/** Open a new parameter set explicitly of the last query */
 	BatchCommand& BatchCommand::openParameterSet() & {
-		if (data_->queries.empty()) {
+		if (CQL_UNLIKELY(data_->queries.empty())) {
 			throw cql::LogicException(CQL_CODEINFO,
 				"please call addQuery before openParameterSet");
 		}
@@ -124,7 +124,7 @@ namespace cql {
 
 	/** Get the mutable count of parameters of the last parameter set */
 	std::size_t& BatchCommand::getParameterCountOfLastSet() & {
-		if (data_->queries.empty()) {
+		if (CQL_UNLIKELY(data_->queries.empty())) {
 			throw cql::LogicException(CQL_CODEINFO,
 				"please call addQuery before addParameters");
 		}
@@ -137,7 +137,7 @@ namespace cql {
 
 	/** Get the mutable encoded parameters of the last parameter set */
 	std::string& BatchCommand::getParametersOfLastSet() & {
-		if (data_->queries.empty()) {
+		if (CQL_UNLIKELY(data_->queries.empty())) {
 			throw cql::LogicException(CQL_CODEINFO,
 				"please call addQuery before addParameters");
 		}

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <seastar/core/byteorder.hh>
 #include <CQLDriver/Common/Exceptions/DecodeException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 
 namespace cql {
 	/** Base class of integer types */
@@ -26,7 +27,7 @@ namespace cql {
 
 		/** Decode from binary data */
 		void decode(const char*& ptr, const char* end) {
-			if (ptr + sizeof(value_) > end) {
+			if (CQL_UNLIKELY(ptr + sizeof(value_) > end)) {
 				throw DecodeException(CQL_CODEINFO, "length not enough");
 			}
 			std::memcpy(&value_, ptr, sizeof(value_));

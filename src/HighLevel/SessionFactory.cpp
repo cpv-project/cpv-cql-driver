@@ -19,7 +19,7 @@ namespace cql {
 			nodeCollection(nodeCollectionRef),
 			connectionPool(seastar::make_lw_shared<
 				ConnectionPool>(sessionConfiguration, nodeCollection)) {
-			if (nodeCollection == nullptr) {
+			if (CQL_UNLIKELY(nodeCollection == nullptr)) {
 				throw LogicException(CQL_CODEINFO, "nodeCollection is nullptr");
 			}
 		}

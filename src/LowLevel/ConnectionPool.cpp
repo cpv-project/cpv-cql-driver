@@ -63,8 +63,8 @@ namespace cql {
 		// spawn connection if no connection available until max pool size is reached
 		auto maxPoolSize = sessionConfiguration_->getMaxPoolSize();
 		auto poolIsFull = allConnections_.size() + connectingCount_ >= maxPoolSize;
-		if (poolIsFull && waiters_.size() >=
-			sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted()) {
+		if (CQL_UNLIKELY(poolIsFull && waiters_.size() >=
+			sessionConfiguration_->getMaxWaitersAfterConnectionsExhausted())) {
 			// can't spawn more connection and can't add more waiter
 			return seastar::make_exception_future<
 				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
@@ -88,7 +88,7 @@ namespace cql {
 		if (!waiters_.empty()) {
 			auto promise = waiters_.pop();
 			auto stream = connection->openStream();
-			if (!stream.isValid()) {
+			if (CQL_UNLIKELY(!stream.isValid())) {
 				promise.set_exception(LogicException(CQL_CODEINFO,
 					"open stream form a returned connection failed"));
 			} else {
@@ -153,7 +153,7 @@ namespace cql {
 		ConnectionPool::addWaiter() {
 		seastar::promise<seastar::lw_shared_ptr<Connection>, ConnectionStream> promise;
 		auto future = promise.get_future();
-		if (!waiters_.push(std::move(promise))) {
+		if (CQL_UNLIKELY(!waiters_.push(std::move(promise)))) {
 			return seastar::make_exception_future<
 				seastar::lw_shared_ptr<Connection>, ConnectionStream>(
 				LogicException(CQL_CODEINFO, "push connection waiter to queue failed"));

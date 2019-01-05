@@ -1,10 +1,11 @@
 #include <CQLDriver/Common/Exceptions/LogicException.hpp>
+#include <CQLDriver/Common/CommonDefinitions.hpp>
 #include "./ConnectionStream.hpp"
 
 namespace cql {
 	/** Get the stream id */
 	ConnectionStream::IdType ConnectionStream::getStreamId() const {
-		if (!isValid_) {
+		if (CQL_UNLIKELY(!isValid_)) {
 			throw LogicException(CQL_CODEINFO, "can't get stream id from an invalid stream");
 		}
 		return streamId_;
@@ -19,7 +20,7 @@ namespace cql {
 	void ConnectionStream::close() {
 		if (isValid_) {
 			isValid_ = false;
-			if (freeStreamIds_.get() != nullptr) {
+			if (CQL_LIKELY(freeStreamIds_.get() != nullptr)) {
 				freeStreamIds_->emplace_back(streamId_);
 			} else {
 				// throw an exception will abort the program, just output the error log

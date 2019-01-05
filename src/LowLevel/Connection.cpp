@@ -24,7 +24,7 @@
 namespace cql {
 	/** Initialize connection and wait until it's ready to send ordinary messages */
 	seastar::future<> Connection::ready() {
-		if (isReady_) {
+		if (CQL_LIKELY(isReady_)) {
 			return seastar::make_ready_future();
 		}
 		auto self = shared_from_this();
@@ -43,7 +43,7 @@ namespace cql {
 			} else {
 				return seastar::net::dns::resolve_name(self->nodeConfiguration_->getAddress().first)
 					.then([self](seastar::net::inet_address inetAddress) {
-					if (inetAddress.in_family() == seastar::net::inet_address::family::INET) {
+					if (CQL_LIKELY(inetAddress.in_family() == seastar::net::inet_address::family::INET)) {
 						seastar::socket_address address(seastar::ipv4_addr(
 							inetAddress, self->nodeConfiguration_->getAddress().second));
 						self->nodeConfiguration_->updateIpAddress(address);
@@ -72,7 +72,7 @@ namespace cql {
 			return self->waitNextMessage(self->streamZero_);
 		}).then([self] (auto message) {
 			// handle SUPPORTED
-			if (message->getHeader().getOpCode() != MessageType::Supported) {
+			if (CQL_UNLIKELY(message->getHeader().getOpCode() != MessageType::Supported)) {
 				return seastar::make_exception_future(LogicException(
 					CQL_CODEINFO, "unexpected response to OPTION message:", message->toString()));
 			}
@@ -111,12 +111,12 @@ namespace cql {
 				return self->waitNextMessage(self->streamZero_);
 			}).then([self] (auto message) {
 				// handle RESULT
-				if (message->getHeader().getOpCode() != MessageType::Result) {
+				if (CQL_UNLIKELY(message->getHeader().getOpCode() != MessageType::Result)) {
 					return seastar::make_exception_future(ResponseErrorException(
 						CQL_CODEINFO, "unexpected response to use keyspace query:", message->toString()));
 				}
 				auto resultMessage = std::move(message).template cast<ResultMessage>();
-				if (resultMessage->getKind() != ResultKind::SetKeySpace) {
+				if (CQL_UNLIKELY(resultMessage->getKind() != ResultKind::SetKeySpace)) {
 					return seastar::make_exception_future(LogicException(
 						CQL_CODEINFO, "unexpected kind of set keyspace result:", message->toString()));
 				}
@@ -185,11 +185,20 @@ namespace cql {
 			return previousSendingFuture.then([&self, &message] {
 				// log message
 				auto& logger = self->sessionConfiguration_->getLogger();
-				if (logger->isEnabled(LogLevel::Debug)) {
+				if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 					logger->log(LogLevel::Debug, "send message:", message->toString());
 				}
 				// encode message
 				self->encodeMessage(message);
+				// log message bytes
+				if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
+					std::string hex;
+					dumpBytesToHex(
+						self->sendingBuffer_.data(),
+						self->sendingBuffer_.size(),
+						hex);
+					logger->log(LogLevel::Debug, "after encode:", hex);
+				}
 				// send the encoded binary data
 				return self->socket_.out().write(self->sendingBuffer_).then([&self] {
 					return self->socket_.out().flush();
@@ -221,7 +230,7 @@ namespace cql {
 		}
 		// message not available, try receiving it from network
 		auto& promiseSlot = receivingPromiseMap_.at(streamId);
-		if (promiseSlot.first) {
+		if (CQL_UNLIKELY(promiseSlot.first)) {
 			return seastar::make_exception_future<Object<ResponseMessageBase>>(
 				LogicException(CQL_CODEINFO, "there already a message waiter registered for this stream"));
 		}
@@ -243,7 +252,8 @@ namespace cql {
 						MessageHeader header;
 						header.decodeHeader(self->connectionInfo_, std::move(buf));
 						auto bodyLength = header.getBodyLength();
-						if (bodyLength > self->connectionInfo_.getMaximumMessageBodySize()) {
+						if (CQL_UNLIKELY(bodyLength >
+							self->connectionInfo_.getMaximumMessageBodySize())) {
 							return seastar::make_exception_future<seastar::temporary_buffer<char>>(
 								LogicException(CQL_CODEINFO, "message body too large:", bodyLength));
 						}
@@ -251,17 +261,23 @@ namespace cql {
 						// receive message body
 						return self->socket_.in().read_exactly(bodyLength);
 					}).then([&self, &message] (seastar::temporary_buffer<char>&& buf) {
+						// log message bytes
+						auto& logger = self->sessionConfiguration_->getLogger();
+						if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
+							std::string hex;
+							dumpBytesToHex(buf.get(), buf.size(), hex);
+							logger->log(LogLevel::Debug, "before decode:", hex);
+						}
 						// decode message body
 						self->decodeMessage(message, std::move(buf));
 						// log message
-						auto& logger = self->sessionConfiguration_->getLogger();
-						if (logger->isEnabled(LogLevel::Debug)) {
+						if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 							logger->log(LogLevel::Debug, "received message:", message->toString());
 						}
 						self->metricsData_->connection_messages_received += 1;
 						// find the corresponding promise
 						auto streamId = message->getHeader().getStreamId();
-						if (streamId >= self->receivedMessageQueueMap_.size()) {
+						if (CQL_UNLIKELY(streamId >= self->receivedMessageQueueMap_.size())) {
 							self->close(joinString(" ",
 								"stream id of received message out of range:", streamId));
 							return seastar::stop_iteration::yes;
@@ -271,14 +287,15 @@ namespace cql {
 							// pass message directly to the promise
 							promiseSlot.first = false;
 							promiseSlot.second.set_value(std::move(message));
-							if (self->receivingPromiseCount_ == 0) {
+							if (CQL_UNLIKELY(self->receivingPromiseCount_ == 0)) {
 								self->close("incorrect receiving promise count, should be logic error");
 								return seastar::stop_iteration::yes;
 							}
 							--self->receivingPromiseCount_;
 						} else {
 							// enqueue message to received queue
-							if (!self->receivedMessageQueueMap_[streamId].push(std::move(message))) {
+							if (CQL_UNLIKELY(
+								!self->receivedMessageQueueMap_[streamId].push(std::move(message)))) {
 								self->close(joinString(" ",
 									"max pending messages is reached, stream id:", streamId));
 								return seastar::stop_iteration::yes;
@@ -407,7 +424,7 @@ namespace cql {
 		}
 		if (enumTrue(flags & MessageHeaderFlags::Compression)) {
 			// with compression
-			if (compressor_ == nullptr) {
+			if (CQL_UNLIKELY(compressor_ == nullptr)) {
 				throw LogicException(CQL_CODEINFO,
 					"server compressed the frame without client's consent");
 			}

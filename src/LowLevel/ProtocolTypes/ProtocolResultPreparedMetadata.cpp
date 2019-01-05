@@ -31,12 +31,12 @@ namespace cql {
 	void ProtocolResultPreparedMetadata::encode(std::string& data) const {
 		ProtocolInt columnsCount(columns_.size());
 		ProtocolInt partitionKeyIndexesCount(partitionKeyIndexes_.size());
-		if (columnsCount.get() < 0 ||
-			static_cast<std::size_t>(columnsCount.get()) != columns_.size()) {
+		if (CQL_UNLIKELY(columnsCount.get() < 0 ||
+			static_cast<std::size_t>(columnsCount.get()) != columns_.size())) {
 			throw LogicException(CQL_CODEINFO, "too many columns cause overflow");
 		}
-		if (partitionKeyIndexesCount.get() < 0 ||
-			static_cast<std::size_t>(partitionKeyIndexesCount.get()) != partitionKeyIndexes_.size()) {
+		if (CQL_UNLIKELY(partitionKeyIndexesCount.get() < 0 ||
+			static_cast<std::size_t>(partitionKeyIndexesCount.get()) != partitionKeyIndexes_.size())) {
 			throw LogicException(CQL_CODEINFO, "too many partition key indexes cause overflow");
 		}
 		auto flags = getFlags();
@@ -65,10 +65,10 @@ namespace cql {
 		ProtocolInt partitionKeyIndexesCount;
 		columnsCount.decode(ptr, end);
 		partitionKeyIndexesCount.decode(ptr, end);
-		if (columnsCount.get() < 0) {
+		if (CQL_UNLIKELY(columnsCount.get() < 0)) {
 			throw LogicException(CQL_CODEINFO, "columns count < 0");
 		}
-		if (partitionKeyIndexesCount.get() < 0) {
+		if (CQL_UNLIKELY(partitionKeyIndexesCount.get() < 0)) {
 			throw LogicException(CQL_CODEINFO, "partition key indexes count < 0");
 		}
 		partitionKeyIndexes_.resize(0);
