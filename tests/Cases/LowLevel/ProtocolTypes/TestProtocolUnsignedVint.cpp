@@ -4,12 +4,12 @@
 
 TEST(TestProtocolUnsignedVint, getset) {
 	cql::ProtocolUnsignedVint value(1);
-	ASSERT_EQ(value.get(), 1);
+	ASSERT_EQ(value.get(), 1U);
 	value.set(0x7fff0000aaaaeeee);
-	ASSERT_EQ(value.get(), 0x7fff0000aaaaeeee);
+	ASSERT_EQ(value.get(), 0x7fff0000aaaaeeeeU);
 
 	value = cql::ProtocolUnsignedVint(0xffff0000aaaaeeee);
-	ASSERT_EQ(value.get(), 0xffff0000aaaaeeee);
+	ASSERT_EQ(value.get(), 0xffff0000aaaaeeeeU);
 }
 
 TEST(TestProtocolUnsignedVint, encode) {
@@ -47,7 +47,7 @@ TEST(TestProtocolUnsignedVint, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get(), 0x7fff0000aaaaeeee);
+		ASSERT_EQ(value.get(), 0x7fff0000aaaaeeeeU);
 	}
 	{
 		auto data = makeTestString("\x03");
@@ -55,7 +55,7 @@ TEST(TestProtocolUnsignedVint, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get(), 3);
+		ASSERT_EQ(value.get(), 3U);
 	}
 	{
 		auto data = makeTestString("\xd2\x23\x8a");
@@ -63,7 +63,7 @@ TEST(TestProtocolUnsignedVint, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get(), 0x12238a);
+		ASSERT_EQ(value.get(), 0x12238aU);
 	}
 	{
 		auto data = makeTestString("\xe0\x7f\x23\x8a");
@@ -71,7 +71,7 @@ TEST(TestProtocolUnsignedVint, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get(), 0x7f238a);
+		ASSERT_EQ(value.get(), 0x7f238aU);
 	}
 }
 

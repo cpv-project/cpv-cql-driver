@@ -3,8 +3,8 @@
 
 TEST(TestUUIDUtils, strToUUID) {
 	cql::UUIDDataType uuid = cql::strToUUID("00112233-4455-6677-8899-aabbccddeeff");
-	ASSERT_EQ(uuid.first, 0x0011223344556677);
-	ASSERT_EQ(uuid.second, 0x8899aabbccddeeff);
+	ASSERT_EQ(uuid.first, 0x0011223344556677U);
+	ASSERT_EQ(uuid.second, 0x8899aabbccddeeffU);
 }
 
 TEST(TestUUIDUtils, uuidToStr) {
@@ -22,8 +22,8 @@ TEST(TestUUIDUtils, makeRandomUUID) {
 	cql::UUIDDataType a = cql::makeRandomUUID();
 	cql::UUIDDataType b = cql::makeRandomUUID();
 	ASSERT_FALSE(a == b);
-	ASSERT_EQ(a.first & 0xf000, 0x4000); // version
-	ASSERT_EQ(a.second & 0xc000'0000'0000'0000, 0x8000'0000'0000'0000); // variant
+	ASSERT_EQ(a.first & 0xf000, 0x4000U); // version
+	ASSERT_EQ(a.second & 0xc000'0000'0000'0000, 0x8000'0000'0000'0000U); // variant
 }
 
 TEST(TestUUIDUtils, makeTimeUUID) {

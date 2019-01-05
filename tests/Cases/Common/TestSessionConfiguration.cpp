@@ -3,10 +3,10 @@
 
 TEST(TestSessionConfiguration, all) {
 	cql::SessionConfiguration configuration;
-	ASSERT_EQ(configuration.getMaxPoolSize(), 100);
-	ASSERT_EQ(configuration.getDnsCacheTime().count(), 30000);
-	ASSERT_EQ(configuration.getMaxWaitersAfterConnectionsExhausted(), 100);
-	ASSERT_EQ(configuration.getDnsCacheTime().count(), 30000);
+	ASSERT_EQ(configuration.getMaxPoolSize(), 100U);
+	ASSERT_EQ(configuration.getDnsCacheTime().count(), 30000U);
+	ASSERT_EQ(configuration.getMaxWaitersAfterConnectionsExhausted(), 100U);
+	ASSERT_EQ(configuration.getDnsCacheTime().count(), 30000U);
 	ASSERT_EQ(configuration.getDefaultKeySpace(), "");
 	ASSERT_EQ(configuration.getDefaultConsistency(), cql::ConsistencyLevel::Quorum);
 	ASSERT_FALSE(configuration.getPrepareAllQueries());
@@ -18,10 +18,10 @@ TEST(TestSessionConfiguration, all) {
 		.setDefaultKeySpace("abc")
 		.setPrepareAllQueries(true)
 		.setDefaultConsistency(cql::ConsistencyLevel::LocalOne);
-	ASSERT_EQ(configuration.getMinPoolSize(), 7);
-	ASSERT_EQ(configuration.getMaxPoolSize(), 101);
-	ASSERT_EQ(configuration.getMaxWaitersAfterConnectionsExhausted(), 102);
-	ASSERT_EQ(configuration.getDnsCacheTime().count(), 30001);
+	ASSERT_EQ(configuration.getMinPoolSize(), 7U);
+	ASSERT_EQ(configuration.getMaxPoolSize(), 101U);
+	ASSERT_EQ(configuration.getMaxWaitersAfterConnectionsExhausted(), 102U);
+	ASSERT_EQ(configuration.getDnsCacheTime().count(), 30001U);
 	ASSERT_EQ(configuration.getDefaultKeySpace(), "abc");
 	ASSERT_EQ(configuration.getDefaultConsistency(), cql::ConsistencyLevel::LocalOne);
 	ASSERT_TRUE(configuration.getPrepareAllQueries());

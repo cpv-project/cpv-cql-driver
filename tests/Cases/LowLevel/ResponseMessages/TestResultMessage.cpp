@@ -37,13 +37,13 @@ TEST(TestResultMessage, decode) {
 			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::ResultKind::Rows);
 			ASSERT_EQ(message->getRowsMetadata().getFlags(), cql::ResultRowsMetadataFlags::NoMetadata);
-			ASSERT_EQ(message->getRowsMetadata().getColumnsCount(), 3);
+			ASSERT_EQ(message->getRowsMetadata().getColumnsCount(), 3U);
 			ASSERT_EQ(message->getRowsCount().get(), 4);
 			cql::Text column_1;
 			cql::Text column_2;
 			cql::Text column_3;
-			ASSERT_EQ(message->getResultSet().getRowsCount(), 4);
-			ASSERT_EQ(message->getResultSet().getColumnsCount(), 3);
+			ASSERT_EQ(message->getResultSet().getRowsCount(), 4U);
+			ASSERT_EQ(message->getResultSet().getColumnsCount(), 3U);
 			message->getResultSet().fill(column_1, column_2, column_3);
 			ASSERT_EQ(column_1, "a_1");
 			ASSERT_EQ(column_2, "a_2");
@@ -92,13 +92,13 @@ TEST(TestResultMessage, decode) {
 			message->decodeBody(info, std::move(bodyBuffer));
 			ASSERT_EQ(message->getKind(), cql::ResultKind::Prepared);
 			ASSERT_EQ(message->getPreparedQueryId().get(), "abc");
-			ASSERT_EQ(message->getPreparedMetadata().getColumns().size(), 1);
+			ASSERT_EQ(message->getPreparedMetadata().getColumns().size(), 1U);
 			ASSERT_EQ(message->getPreparedMetadata().getColumns().at(0).getKeySpace(), "k");
 			ASSERT_EQ(message->getPreparedMetadata().getColumns().at(0).getTable(), "t");
 			ASSERT_EQ(message->getPreparedMetadata().getColumns().at(0).getName(), "c");
 			ASSERT_EQ(message->getPreparedMetadata().getColumns().at(0).getType().get(), cql::ColumnType::Int);
 			ASSERT_EQ(message->getPreparedRowsMetadata().getFlags(), cql::ResultRowsMetadataFlags::NoMetadata);
-			ASSERT_EQ(message->getPreparedRowsMetadata().getColumnsCount(), 3);
+			ASSERT_EQ(message->getPreparedRowsMetadata().getColumnsCount(), 3U);
 		}
 		{
 			// SchemaChange

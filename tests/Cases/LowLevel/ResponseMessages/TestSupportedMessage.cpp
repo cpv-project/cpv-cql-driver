@@ -20,11 +20,11 @@ TEST(TestSupportedMessage, decode) {
 		seastar::temporary_buffer<char> bodyBuffer(bodyData.data(), bodyData.size());
 		message->decodeBody(info, std::move(bodyBuffer));
 		auto& options = message->getOptions();
-		ASSERT_EQ(options.get().size(), 2);
-		ASSERT_EQ(options.get().at(cql::ProtocolString("apple")).get().size(), 2);
+		ASSERT_EQ(options.get().size(), 2U);
+		ASSERT_EQ(options.get().at(cql::ProtocolString("apple")).get().size(), 2U);
 		ASSERT_EQ(options.get().at(cql::ProtocolString("apple")).get().at(0).get(), "dogA");
 		ASSERT_EQ(options.get().at(cql::ProtocolString("apple")).get().at(1).get(), "dogB");
-		ASSERT_EQ(options.get().at(cql::ProtocolString("orange")).get().size(), 1);
+		ASSERT_EQ(options.get().at(cql::ProtocolString("orange")).get().size(), 1U);
 		ASSERT_EQ(options.get().at(cql::ProtocolString("orange")).get().at(0).get(), "cat");
 	}
 }

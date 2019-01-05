@@ -9,7 +9,7 @@ TEST(TestProtocolInt, getset) {
 	ASSERT_EQ(value.get(), 0x7fff0000);
 
 	value = cql::ProtocolInt(-0x80000000);
-	ASSERT_EQ(value.get(), -0x80000000);
+	ASSERT_EQ(value.get(), static_cast<std::int32_t>(-0x80000000));
 }
 
 TEST(TestProtocolInt, encode) {

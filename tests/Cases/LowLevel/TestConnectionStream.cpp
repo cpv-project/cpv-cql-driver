@@ -15,7 +15,7 @@ TEST(TestConnectionStream, all) {
 			ASSERT_TRUE(stream.isValid());
 			ASSERT_EQ(stream.getStreamId(), 1);
 		}
-		ASSERT_EQ(freeStreamIds->size(), 1);
+		ASSERT_EQ(freeStreamIds->size(), 1U);
 		ASSERT_EQ(freeStreamIds->at(0), 1);
 	}
 	{
@@ -39,7 +39,7 @@ TEST(TestConnectionStream, all) {
 		// release stream by move assignment
 		testMoveAssign = {};
 		ASSERT_FALSE(testMoveAssign.isValid());
-		ASSERT_EQ(freeStreamIds->size(), 1);
+		ASSERT_EQ(freeStreamIds->size(), 1U);
 		ASSERT_EQ(freeStreamIds->at(0), 2);
 	}
 }

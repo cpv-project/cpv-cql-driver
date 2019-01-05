@@ -22,8 +22,8 @@ TEST(TestResultSet, isValid) {
 TEST(TestResultSet, getters) {
 	cql::ResultSet resultSet(cql::makeObject<cql::ResultSetData>(
 		123, 321, "state", seastar::temporary_buffer<char>("abcde", 5), 1, 3));
-	ASSERT_EQ(resultSet.getRowsCount(), 123);
-	ASSERT_EQ(resultSet.getColumnsCount(), 321);
+	ASSERT_EQ(resultSet.getRowsCount(), 123U);
+	ASSERT_EQ(resultSet.getColumnsCount(), 321U);
 	ASSERT_EQ(resultSet.getPagingState(), "state");
 	ASSERT_EQ(std::string(resultSet.getDecodePtr(), resultSet.getDecodeEnd()), "bc");
 }

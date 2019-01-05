@@ -9,7 +9,7 @@ TEST(TestProtocolResultRowsMetadata, getset) {
 		ASSERT_EQ(value.getFlags(),
 			cql::ResultRowsMetadataFlags::NoMetadata |
 			cql::ResultRowsMetadataFlags::HasMorePages);
-		ASSERT_EQ(value.getColumnsCount(), 123);
+		ASSERT_EQ(value.getColumnsCount(), 123U);
 		ASSERT_EQ(value.getPagingState(), "abc");
 	}
 	{
@@ -21,7 +21,7 @@ TEST(TestProtocolResultRowsMetadata, getset) {
 		value.getColumns().at(1).setName("b");
 		value.getColumns().at(1).setType(cql::ProtocolColumnOption(cql::ColumnType::Ascii));
 		ASSERT_EQ(value.getFlags(), cql::ResultRowsMetadataFlags::GlobalTableSpec);
-		ASSERT_EQ(value.getColumnsCount(), 2);
+		ASSERT_EQ(value.getColumnsCount(), 2U);
 		ASSERT_EQ(value.getGlobalKeySpace(), "asd");
 		ASSERT_EQ(value.getGlobalTable(), "qwe");
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");
@@ -91,7 +91,7 @@ TEST(TestProtocolResultRowsMetadata, decode) {
 		ASSERT_EQ(value.getFlags(),
 			cql::ResultRowsMetadataFlags::NoMetadata |
 			cql::ResultRowsMetadataFlags::HasMorePages);
-		ASSERT_EQ(value.getColumnsCount(), 123);
+		ASSERT_EQ(value.getColumnsCount(), 123U);
 		ASSERT_EQ(value.getPagingState(), "abc");
 	}
 	{
@@ -107,7 +107,7 @@ TEST(TestProtocolResultRowsMetadata, decode) {
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.getFlags(), cql::ResultRowsMetadataFlags::GlobalTableSpec);
-		ASSERT_EQ(value.getColumnsCount(), 2);
+		ASSERT_EQ(value.getColumnsCount(), 2U);
 		ASSERT_EQ(value.getGlobalKeySpace(), "asd");
 		ASSERT_EQ(value.getGlobalTable(), "qwe");
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");
@@ -125,7 +125,7 @@ TEST(TestProtocolResultRowsMetadata, decode) {
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.getFlags(), cql::ResultRowsMetadataFlags::None);
-		ASSERT_EQ(value.getColumnsCount(), 1);
+		ASSERT_EQ(value.getColumnsCount(), 1U);
 		ASSERT_EQ(value.getColumns().at(0).getKeySpace(), "k");
 		ASSERT_EQ(value.getColumns().at(0).getTable(), "t");
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");

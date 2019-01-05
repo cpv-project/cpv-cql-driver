@@ -15,9 +15,9 @@ TEST(TestProtocolResultPreparedMetadata, getset) {
 		value.getColumns().at(1).setName("b");
 		value.getColumns().at(1).setType(cql::ProtocolColumnOption(cql::ColumnType::Ascii));
 		ASSERT_EQ(value.getFlags(), cql::ResultPreparedMetadataFlags::None);
-		ASSERT_EQ(value.getPartitionKeyIndexes().size(), 1);
+		ASSERT_EQ(value.getPartitionKeyIndexes().size(), 1U);
 		ASSERT_EQ(value.getPartitionKeyIndexes().at(0).get(), 1);
-		ASSERT_EQ(value.getColumns().size(), 2);
+		ASSERT_EQ(value.getColumns().size(), 2U);
 		ASSERT_EQ(value.getColumns().at(0).getKeySpace(), "k");
 		ASSERT_EQ(value.getColumns().at(0).getTable(), "t");
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");
@@ -39,7 +39,7 @@ TEST(TestProtocolResultPreparedMetadata, getset) {
 		ASSERT_TRUE(value.getPartitionKeyIndexes().empty());
 		ASSERT_EQ(value.getGlobalKeySpace(), "k0");
 		ASSERT_EQ(value.getGlobalTable(), "t0");
-		ASSERT_EQ(value.getColumns().size(), 2);
+		ASSERT_EQ(value.getColumns().size(), 2U);
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");
 		ASSERT_EQ(value.getColumns().at(0).getType().get(), cql::ColumnType::Int);
 		ASSERT_EQ(value.getColumns().at(1).getName(), "b");
@@ -105,9 +105,9 @@ TEST(TestProtocolResultPreparedMetadata, decode) {
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.getFlags(), cql::ResultPreparedMetadataFlags::None);
-		ASSERT_EQ(value.getPartitionKeyIndexes().size(), 1);
+		ASSERT_EQ(value.getPartitionKeyIndexes().size(), 1U);
 		ASSERT_EQ(value.getPartitionKeyIndexes().at(0).get(), 1);
-		ASSERT_EQ(value.getColumns().size(), 2);
+		ASSERT_EQ(value.getColumns().size(), 2U);
 		ASSERT_EQ(value.getColumns().at(0).getKeySpace(), "k");
 		ASSERT_EQ(value.getColumns().at(0).getTable(), "t");
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");
@@ -133,7 +133,7 @@ TEST(TestProtocolResultPreparedMetadata, decode) {
 		ASSERT_TRUE(value.getPartitionKeyIndexes().empty());
 		ASSERT_EQ(value.getGlobalKeySpace(), "k0");
 		ASSERT_EQ(value.getGlobalTable(), "t0");
-		ASSERT_EQ(value.getColumns().size(), 2);
+		ASSERT_EQ(value.getColumns().size(), 2U);
 		ASSERT_EQ(value.getColumns().at(0).getName(), "a");
 		ASSERT_EQ(value.getColumns().at(0).getType().get(), cql::ColumnType::Int);
 		ASSERT_EQ(value.getColumns().at(1).getName(), "b");

@@ -8,7 +8,7 @@ TEST(TestVarInt, getset) {
 	ASSERT_EQ(value.get(), 0x7fff'0000'ffff'0000);
 
 	value = cql::VarInt(-0x8000'0000'0000'0000);
-	ASSERT_EQ(value.get(), -0x8000'0000'0000'0000);
+	ASSERT_EQ(value.get(), static_cast<std::int64_t>(-0x8000'0000'0000'0000));
 }
 
 TEST(TestVarInt, encodeBody) {

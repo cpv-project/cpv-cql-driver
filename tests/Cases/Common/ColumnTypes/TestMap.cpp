@@ -8,11 +8,11 @@ TEST(TestMap, getset) {
 		cql::Text, cql::BigInt, cql::ColumnTrait<cql::Text>::Hash>;
 	cql::Map<cql::Text, cql::BigInt> value;
 	value.set(MapType({ { "abc", 123 } }));
-	ASSERT_EQ(value.get().size(), 1);
+	ASSERT_EQ(value.get().size(), 1U);
 	ASSERT_EQ(value.get().at("abc"), 123);
 
 	value.set({ { "asd", 100 }, { "qwe", 101 } });
-	ASSERT_EQ(value.get().size(), 2);
+	ASSERT_EQ(value.get().size(), 2U);
 	ASSERT_EQ(value.get().at("asd"), 100);
 	ASSERT_EQ(value.get().at("qwe"), 101);
 }
@@ -51,7 +51,7 @@ TEST(TestMap, decodeBody) {
 			"\x00\x00\x00\x03""qwe"
 			"\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x65");
 		value.decodeBody(data.data(), data.size());
-		ASSERT_EQ(value->size(), 2);
+		ASSERT_EQ(value->size(), 2U);
 		ASSERT_EQ(value->at("asd"), 100);
 		ASSERT_EQ(value->at("qwe"), 101);
 	}
@@ -99,14 +99,14 @@ TEST(TestMap, operations) {
 	{
 		// dereference
 		cql::Map<cql::Text, cql::BigInt> value({ { "abc", 123 } });
-		ASSERT_EQ((*value).size(), 1);
+		ASSERT_EQ((*value).size(), 1U);
 		ASSERT_EQ((*value).at("abc"), 123);
 	}
 	{
 		// get pointer
 		cql::Map<cql::Text, cql::BigInt> value;
 		value->emplace("abc", 123);
-		ASSERT_EQ(value->size(), 1);
+		ASSERT_EQ(value->size(), 1U);
 		ASSERT_EQ(value->at("abc"), 123);
 	}
 }

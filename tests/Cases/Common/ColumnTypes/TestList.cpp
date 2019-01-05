@@ -5,11 +5,11 @@
 TEST(TestList, getset) {
 	cql::List<cql::BigInt> value;
 	value.set(std::vector<cql::BigInt>({ 123 }));
-	ASSERT_EQ(value.get().size(), 1);
+	ASSERT_EQ(value.get().size(), 1U);
 	ASSERT_EQ(value.get().at(0), 123);
 
 	value.set({ 1, 2, 3 });
-	ASSERT_EQ(value.get().size(), 3);
+	ASSERT_EQ(value.get().size(), 3U);
 	ASSERT_EQ(value.get().at(0), 1);
 	ASSERT_EQ(value.get().at(1), 2);
 	ASSERT_EQ(value.get().at(2), 3);
@@ -47,7 +47,7 @@ TEST(TestList, decodeBody) {
 			"\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x01"
 			"\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x02");
 		value.decodeBody(data.data(), data.size());
-		ASSERT_EQ(value->size(), 2);
+		ASSERT_EQ(value->size(), 2U);
 		ASSERT_EQ(value->at(0), 1);
 		ASSERT_EQ(value->at(1), 2);
 	}
@@ -84,14 +84,14 @@ TEST(TestList, operations) {
 	{
 		// dereference
 		cql::List<cql::BigInt> value({ 123 });
-		ASSERT_EQ((*value).size(), 1);
+		ASSERT_EQ((*value).size(), 1U);
 		ASSERT_EQ((*value).at(0), 123);
 	}
 	{
 		// get pointer
 		cql::List<cql::BigInt> value;
 		value->emplace_back(123);
-		ASSERT_EQ(value->size(), 1);
+		ASSERT_EQ(value->size(), 1U);
 		ASSERT_EQ(value->at(0), 123);
 	}
 }

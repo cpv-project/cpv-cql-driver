@@ -211,7 +211,7 @@ TEST(TestFloat, operations) {
 	{
 		// get text description
 		std::string str(cql::joinString("", cql::Float(1.2)));
-		ASSERT_EQ(str.find("1.2"), 0);
+		ASSERT_EQ(str.find("1.2"), 0U);
 	}
 }
 

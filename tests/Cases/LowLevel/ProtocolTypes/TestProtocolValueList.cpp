@@ -7,12 +7,12 @@ TEST(TestProtocolValueList, getset) {
 		cql::ProtocolValue("abc"),
 		cql::ProtocolValue("aaaaa")
 	});
-	ASSERT_EQ(value.get().size(), 2);
+	ASSERT_EQ(value.get().size(), 2U);
 	ASSERT_EQ(value.get().at(0).get(), "abc");
 	ASSERT_EQ(value.get().at(1).get(), "aaaaa");
 
 	value.get().emplace_back("asd");
-	ASSERT_EQ(value.get().size(), 3);
+	ASSERT_EQ(value.get().size(), 3U);
 
 	value = cql::ProtocolValueList();
 	ASSERT_TRUE(value.get().empty());
@@ -36,7 +36,7 @@ TEST(TestProtocolValueList, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 2);
+		ASSERT_EQ(value.get().size(), 2U);
 		ASSERT_EQ(value.get().at(0).get(), "abc");
 		ASSERT_EQ(value.get().at(1).get(), "aaaaa");
 	}
@@ -46,7 +46,7 @@ TEST(TestProtocolValueList, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 1);
+		ASSERT_EQ(value.get().size(), 1U);
 		ASSERT_EQ(value.get().at(0).get(), "aa");
 	}
 	{

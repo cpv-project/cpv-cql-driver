@@ -18,17 +18,17 @@ TEST(TestProtocolStringMultiMap, getset) {
 			})
 		}
 	});
-	ASSERT_EQ(value.get().size(), 2);
-	ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().size(), 2);
+	ASSERT_EQ(value.get().size(), 2U);
+	ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().size(), 2U);
 	ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().at(0).get(), "dogA");
 	ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().at(1).get(), "dogB");
-	ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get().size(), 1);
+	ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get().size(), 1U);
 	ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get().at(0).get(), "cat");
 
 	value.get().emplace(
 		cql::ProtocolString("banana"),
 		cql::ProtocolStringList({ cql::ProtocolString("cow") }));
-	ASSERT_EQ(value.get().size(), 3);
+	ASSERT_EQ(value.get().size(), 3U);
 
 	value = cql::ProtocolStringMultiMap();
 	ASSERT_TRUE(value.get().empty());
@@ -74,11 +74,11 @@ TEST(TestProtocolStringMultiMap, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 2);
-		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().size(), 2);
+		ASSERT_EQ(value.get().size(), 2U);
+		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().size(), 2U);
 		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().at(0).get(), "dogA");
 		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().at(1).get(), "dogB");
-		ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get().size(), 1);
+		ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get().size(), 1U);
 		ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get().at(0).get(), "cat");
 	}
 	{
@@ -89,8 +89,8 @@ TEST(TestProtocolStringMultiMap, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 1);
-		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().size(), 2);
+		ASSERT_EQ(value.get().size(), 1U);
+		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().size(), 2U);
 		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().at(0).get(), "dogA");
 		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get().at(1).get(), "dogB");
 	}

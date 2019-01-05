@@ -5,18 +5,18 @@
 
 TEST(TestProtocolUUID, getset) {
 	cql::ProtocolUUID uuid("00112233-4455-6677-8899-aabbccddeeff");
-	ASSERT_EQ(uuid.get().first, 0x0011223344556677);
-	ASSERT_EQ(uuid.get().second, 0x8899aabbccddeeff);
+	ASSERT_EQ(uuid.get().first, 0x0011223344556677U);
+	ASSERT_EQ(uuid.get().second, 0x8899aabbccddeeffU);
 	ASSERT_EQ(uuid.str(), "00112233-4455-6677-8899-AABBCCDDEEFF");
 
 	uuid.set(std::make_pair(0x12345678abcdefaaU, 0x87654321ffabcdefU));
-	ASSERT_EQ(uuid.get().first, 0x12345678abcdefaa);
-	ASSERT_EQ(uuid.get().second, 0x87654321ffabcdef);
+	ASSERT_EQ(uuid.get().first, 0x12345678abcdefaaU);
+	ASSERT_EQ(uuid.get().second, 0x87654321ffabcdefU);
 	ASSERT_EQ(uuid.str(), "12345678-ABCD-EFAA-8765-4321FFABCDEF");
 
 	uuid = cql::ProtocolUUID(std::make_pair(0x0011223344556677U, 0x8899aabbccddeeffU));
-	ASSERT_EQ(uuid.get().first, 0x0011223344556677);
-	ASSERT_EQ(uuid.get().second, 0x8899aabbccddeeff);
+	ASSERT_EQ(uuid.get().first, 0x0011223344556677U);
+	ASSERT_EQ(uuid.get().second, 0x8899aabbccddeeffU);
 	ASSERT_EQ(uuid.str(), "00112233-4455-6677-8899-AABBCCDDEEFF");
 }
 

@@ -7,12 +7,12 @@ TEST(TestProtocolColumnOptionList, getset) {
 		cql::ProtocolColumnOption(cql::ColumnType::Ascii),
 		cql::ProtocolColumnOption(cql::ColumnType::Int)
 	});
-	ASSERT_EQ(value.get().size(), 2);
+	ASSERT_EQ(value.get().size(), 2U);
 	ASSERT_EQ(value.get().at(0).get(), cql::ColumnType::Ascii);
 	ASSERT_EQ(value.get().at(1).get(), cql::ColumnType::Int);
 
 	value.get().emplace_back(cql::ProtocolColumnOption(cql::ColumnType::VarChar));
-	ASSERT_EQ(value.get().size(), 3);
+	ASSERT_EQ(value.get().size(), 3U);
 
 	value = cql::ProtocolColumnOptionList();
 	ASSERT_TRUE(value.get().empty());
@@ -36,7 +36,7 @@ TEST(TestProtocolColumnOptionList, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 2);
+		ASSERT_EQ(value.get().size(), 2U);
 		ASSERT_EQ(value.get().at(0).get(), cql::ColumnType::Ascii);
 		ASSERT_EQ(value.get().at(1).get(), cql::ColumnType::Int);
 	}
@@ -46,7 +46,7 @@ TEST(TestProtocolColumnOptionList, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 1);
+		ASSERT_EQ(value.get().size(), 1U);
 		ASSERT_EQ(value.get().at(0).get(), cql::ColumnType::Ascii);
 	}
 	{

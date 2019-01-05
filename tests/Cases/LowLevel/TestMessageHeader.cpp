@@ -7,10 +7,10 @@ TEST(TestMessageHeader, getset) {
 	header.setStreamId(123);
 	header.setOpCode(cql::MessageType::Startup, cql::MessageDirection::Request);
 	ASSERT_EQ(header.getFlags(), cql::MessageHeaderFlags::Compression);
-	ASSERT_EQ(header.getStreamId(), 123);
+	ASSERT_EQ(header.getStreamId(), 123U);
 	ASSERT_EQ(header.getOpCode(), cql::MessageType::Startup);
 	ASSERT_EQ(header.getDirection(), cql::MessageDirection::Request);
-	ASSERT_EQ(header.getBodyLength(), 0);
+	ASSERT_EQ(header.getBodyLength(), 0U);
 }
 
 TEST(TestMessageHeader, encode) {
@@ -33,9 +33,9 @@ TEST(TestMessageHeader, decode) {
 	seastar::temporary_buffer<char> buffer(data.data(), data.size());
 	header.decodeHeader(info, std::move(buffer));
 	ASSERT_EQ(header.getFlags(), cql::MessageHeaderFlags::Compression);
-	ASSERT_EQ(header.getStreamId(), 123);
+	ASSERT_EQ(header.getStreamId(), 123U);
 	ASSERT_EQ(header.getOpCode(), cql::MessageType::Ready);
 	ASSERT_EQ(header.getDirection(), cql::MessageDirection::Response);
-	ASSERT_EQ(header.getBodyLength(), 8);
+	ASSERT_EQ(header.getBodyLength(), 8U);
 }
 

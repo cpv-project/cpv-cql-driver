@@ -38,8 +38,8 @@ TEST(TestStringHolder, asMapKey) {
 	std::unordered_map<cql::StringHolder, std::size_t, cql::StringHolder::Hash> map;
 	map.emplace("abc", 123);
 	map.emplace("asd", 100);
-	ASSERT_EQ(map.at(cql::StringHolder("abc")), 123);
-	ASSERT_EQ(map.at(cql::StringHolder("asd")), 100);
+	ASSERT_EQ(map.at(cql::StringHolder("abc")), 123U);
+	ASSERT_EQ(map.at(cql::StringHolder("asd")), 100U);
 	cql::StringHolder::Hash hash;
 	ASSERT_TRUE(hash(cql::StringHolder("a")) != hash(cql::StringHolder("b")));
 }

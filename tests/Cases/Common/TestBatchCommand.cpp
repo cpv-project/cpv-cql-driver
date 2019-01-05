@@ -45,14 +45,14 @@ TEST(TestBatchCommand, consistencyLevel) {
 TEST(TestBatchCommand, query) {
 	{
 		cql::BatchCommand command;
-		ASSERT_EQ(command.getQueries().size(), 0);
+		ASSERT_EQ(command.getQueries().size(), 0U);
 	}
 	{
 		auto command = cql::BatchCommand()
 			.addQuery("insert into a (k, v) values (123, 'abc');")
 			.addQuery("insert into b (k, c, v) values (100, 0, 'asd');");
 		auto queries = command.getQueries();
-		ASSERT_EQ(queries.size(), 2);
+		ASSERT_EQ(queries.size(), 2U);
 		ASSERT_EQ(queries.at(0).queryStr.get(),
 			"insert into a (k, v) values (123, 'abc');");
 		ASSERT_EQ(queries.at(1).queryStr.get(),
@@ -66,7 +66,7 @@ TEST(TestBatchCommand, prepare) {
 		.addQuery("insert into b (k, c, v) values (100, 0, 'asd');")
 			.prepareQuery();
 	auto queries = command.getQueries();
-	ASSERT_EQ(queries.size(), 2);
+	ASSERT_EQ(queries.size(), 2U);
 	ASSERT_FALSE(queries.at(0).needPrepare.has_value());
 	ASSERT_TRUE(queries.at(1).needPrepare.has_value());
 	ASSERT_TRUE(*queries.at(1).needPrepare);
@@ -86,13 +86,13 @@ TEST(TestBatchCommand, parameters) {
 				.addParameter(cql::Int(255))
 				.addParameter(cql::Text("qwert"));
 	auto queries = command.getQueries();
-	ASSERT_EQ(queries.size(), 2);
+	ASSERT_EQ(queries.size(), 2U);
 
 	auto query_0 = queries.at(0);
 	ASSERT_EQ(query_0.queryStr.get(),
 		"insert into a (k, v) values (?, ?);");
-	ASSERT_EQ(query_0.parameterSets.size(), 1);
-	ASSERT_EQ(query_0.parameterSets.at(0).first, 2);
+	ASSERT_EQ(query_0.parameterSets.size(), 1U);
+	ASSERT_EQ(query_0.parameterSets.at(0).first, 2U);
 	ASSERT_EQ(query_0.parameterSets.at(0).second, makeTestString(
 		"\x00\x00\x00\x04\x00\x00\x00\x7b"
 		"\x00\x00\x00\x03""abc"));
@@ -100,13 +100,13 @@ TEST(TestBatchCommand, parameters) {
 	auto query_1 = queries.at(1);
 	ASSERT_EQ(query_1.queryStr.get(),
 		"insert into b (k, c, v) values (?, ?, ?);");
-	ASSERT_EQ(query_1.parameterSets.size(), 2);
-	ASSERT_EQ(query_1.parameterSets.at(0).first, 3);
+	ASSERT_EQ(query_1.parameterSets.size(), 2U);
+	ASSERT_EQ(query_1.parameterSets.at(0).first, 3U);
 	ASSERT_EQ(query_1.parameterSets.at(0).second, makeTestString(
 		"\x00\x00\x00\x04\x00\x00\x00\x64"
 		"\x00\x00\x00\x04\x00\x00\x00\x00"
 		"\x00\x00\x00\x03""asd"));
-	ASSERT_EQ(query_1.parameterSets.at(1).first, 3);
+	ASSERT_EQ(query_1.parameterSets.at(1).first, 3U);
 	ASSERT_EQ(query_1.parameterSets.at(1).second, makeTestString(
 		"\x00\x00\x00\x04\x00\x00\x00\x7f"
 		"\x00\x00\x00\x04\x00\x00\x00\xff"
@@ -157,12 +157,12 @@ TEST(TestBatchCommand, defaultTimestamp) {
 TEST(TestBatchCommand, maxRetries) {
 	{
 		cql::BatchCommand command;
-		ASSERT_EQ(command.getMaxRetries(), 0);
+		ASSERT_EQ(command.getMaxRetries(), 0U);
 	}
 	{
 		auto command = cql::BatchCommand()
 			.setMaxRetries(2);
-		ASSERT_EQ(command.getMaxRetries(), 2);
+		ASSERT_EQ(command.getMaxRetries(), 2U);
 	}
 }
 

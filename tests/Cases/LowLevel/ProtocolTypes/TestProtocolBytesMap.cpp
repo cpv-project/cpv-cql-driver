@@ -7,12 +7,12 @@ TEST(TestProtocolBytesMap, getset) {
 		{ cql::ProtocolString("apple"), cql::ProtocolBytes("dog") },
 		{ cql::ProtocolString("orange"), cql::ProtocolBytes("cat") }
 	});
-	ASSERT_EQ(value.get().size(), 2);
+	ASSERT_EQ(value.get().size(), 2U);
 	ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get(), "dog");
 	ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get(), "cat");
 
 	value.get().emplace(cql::ProtocolString("banana"), cql::ProtocolBytes("cow"));
-	ASSERT_EQ(value.get().size(), 3);
+	ASSERT_EQ(value.get().size(), 3U);
 
 	value = cql::ProtocolBytesMap();
 	ASSERT_TRUE(value.get().empty());
@@ -47,7 +47,7 @@ TEST(TestProtocolBytesMap, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 2);
+		ASSERT_EQ(value.get().size(), 2U);
 		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get(), "dog");
 		ASSERT_EQ(value.get().at(cql::ProtocolString("orange")).get(), "cat");
 	}
@@ -59,7 +59,7 @@ TEST(TestProtocolBytesMap, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 1);
+		ASSERT_EQ(value.get().size(), 1U);
 		ASSERT_EQ(value.get().at(cql::ProtocolString("apple")).get(), "dog");
 	}
 	{
@@ -70,7 +70,7 @@ TEST(TestProtocolBytesMap, decode) {
 		auto end = ptr + data.size();
 		value.decode(ptr, end);
 		ASSERT_TRUE(ptr == end);
-		ASSERT_EQ(value.get().size(), 1);
+		ASSERT_EQ(value.get().size(), 1U);
 		ASSERT_TRUE(value.get().at(cql::ProtocolString("apple")).isNull());
 	}
 	{

@@ -63,7 +63,7 @@ TEST(TestAscii, operations) {
 		// get pointer
 		cql::Ascii value("abc");
 		value->append("de", 2);
-		ASSERT_EQ(value->size(), 5);
+		ASSERT_EQ(value->size(), 5U);
 	}
 	{
 		// equal to

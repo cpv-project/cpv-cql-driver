@@ -70,7 +70,7 @@ TEST(TestProtocolColumnOption, getsetUDTPayload) {
 	auto payload = value.getUDTPayload();
 	ASSERT_EQ(payload.getKeySpace().get(), "some key space");
 	ASSERT_EQ(payload.getUDTName().get(), "some udt name");
-	ASSERT_EQ(payload.getFields().size(), 2);
+	ASSERT_EQ(payload.getFields().size(), 2U);
 	ASSERT_EQ(payload.getFields().at(0).first.get(), "column a");
 	ASSERT_EQ(payload.getFields().at(0).second.get(), cql::ColumnType::Int);
 	ASSERT_EQ(payload.getFields().at(1).first.get(), "column b");
@@ -87,7 +87,7 @@ TEST(TestProtocolColumnOption, getsetTuplePayload) {
 		}));
 	ASSERT_EQ(value.get(), cql::ColumnType::Tuple);
 	auto payload = value.getTuplePayload();
-	ASSERT_EQ(payload.getTypes().size(), 3);
+	ASSERT_EQ(payload.getTypes().size(), 3U);
 	ASSERT_EQ(payload.getTypes().at(0).get(), cql::ColumnType::Ascii);
 	ASSERT_EQ(payload.getTypes().at(1).get(), cql::ColumnType::Int);
 	ASSERT_EQ(payload.getTypes().at(2).get(), cql::ColumnType::BigInt);
@@ -253,7 +253,7 @@ TEST(TestProtocolColumnOption, decode) {
 		auto payload = value.getUDTPayload();
 		ASSERT_EQ(payload.getKeySpace().get(), "ks");
 		ASSERT_EQ(payload.getUDTName().get(), "unx");
-		ASSERT_EQ(payload.getFields().size(), 2);
+		ASSERT_EQ(payload.getFields().size(), 2U);
 		ASSERT_EQ(payload.getFields().at(0).first.get(), "abc");
 		ASSERT_EQ(payload.getFields().at(0).second.get(), cql::ColumnType::Int);
 		ASSERT_EQ(payload.getFields().at(1).first.get(), "asdfg");
@@ -268,7 +268,7 @@ TEST(TestProtocolColumnOption, decode) {
 		ASSERT_TRUE(ptr == end);
 		ASSERT_EQ(value.get(), cql::ColumnType::Tuple);
 		auto payload = value.getTuplePayload();
-		ASSERT_EQ(payload.getTypes().size(), 2);
+		ASSERT_EQ(payload.getTypes().size(), 2U);
 		ASSERT_EQ(payload.getTypes().at(0).get(), cql::ColumnType::Ascii);
 		ASSERT_EQ(payload.getTypes().at(1).get(), cql::ColumnType::Int);
 	}

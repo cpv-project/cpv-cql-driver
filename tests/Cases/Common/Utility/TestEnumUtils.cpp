@@ -27,34 +27,34 @@ namespace cql {
 TEST(TestEnumUtils, operators) {
 	{
 		auto value = cql::MyTestEnum::A | cql::MyTestEnum::B;
-		ASSERT_EQ(static_cast<std::size_t>(value), 3);
+		ASSERT_EQ(static_cast<std::size_t>(value), 3U);
 	}
 	{
 		auto value = cql::MyTestEnum::A;
 		value |= cql::MyTestEnum::B;
-		ASSERT_EQ(static_cast<std::size_t>(value), 3);
+		ASSERT_EQ(static_cast<std::size_t>(value), 3U);
 	}
 	{
 		auto value = cql::MyTestEnum::A & (cql::MyTestEnum::A | cql::MyTestEnum::B);
-		ASSERT_EQ(static_cast<std::size_t>(value), 1);
+		ASSERT_EQ(static_cast<std::size_t>(value), 1U);
 	}
 	{
 		auto value = cql::MyTestEnum::A | cql::MyTestEnum::B;
 		value &= cql::MyTestEnum::A;
-		ASSERT_EQ(static_cast<std::size_t>(value), 1);
+		ASSERT_EQ(static_cast<std::size_t>(value), 1U);
 	}
 	{
 		auto value = ~cql::MyTestEnum::A & (cql::MyTestEnum::A | cql::MyTestEnum::B);
-		ASSERT_EQ(static_cast<std::size_t>(value), 2);
+		ASSERT_EQ(static_cast<std::size_t>(value), 2U);
 	}
 	{
 		auto value = cql::MyTestEnum::A | cql::MyTestEnum::B;
 		value &= cql::MyTestEnum::B;
-		ASSERT_EQ(static_cast<std::size_t>(value), 2);
+		ASSERT_EQ(static_cast<std::size_t>(value), 2U);
 	}
 	{
 		auto value = ~cql::MyTestEnum::A;
-		ASSERT_EQ(static_cast<std::size_t>(value), ~1);
+		ASSERT_EQ(static_cast<std::size_t>(value), ~static_cast<std::size_t>(1));
 	}
 	{
 		auto value = cql::MyTestEnum::A;

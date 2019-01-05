@@ -6,7 +6,7 @@ TEST(TestProtocolVint, getset) {
 	cql::ProtocolVint value(1);
 	ASSERT_EQ(value.get(), 1);
 	value.set(0x7fff0000aaaaeeee);
-	ASSERT_EQ(value.get(), 0x7fff0000aaaaeeee);
+	ASSERT_EQ(value.get(), static_cast<std::int64_t>(0x7fff0000aaaaeeee));
 
 	value = cql::ProtocolVint(-3);
 	ASSERT_EQ(value.get(), -3);

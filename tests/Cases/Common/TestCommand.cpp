@@ -61,7 +61,7 @@ TEST(TestCommand, pageSize) {
 		auto command = cql::Command("use a;")
 			.setPageSize(123);
 		ASSERT_TRUE(command.getPageSize().has_value());
-		ASSERT_EQ(*command.getPageSize(), 123);
+		ASSERT_EQ(*command.getPageSize(), 123U);
 	}
 }
 
@@ -80,14 +80,14 @@ TEST(TestCommand, pagingState) {
 TEST(TestCommand, parameters) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getParameterCount(), 0);
+		ASSERT_EQ(command.getParameterCount(), 0U);
 		ASSERT_EQ(command.getParameters(), "");
 	}
 	{
 		auto command = cql::Command("insert into a (k, v) values (?, ?);")
 			.addParameter(cql::Int(123))
 			.addParameter(cql::Text("abc"));
-		ASSERT_EQ(command.getParameterCount(), 2);
+		ASSERT_EQ(command.getParameterCount(), 2U);
 		ASSERT_EQ(command.getParameters(), makeTestString(
 			"\x00\x00\x00\x04\x00\x00\x00\x7b"
 			"\x00\x00\x00\x03""abc"));
@@ -96,7 +96,7 @@ TEST(TestCommand, parameters) {
 		auto command = cql::Command("insert into b (k, c, v) values (?, ?, ?);")
 			.addParameter(cql::Int(123))
 			.addParameters(cql::Int(255), cql::Text("abc"));
-		ASSERT_EQ(command.getParameterCount(), 3);
+		ASSERT_EQ(command.getParameterCount(), 3U);
 		ASSERT_EQ(command.getParameters(), makeTestString(
 			"\x00\x00\x00\x04\x00\x00\x00\x7b"
 			"\x00\x00\x00\x04\x00\x00\x00\xff"
@@ -140,12 +140,12 @@ TEST(TestCommand, defaultTimestamp) {
 TEST(TestCommand, maxRetries) {
 	{
 		cql::Command command("use a;");
-		ASSERT_EQ(command.getMaxRetries(), 0);
+		ASSERT_EQ(command.getMaxRetries(), 0U);
 	}
 	{
 		auto command = cql::Command("use a;")
 			.setMaxRetries(2);
-		ASSERT_EQ(command.getMaxRetries(), 2);
+		ASSERT_EQ(command.getMaxRetries(), 2U);
 	}
 }
 

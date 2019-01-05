@@ -11,8 +11,8 @@ TEST(TestNodeConfiguration, all) {
 		ASSERT_EQ(configuration.getAddress().second, 0);
 		ASSERT_FALSE(configuration.getUseSSL());
 		ASSERT_FALSE(configuration.getUseCompression());
-		ASSERT_EQ(configuration.getMaxStreams(), 20);
-		ASSERT_EQ(configuration.getMaxPendingMessages(), 100);
+		ASSERT_EQ(configuration.getMaxStreams(), 20U);
+		ASSERT_EQ(configuration.getMaxPendingMessages(), 100U);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::AuthenticatorClasses::AllowAllAuthenticator);
 		ASSERT_TRUE(configuration.getAuthenticatorData().empty());
 		seastar::socket_address address;
@@ -30,8 +30,8 @@ TEST(TestNodeConfiguration, all) {
 		ASSERT_EQ(configuration.getAddress().second, 9000);
 		ASSERT_TRUE(configuration.getUseSSL());
 		ASSERT_TRUE(configuration.getUseCompression());
-		ASSERT_EQ(configuration.getMaxStreams(), 21);
-		ASSERT_EQ(configuration.getMaxPendingMessages(), 22);
+		ASSERT_EQ(configuration.getMaxStreams(), 21U);
+		ASSERT_EQ(configuration.getMaxPendingMessages(), 22U);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::AuthenticatorClasses::PasswordAuthenticator);
 		ASSERT_EQ(configuration.getAuthenticatorData(), makeTestString("\x00""abc""\x00""asdfg"));
 		seastar::socket_address address;

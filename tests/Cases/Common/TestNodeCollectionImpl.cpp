@@ -7,7 +7,7 @@ TEST(TestNodeCollectionImpl, construct) {
 		cql::NodeConfiguration().setAddress("b", 1024),
 		cql::NodeConfiguration().setAddress("c", 1024)
 	});
-	ASSERT_EQ(nodeCollection.getNodesCount(), 3);
+	ASSERT_EQ(nodeCollection.getNodesCount(), 3U);
 }
 
 TEST(TestNodeCollectionImpl, chooseOneNodeSimple) {

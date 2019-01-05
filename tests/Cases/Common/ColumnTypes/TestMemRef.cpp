@@ -11,14 +11,14 @@ TEST(TestMemRef, getset) {
 
 	value = cql::MemRef();
 	ASSERT_EQ(value.get().first, nullptr);
-	ASSERT_EQ(value.get().second, 0);
+	ASSERT_EQ(value.get().second, 0U);
 
 	value = cql::MemRef("qwert", 3);
 	ASSERT_EQ(std::string(value.data(), value.size()), makeTestString("qwe"));
 	ASSERT_FALSE(value.empty());
 	value.reset();
 	ASSERT_EQ(value.data(), nullptr);
-	ASSERT_EQ(value.size(), 0);
+	ASSERT_EQ(value.size(), 0U);
 	ASSERT_TRUE(value.empty());
 }
 

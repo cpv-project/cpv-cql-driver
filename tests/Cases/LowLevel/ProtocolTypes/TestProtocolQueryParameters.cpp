@@ -13,10 +13,10 @@ TEST(TestProtocolQueryParameters, getset) {
 	auto& command = value.getCommand();
 	ASSERT_TRUE(command.getConsistency().has_value());
 	ASSERT_EQ(*command.getConsistency(), cql::ConsistencyLevel::One);
-	ASSERT_EQ(command.getParameterCount(), 1);
+	ASSERT_EQ(command.getParameterCount(), 1U);
 	ASSERT_EQ(command.getParameters(), makeTestString("\x00\x00\x00\x04\x00\x00\x00\x7b"));
 	ASSERT_TRUE(command.getPageSize().has_value());
-	ASSERT_EQ(*command.getPageSize(), 100);
+	ASSERT_EQ(*command.getPageSize(), 100U);
 	ASSERT_EQ(command.getPagingState(), "state");
 }
 
@@ -108,12 +108,12 @@ TEST(TestProtocolQueryParameters, decode) {
 			cql::QueryParametersFlags::WithValues |
 			cql::QueryParametersFlags::WithPageSize |
 			cql::QueryParametersFlags::WithPagingState);
-		ASSERT_EQ(command.getParameterCount(), 2);
+		ASSERT_EQ(command.getParameterCount(), 2U);
 		ASSERT_EQ(command.getParameters(), makeTestString(
 			"\x00\x00\x00\x01""a"
 			"\x00\x00\x00\x01""b"));
 		ASSERT_TRUE(command.getPageSize().has_value());
-		ASSERT_EQ(*command.getPageSize(), 100);
+		ASSERT_EQ(*command.getPageSize(), 100U);
 		ASSERT_EQ(command.getPagingState(), "state");
 		ASSERT_FALSE(command.getSerialConsistency().has_value());
 		ASSERT_FALSE(command.getDefaultTimestamp().has_value());
@@ -138,7 +138,7 @@ TEST(TestProtocolQueryParameters, decode) {
 			cql::QueryParametersFlags::WithValues |
 			cql::QueryParametersFlags::WithSerialConsistency |
 			cql::QueryParametersFlags::WithDefaultTimestamp);
-		ASSERT_EQ(command.getParameterCount(), 1);
+		ASSERT_EQ(command.getParameterCount(), 1U);
 		ASSERT_EQ(command.getParameters(), makeTestString("\x00\x00\x00\x01""a"));
 		ASSERT_FALSE(command.getPageSize().has_value());
 		ASSERT_EQ(command.getPagingState(), "");

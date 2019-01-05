@@ -88,8 +88,8 @@ TEST_FUTURE(TestSession, execute) {
 			return session.query(cql::Command(
 				"select id, name from testkeyspace.testtable"));
 		}).then([] (auto result) {
-			ASSERT_EQ(result.getRowsCount(), 1);
-			ASSERT_EQ(result.getColumnsCount(), 2);
+			ASSERT_EQ(result.getRowsCount(), 1U);
+			ASSERT_EQ(result.getColumnsCount(), 2U);
 			cql::Int id;
 			cql::Text name;
 			result.fill(id, name);
@@ -176,8 +176,8 @@ TEST_FUTURE(TestSession, batchExecute) {
 			return session.query(cql::Command(
 				"select id, name from testkeyspace.testtable"));
 		}).then([] (auto result) {
-			ASSERT_EQ(result.getRowsCount(), 3);
-			ASSERT_EQ(result.getColumnsCount(), 2);
+			ASSERT_EQ(result.getRowsCount(), 3U);
+			ASSERT_EQ(result.getColumnsCount(), 2U);
 			cql::Int id;
 			cql::Text name;
 			result.fill(id, name);
