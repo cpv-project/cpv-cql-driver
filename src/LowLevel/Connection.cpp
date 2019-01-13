@@ -128,12 +128,12 @@ namespace cql {
 		}).handle_exception([self] (std::exception_ptr ex) {
 			// initialize connection failed
 			auto& logger = self->sessionConfiguration_->getLogger();
-			if (logger->isEnabled(LogLevel::Info)) {
-				logger->log(LogLevel::Info, "initialize connection to",
+			if (logger->isEnabled(LogLevel::Error)) {
+				logger->log(LogLevel::Error, "initialize connection to",
 					self->nodeConfiguration_->getAddressAsString(), "failed:", ex);
 			}
 			self->metricsData_->connection_initialize_errors += 1;
-			self->close("initialize connection failed");
+			self->close("initialize connection failed", true);
 			return seastar::make_exception_future(ConnectionInitializeException(
 				CQL_CODEINFO, "initialize connection to",
 				self->nodeConfiguration_->getAddressAsString(), "failed:\n", ex));
@@ -211,7 +211,7 @@ namespace cql {
 				// this message is failed, report the error to both waiters
 				sendingPromise.set_exception(ex);
 				self->metricsData_->connection_send_message_errors += 1;
-				self->close(joinString("send message failed:", ex));
+				self->close(joinString("send message failed:", ex), true);
 				return seastar::make_exception_future(NetworkException(
 					CQL_CODEINFO, "send message to",
 					self->nodeConfiguration_->getAddress().first, "failed:", ex));
@@ -279,7 +279,7 @@ namespace cql {
 						auto streamId = message->getHeader().getStreamId();
 						if (CQL_UNLIKELY(streamId >= self->receivedMessageQueueMap_.size())) {
 							self->close(joinString(" ",
-								"stream id of received message out of range:", streamId));
+								"stream id of received message out of range:", streamId), true);
 							return seastar::stop_iteration::yes;
 						}
 						auto& promiseSlot = self->receivingPromiseMap_[streamId];
@@ -288,7 +288,8 @@ namespace cql {
 							promiseSlot.first = false;
 							promiseSlot.second.set_value(std::move(message));
 							if (CQL_UNLIKELY(self->receivingPromiseCount_ == 0)) {
-								self->close("incorrect receiving promise count, should be logic error");
+								self->close(
+									"incorrect receiving promise count, should be logic error", true);
 								return seastar::stop_iteration::yes;
 							}
 							--self->receivingPromiseCount_;
@@ -297,7 +298,7 @@ namespace cql {
 							if (CQL_UNLIKELY(
 								!self->receivedMessageQueueMap_[streamId].push(std::move(message)))) {
 								self->close(joinString(" ",
-									"max pending messages is reached, stream id:", streamId));
+									"max pending messages is reached, stream id:", streamId), true);
 								return seastar::stop_iteration::yes;
 							}
 						}
@@ -311,7 +312,7 @@ namespace cql {
 					});
 				}).handle_exception([&self] (std::exception_ptr ex) {
 					self->metricsData_->connection_receive_message_errors += 1;
-					self->close(joinString(" ", "receive message failed:", ex));
+					self->close(joinString(" ", "receive message failed:", ex), true);
 				});
 			});
 		}
@@ -367,7 +368,7 @@ namespace cql {
 	/** Destructor */
 	Connection::~Connection() {
 		try {
-			close("close from destructor");
+			close("close from destructor", false);
 		} catch (...) {
 			std::cerr << std::current_exception() << std::endl;
 		}
@@ -437,11 +438,13 @@ namespace cql {
 	}
 
 	/** Close the connection */
-	void Connection::close(const std::string_view& errorMessage) {
+	void Connection::close(const std::string_view& errorMessage, bool isError) {
 		// log close
 		if (isReady_) {
 			auto& logger = sessionConfiguration_->getLogger();
-			logger->log(LogLevel::Info, "close connection:", errorMessage);
+			logger->log(
+				isError ? LogLevel::Error : LogLevel::Info,
+				"close connection:", errorMessage);
 		}
 		// close the socket and reset the ready state
 		socket_ = SocketHolder();

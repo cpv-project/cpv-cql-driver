@@ -109,7 +109,7 @@ namespace cql {
 			seastar::temporary_buffer<char>&& buffer) const;
 
 		/** Close the connection */
-		void close(const std::string_view& errorMessage);
+		void close(const std::string_view& errorMessage, bool isError);
 
 	private:
 		seastar::lw_shared_ptr<SessionConfiguration> sessionConfiguration_;
