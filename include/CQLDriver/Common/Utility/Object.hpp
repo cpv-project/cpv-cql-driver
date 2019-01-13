@@ -22,6 +22,8 @@ namespace cql {
 	 * Cast Object<Derived> to Object<Base> is supported (polymorphism is supported).
 	 * Cast Object<Base> to Object<Derived> is also supported (use it carefully).
 	 * Incomplete type is supported (however it require the complete definition on construct).
+	 * Warning: Don't keep other Object<> live after freeResources, it may cause segment fault.
+	 * - For example: A in freeList -> A refs B -> deallocate freeList B -> deallocate freeList A
 	 */
 	template <class T>
 	class Object {
