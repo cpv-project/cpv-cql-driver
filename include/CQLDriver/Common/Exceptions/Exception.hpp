@@ -6,14 +6,18 @@
 namespace cql {
 	/**
 	 * The base class of all exceptions this library will throw.
-	 * Example: throw Exception(CQL_CODEINFO, "some error");
+	 * Example: throw Exception(CPV_CODEINFO, "some error");
 	 */
 	class Exception : public std::runtime_error {
 	public:
 		/** Constructor */
 		template <class... Args>
 		Exception(CodeInfo&& codeInfo, Args&&... args) :
-			runtime_error(joinString(" ", std::move(codeInfo).str(), std::forward<Args>(args)...)) { }
+			Exception(std::move(codeInfo).str(), joinString(" ", std::forward<Args>(args)...)) { }
+		
+	protected:
+		/** Constructor */
+		Exception(std::string&& codeInfoStr, std::string&& message);
 	};
 }
 
