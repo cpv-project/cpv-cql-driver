@@ -21,7 +21,8 @@ namespace cql {
 		void log(LogLevel logLevel, const Args&... args) {
 			if (CQL_UNLIKELY(isEnabled(logLevel))) {
 				logImpl(logLevel, joinString("",
-					"<CQL:", logLevel, "> ", joinString(" ", args...), '\n'));
+					"<CQL:", logLevel, ":", getThreadId(), "> ",
+					joinString(" ", args...), '\n'));
 			}
 		}
 
@@ -40,6 +41,9 @@ namespace cql {
 	protected:
 		/** The implmentation of log, may write to console or database */
 		virtual void logImpl(LogLevel logLevel, const std::string& message) = 0;
+
+		/** Get thread id for logging */
+		std::size_t getThreadId();
 
 	private:
 		LogLevel logLevel_;
