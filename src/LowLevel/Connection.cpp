@@ -199,8 +199,12 @@ namespace cql {
 						hex);
 					logger->log(LogLevel::Debug, "after encode:", hex);
 				}
-				// send the encoded binary data
-				return self->socket_.out().write(self->sendingBuffer_).then([&self] {
+				// send the encoded binary data, use temporary_buffer without deleter to avoid copy
+				seastar::temporary_buffer<char> buf(
+					self->sendingBuffer_.data(),
+					self->sendingBuffer_.size(),
+					seastar::deleter());
+				return self->socket_.out().put(std::move(buf)).then([&self] {
 					return self->socket_.out().flush();
 				});
 			}).then([&self, &sendingPromise] {
