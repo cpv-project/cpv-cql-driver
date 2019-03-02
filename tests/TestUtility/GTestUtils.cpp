@@ -14,7 +14,7 @@ namespace cql {
 					return RUN_ALL_TESTS();
 				}).then([&returnValue] (int result) {
 					returnValue = result;
-					// wait 1s for cleanup
+					// wait for internal cleanup to make leak sanitizer happy
 					return seastar::sleep(std::chrono::seconds(1));
 				});
 			});
