@@ -25,10 +25,9 @@
 
 #define ASSERT_THROWS(exception, expression) ASSERT_THROWS_CONTAINS(exception, expression, "")
 
-namespace cql {
-	namespace Internal_Gtest {
-		int runAllTests(int argc, char** argv);
-	}
+namespace cql::gtest {
+	/** the main function of test executable */
+	int runAllTests(int argc, char** argv);
 }
 
 namespace {
