@@ -1,7 +1,9 @@
+# Prepare
+
 For statements that execute often, you can prepare it to improve execution performance and reduce transfer size.<br/>
 The preparation can be enabled globally or for a single query.<br/>
 
-### Enable preparation globally
+## Enable preparation globally
 
 Use `setPrepareAllQueries(true)` in [SessionConfiguration](./Configuration.md#setprepareallqueriesbool), for example:
 
@@ -26,7 +28,7 @@ auto command = cql::BatchCommand()
 		.addParameters(cql::Text("aaa"), cql::Int(1));
 ```
 
-### Enable preparation for a single query
+## Enable preparation for a single query
 
 By default, the preparation is disabled for all queries.<br/>
 To enable preparation for a single query, use `prepareQuery()` just like above, for example:
@@ -45,9 +47,9 @@ auto command = cql::BatchCommand()
 		.addParameters(cql::Text("aaa"), cql::Int(1));
 ```
 
-### More details
+## More details
 
-Unlike other drivers, this driver manages preparation fully automatic.<br/>
+Unlike other drivers, this driver manages preparation automatically.<br/>
 User doesn't have to manage the prepared id themselves, as a cost, every queries have to perform a hash table lookup by the query string.<br/>
 But I think a hash table loopup is necessary anyway, because the prepared id is cached in each node separately.
 

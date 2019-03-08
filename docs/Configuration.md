@@ -1,6 +1,8 @@
+# Configuration
+
 To create a `SessionFactory`, two types of configuration is needed. `SessionConfiguration` provides the common configurations for all sessions and all connections, `NodeConfiguration` provides node specified configurations for a single node and the connections connected to this node.
 
-# SessionConfiguration
+## SessionConfiguration
 
 `SessionConfiguration` can built with chain style or command style:
 
@@ -22,13 +24,13 @@ configuration.setDefaultKeySpace("system");
 
 `SessionConfiguration` contains following options:
 
-### setMinPoolSize(std::size_t)
+### `setMinPoolSize(std::size_t)`
 
 Set the minimum database connection pool size.<br/>
 Notice it's per core configuration.<br/>
 The default value is 5.<br/>
 
-### setMaxPoolSize(std::size_t)
+### `setMaxPoolSize(std::size_t)`
 
 Set the maximum database connection pool size.<br/>
 Notice it's per core configuration,<br/>
@@ -36,7 +38,7 @@ for example if the max pool size is 100 and there 2 cpu cores,<br/>
 then the maximum database connections in the pool for a single process is 200.<br/>
 The default value is 100.<br/>
 
-### setMaxWaitersAfterConnectionsExhausted(std::size_t)
+### `setMaxWaitersAfterConnectionsExhausted(std::size_t)`
 
 Set how many waiters can exist after connections are exhausted.<br/>
 After all connections are occupied and the poll can't raise new connection,<br/>
@@ -47,16 +49,16 @@ the pool will return an error instead of waiting.<br/>
 Notice it's per core configuration.<br/>
 The default value is 100.<br/>
 
-### setDnsCacheTime(std::chrono::milliseconds)
+### `setDnsCacheTime(std::chrono::milliseconds)`
 
 Set the dns cache time for the hostname of nodes.<br/>
 The default value is 30000ms.<br/>
 
-### setDefaultKeySpace(const std::string&)
+### `setDefaultKeySpace(const std::string&)`
 
 Set the default keyspace of all connections created by this configuration.<br/>
 
-### setDefaultConsistency(ConsistencyLevel)
+### `setDefaultConsistency(ConsistencyLevel)`
 
 Set the default consistency level.<br/>
 The default value is `ConsistencyLevel.Quorum`.<br/>
@@ -76,7 +78,7 @@ Supported consistencies:<br/>
 - ConsistencyLevel::LocalSerial
 - ConsistencyLevel::LocalOne
 
-### setPrepareAllQueries(bool)
+### `setPrepareAllQueries(bool)`
 
 Set should prepare all queries by default.<br/>
 The default value is false.<br/>
@@ -87,7 +89,7 @@ This can be overridden by `prepareQuery(bool)` in [Command](./Query.md#preparequ
 Set the logger instance.<br/>
 See the document about [Logging](./Logging.md).
 
-# NodeConfiguration
+## NodeConfiguration
 
 `NodeConfiguration` can built with chain style or command style:
 
@@ -107,24 +109,24 @@ node.setUseSSL(true);
 
 `NodeConfiguration` contains following options:
 
-### setAddress(std::string&&, std::uint16_t)
+### `setAddress(std::string&&, std::uint16_t)`
 
 Set the hostname and the port of this node.<br/>
 
-### setUseSSL(bool)
+### `setUseSSL(bool)`
 
 Set should connect this node with ssl connection, default value is false.<br/>
 
-### setUseCompression(bool)
+### `setUseCompression(bool)`
 
 Set should use frame compression if available, default value is false.<br/>
 For now only lz4 algorithm is supported and will be used if this option is set.
 
-### setMaxStreams(std::size_t)
+### `setMaxStreams(std::size_t)`
 
 Set how many streams can hold in a single connection, default value is 20.<br/>
 
-### setMaxPendingMessages(std::size_t)
+### `setMaxPendingMessages(std::size_t)`
 
 Set how many messages can hold in a received queue for a single stream, default value is 100.<br/>
 Notice this setting may cause batch execute with preparation failed,<br/>
@@ -132,7 +134,7 @@ for example if max pending messages is 100 and there 101 queries to prepare,<br/
 you may see an error like `max pending messages is reached`,<br/>
 the solution is increase this limitation if you have too many queries in a single batch.
 
-### setPasswordAuthentication(std::string&&, std::string&&)
+### `setPasswordAuthentication(std::string&&, std::string&&)`
 
 Set to use password authentication for this node.<br/>
 The first argument is username, the second argument is password.
@@ -142,7 +144,7 @@ The first argument is username, the second argument is password.
 Set keepalive parameters of connection, default is use kernel settings which can modify by sysctl.<br/>
 By default all connection will enable tcp keepalive to avoid dead connection persistent.
 
-# Create a session factory
+## Create a session factory
 
 Here is the code to create a session factory:
 
@@ -164,7 +166,7 @@ cql::SessionFactory sessionFactory(
 
 `NodeCollection` is an interface use to manage node configurations and choose node based on some strategy, you can implement your own node collection to do the custom load balancing.
 
-# NodeCollection
+## NodeCollection
 
 The default implemention of `NodeCollection` is very simple, it will choose nodes in order, if connect to a node has failed, the node will be put on a fault list, nodes in fault list will not be choose unless a round has finished.<br/>
 For example, there nodes A, B, C, D, E:

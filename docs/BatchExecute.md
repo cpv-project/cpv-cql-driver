@@ -1,3 +1,5 @@
+# Batch Execute
+
 If you want to perform multiple data modification operations in a single roundtrip, `Session::batchExecute` will be the choice.<br/>
 The signature of `Session::batchExecute` is:
 
@@ -8,7 +10,7 @@ seastar::future<> batchExecute(BatchCommand&& command);
 Different to `query` and `execute`, `batchExecute` takes `BatchCommand` instead of `Command`.<br/>
 Only insert, update and delete statements can use in a batch command.<br/>
 
-# BatchCommand
+## BatchCommand
 
 `BatchCommand` can built with chain style or command style:
 
@@ -56,7 +58,7 @@ session.batchExecute(std::move(command)).then([] {
 
 `BatchCommand` contains following options:
 
-### setType(BatchType)
+### `setType(BatchType)`
 
 Set the type of this batch, default is "Logged".<br/>
 Supported batch types:<br/>
@@ -65,7 +67,7 @@ Supported batch types:<br/>
 - BatchType::UnLogged
 - BatchType::Counter
 
-### setConsistency(ConsistencyLevel)
+### `setConsistency(ConsistencyLevel)`
 
 Set the consistency level of this query.<br/>
 This will override the default setting in [SessionConfiguration](./Configuration.md#setdefaultconsistencyconsistencylevel).<br/>
@@ -84,7 +86,7 @@ Supported consistencies:<br/>
 - ConsistencyLevel::LocalSerial
 - ConsistencyLevel::LocalOne
 
-### addQuery(...)
+### `addQuery(...)`
 
 Add a new query to this batch.
 There multiple overloads of this function:
@@ -100,14 +102,14 @@ Notice overload 2 and 3 won't copy the string to the internal buffer in `BatchCo
 it can avoid the unnecessary memory copy,
 but you have to ensure the string is alive until `Session::batchExecute` is finished.
 
-### prepareQuery(bool)
+### `prepareQuery(bool)`
 
 Set should prepare the last query.<br/>
 This will override the default setting in [SessionConfiguration](./Configuration.md#setprepareallqueriesbool).<br/>
 The prepare request will only be sent if the query isn't prepared before.<br/>
 For more information see [Prepare](./Prepare.md).
 
-### openParameterSet()
+### `openParameterSet()`
 
 Open a new parameter set explicitly of the last query.<br/>
 This function is optional if there only one parameter set, for example:<br/>
@@ -141,12 +143,12 @@ auto command = cql::BatchCommand()
 			.addParameters(cql::Int(3), cql::Text("c"));
 ```
 
-### addParameter(T&&)
+### `addParameter(T&&)`
 
 Add single query parameter bound by position to the last parameter set.<br/>
 The position is incremental, when this function is called.<br/>
 
-### addParameters(Args&&...)
+### `addParameters(Args&&...)`
 
 Add multiple query parameters bound by position to the last parameter set.<br/>
 The position is incremental, when this function is called.<br/>
@@ -168,18 +170,18 @@ auto command = cql::BatchCommand()
 		.addParameter(cql::Int(1));
 ```
 
-### setSerialConsistency(ConsistencyLevel)
+### `setSerialConsistency(ConsistencyLevel)`
 
 Set the serial consistency level of this query.<br/>
-Can only be either SERIAL or LOCAL_SERIAL.<br/>
+Can only be either `SERIAL` or `LOCAL_SERIAL`.<br/>
 
-### setDefaultTimestamp(std::chrono::system_clock::time_point)
+### `setDefaultTimestamp(std::chrono::system_clock::time_point)`
 
 Set the default timestamp of this query.<br/>
 This will replace the server side assigned timestamp as default timestamp.<br/>
 A timestamp in the query itself will still override this timestamp.<br/>
 
-### setMaxRetries(std::size_t)
+### `setMaxRetries(std::size_t)`
 
 Set the maximum retry times *after* the first try has failed, default is 0.<br/>
 **Please ensure all statements are idempotent, this driver won't check it.**<br/>

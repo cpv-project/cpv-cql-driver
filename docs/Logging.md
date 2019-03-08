@@ -1,7 +1,9 @@
+# Logging
+
 `Logger` can be used to capture internal logs to find and solve problems.<br/>
 This library contains two default `Logger` implementions:
 
-# ConsoleLogger
+## ConsoleLogger
 
 A logger writes messages to console.<br/>
 The example code to create it:<br/>
@@ -21,7 +23,7 @@ Supported log levels:
 - LogLevel::Info
 - LogLevel::Debug
 
-# NoopLogger
+## NoopLogger
 
 A do-nothing logger.
 
@@ -29,9 +31,9 @@ A do-nothing logger.
 auto logger = cql::Logger::createNoop();
 ```
 
-# Use logger
+## Use logger
 
-You can specific a logger by calling `SessionConfiguration::setLogger`, for example:
+You can specify the logger in session configuration by calling `SessionConfiguration::setLogger`, for example:
 
 ``` c++
 auto configuration = cql::SessionConfiguration()

@@ -1,7 +1,9 @@
+# Hello World
+
 This document will teach you how to write a simple program that use this driver to manipulate a cassandra/scylla database.<br/>
 First, if you don't known about seastar framework, you should read [this](https://github.com/scylladb/seastar/blob/master/doc/tutorial.md) before continue.
 
-# Install cqldriver
+## Install cqldriver
 
 Please follow the installation instructions on [README.md](../README.md),
 to complete this tutorial, you should ensure following commands work.
@@ -14,7 +16,7 @@ to complete this tutorial, you should ensure following commands work.
 If you install cqldriver from ubuntu ppa then both seastar and cqldriver will available as shared library,
 static library from custom build should work too but I didn't test.
 
-# A hello world program
+## A hello world program
 
 Here is the source code of a hello world program:
 
@@ -175,13 +177,7 @@ session.query(std::move(command)).then([] (cql::ResultSet result) {
 The return type of `Session::query` is `seastar::future<ResultSet>`.<br/>
 And the return type of of `Session::execute` is `seastar::future<>`.
 
-### Dynamic linking
-
-For now this library doesn't support dynamic linking, so the linking time is long.<br/>
-To reduce the executable binary size you could use the `strip` command.<br/>
-I will provide dynamic linking support in the future version, and you can contribute if you already did it.
-
-# Finally
+## Finally
 
 Now I assume you already know how to write a simple program and compile it with this library.<br/>
 You can read other documents for more information.<br/>

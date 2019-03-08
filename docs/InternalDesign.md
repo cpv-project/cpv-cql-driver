@@ -1,16 +1,18 @@
+# Internal Design
+
 This document is for those who wants to contribute.
 
-# Code structure
+## Code structure
 
-The code of this driver is splited by 3 parts:
+Code of this driver are splited as 3 parts:
 
-- Common
-- LowLevel
-- HighLevel
+- Common: contains common types and functions used from LowLevel and HighLevel
+- LowLevel: contains internal types which can't access from public header files under include folder
+- HighLevel: contains public types which can access from public headers files under include folder
 
-LowLevel can include headers in Common, HighLevel can include headers in both Common and LowLevel.
+LowLevel can include headers from Common, HighLevel can include headers from both Common and LowLevel.
 
-# TODO: provide more sections
+## TODO: provide more sections
 
 - Define new column type
 - Define new logger

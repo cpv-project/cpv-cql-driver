@@ -1,3 +1,5 @@
+# Execute
+
 `Session::execute` is almost the same as `Session::query`, the difference is `execute` won't return `ResultSet`.<br/>
 The signature of `Session::execute` is:
 

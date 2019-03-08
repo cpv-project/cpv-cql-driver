@@ -1,7 +1,9 @@
+# Column Types
+
 This driver supports following column types:<br/>
 Notice all column types can't hold a null value unless `Nullable<T>` is used.
 
-# Ascii
+### `Ascii`
 
 A sequence of bytes in the ASCII range `[0, 127]`.<br/>
 For now there no client side validation (for performance).<br/>
@@ -14,7 +16,7 @@ value->append("de", 2);
 std::size_t size = value->size(); // 5
 ```
 
-# BigInt
+### `BigInt`
 
 A 8 byte two's complement integer.
 
@@ -25,7 +27,7 @@ cql::BigInt value(1);
 value += 123;
 ```
 
-# Blob
+### `Blob`
 
 Any sequence of bytes.
 
@@ -37,7 +39,7 @@ value->append("de", 2);
 std::cout << value->size() << std::endl; // 5
 ```
 
-# Boolean
+### `Boolean`
 
 A single byte.
 
@@ -50,7 +52,7 @@ if (value) {
 }
 ```
 
-# Counter
+### `Counter`
 
 Same as "bigint", but able to perform increment and decrement.
 
@@ -61,7 +63,7 @@ cql::Counter value(1);
 value += 123;
 ```
 
-# Date
+### `Date`
 
 An unsigned integer representing days with epoch centered at 2^31.<br/>
 (unix epoch January 1st, 1970).<br/>
@@ -74,7 +76,7 @@ value = cql::Date::create(1970, 1, 15); // in local timezone
 value = cql::Date::today(); // in local timezone
 ```
 
-# Decimal
+### `Decimal`
 
 The decimal format represents an arbitrary-precision number.
 
@@ -85,7 +87,7 @@ cql::Decimal value(2, 123);
 std::cout << value << std::endl; // 1.23
 ```
 
-# Double
+### `Double`
 
 A 8 byte floating point number in the IEEE 754 binary64 format.
 
@@ -96,7 +98,7 @@ cql::Double value(0.001);
 value += 0.123;
 ```
 
-# Float
+### `Float`
 
 A 4 byte floating point number in the IEEE 754 binary32 format.
 
@@ -107,7 +109,7 @@ cql::Float value(0.001);
 value += 0.123;
 ```
 
-# Inet
+### `Inet`
 
 A 4 byte or 16 byte sequence denoting an IPv4 or IPv6 address.
 
@@ -117,7 +119,7 @@ Example:
 cql::Inet value("127.0.0.1");
 ```
 
-# Int
+### `Int`
 
 A 4 byte two's complement integer.
 
@@ -128,7 +130,7 @@ cql::Int value(1);
 value += 123;
 ```
 
-# List<T>
+### `List<T>`
 
 A list store repeatable values.
 
@@ -139,7 +141,7 @@ cql::List<cql::BigInt> value({ 1, 2 });
 std::cout << value->size() << std::endl; // 2
 ```
 
-# Map<TKey, TValue>
+### `Map<TKey, TValue>`
 
 A map store key-value pairs.
 
@@ -151,7 +153,7 @@ value->emplace("asd", 321);
 std::cout << value->size() << std::endl; // 2
 ```
 
-# MemRef
+### `MemRef`
 
 Memory reference, it doesn't have the owership of the target.
 
@@ -161,7 +163,7 @@ Example:
 cql::MemRef value("abc");
 ```
 
-# Nullable<T>
+### `Nullable<T>`
 
 Wrapper class that able to represent a null value.</br>
 For convenient and performance, getting underlying value will not perform null check,</br>
@@ -178,7 +180,7 @@ std::cout << *value << std::endl; // 123
 std::cout << value.isNull() << std::endl; // false
 ```
 
-# Set<T>
+### `Set<T>`
 
 A set store disinct values.
 
@@ -189,7 +191,7 @@ cql::Set<cql::BigInt> value({ 1, 2 });
 std::cout << value->size() << std::endl; // 2
 ```
 
-# SmallInt
+### `SmallInt`
 
 A 2 byte two's complement integer.
 
@@ -200,7 +202,7 @@ cql::SmallInt value(1);
 value += 123;
 ```
 
-# Text
+### `Text`
 
 A sequence of bytes of conforming to the UTF-8 specifications.<br/>
 For now there no client side validation (for performance).<br/>
@@ -214,7 +216,7 @@ value->append("de", 2);
 std::cout << value->size() << std::endl; // 5
 ```
 
-# Time
+### `Time`
 
 An 8 byte two's complement long representing nanoseconds since midnignt.<br/>
 Valid values are in the range 0 to 86'3999'9999'9999.<br/>
@@ -227,7 +229,7 @@ value = cql::Time::create(1, 2, 3); // in local timezone
 value = cql::Time::now(); // in local timezone
 ```
 
-# Timestamp
+### `Timestamp`
 
 An 8 byte two's complement integer representing a millisecond-precision<br/>
 offset from the unix epoch (00:00:00, January 1st, 1970).<br/>
@@ -243,7 +245,7 @@ value += std::chrono::hours(1);
 value += std::chrono::minutes(30);
 ```
 
-# TimeUUID
+### `TimeUUID`
 
 A 16 byte sequence representing a version 1 UUID as defined by RFC 4122.
 
@@ -256,7 +258,7 @@ uuid = cql::TimeUUID::create();
 std::cout << uuid.empty() << std::endl; // false
 ```
 
-# TinyInt
+### `TinyInt`
 
 A 1 byte two's complement integer.
 
@@ -267,7 +269,7 @@ cql::TinyInt value(1);
 value += 123;
 ```
 
-# Tuple<Types...>
+### `Tuple<Types...>`
 
 A tuple store different types values.
 
@@ -281,7 +283,7 @@ std::cout << value.get<0>() << std::endl; // 123
 std::cout << value.get<1>() << std::endl; // abc
 ```
 
-# UDT<Fields...>
+### `UDT<Fields...>`
 
 A user defined type store different types named values.
 
@@ -298,7 +300,7 @@ std::cout << value.get<0>() << std::endl; // 123
 std::cout << value.get<1>() << std::endl; // abc
 ```
 
-# UUID
+### `UUID`
 
 A 16 byte sequence representing any valid UUID as defined by RFC 4122.
 
@@ -312,7 +314,7 @@ std::cout << uuid.empty() << std::endl; // false
 uuid = cql::UUID::create(); // create a version 4 (random) uuid
 ```
 
-# VarInt
+### `VarInt`
 
 A variable length two's complement encoding of a signed integer.<br/>
 This class can't store a variable integer that std::int64_t can't hold,<br/>

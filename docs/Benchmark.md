@@ -1,7 +1,9 @@
+# Benchmark
+
 This document records the benchmark results.<br/>
 Environment: VMware Player on i5-6400 2.7GHz.<br/>
 
-# Select
+## Select
 
 Task: select 100 records from 200 records 10000 times (single thread).
 
@@ -27,7 +29,7 @@ Task: select 100 records from 200 records 20000 times (multiple threads with con
 | DataStax C++ 2.8.1 (+Prepare)    | 4*20  | `[11.161, 11.644, 11.228, 11.079, 11.137]` | 11.249       |
 | CQLDriver 0.3 (+Prepare)         | 4*20  | `[9.373, 9.787, 9.784, 9.770, 9.600]`      | 9.662        |
 
-# Insert
+## Insert
 
 Task: insert a single record 10000 times (single thread).
 
@@ -53,7 +55,7 @@ Task: insert a single record 100000 times (multiple threads with concurrent task
 | DataStax C++ 2.8.1 (+Prepare)    | 4*20  | `[4.812, 4.496, 4.347, 4.770, 4.270]`      | 4.539        |
 | CQLDriver 0.3 (+Prepare)         | 4*20  | `[3.614, 3.680, 3.385, 3.699, 3.702]`      | 3.615        |
 
-# Batch Insert
+## Batch Insert
 
 Task: batch insert 100 records 1000 times (single thread).
 
@@ -83,7 +85,7 @@ Task: batch insert 100 records 10000 times (multiple threads with concurrent tas
 | CQLDriver 0.3 (+Prepare)         | 4*20  | `[30.219, 28.663, 28.507, 27.618, 26.074]` | 28.216       |
 | CQLDriver 0.3 (+P+C)             | 4*20  | `[24.043, 22.687, 23.060, 23.902, 21.607]` | 23.059       |
 
-# Performance analysis (live-profiler)
+## Performance analysis (live-profiler)
 
 Provided by [live-profiler](https://github.com/cpv-project/live-profiler).<br/>
 Last updated version: 0.2<br/>
