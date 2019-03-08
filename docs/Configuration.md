@@ -82,7 +82,7 @@ Set should prepare all queries by default.<br/>
 The default value is false.<br/>
 This can be overridden by `prepareQuery(bool)` in [Command](./Query.md#preparequerybool) and [BatchCommand](./BatchExecute.md#preparequerybool).
 
-### setLogger(seastar::shared_ptr<Logger>&)
+### `setLogger(seastar::shared_ptr<Logger>&)`
 
 Set the logger instance.<br/>
 See the document about [Logging](./Logging.md).
@@ -136,6 +136,11 @@ the solution is increase this limitation if you have too many queries in a singl
 
 Set to use password authentication for this node.<br/>
 The first argument is username, the second argument is password.
+
+### `setKeepaliveParameters(std::optional<seastar::net::keepalive_params>&& keepaliveParameters)`
+
+Set keepalive parameters of connection, default is use kernel settings which can modify by sysctl.<br/>
+By default all connection will enable tcp keepalive to avoid dead connection persistent.
 
 # Create a session factory
 

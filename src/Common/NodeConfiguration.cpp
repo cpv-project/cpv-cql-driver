@@ -19,6 +19,7 @@ namespace cql {
 			maxPendingMessages(100),
 			authenticatorClass(AuthenticatorClasses::AllowAllAuthenticator),
 			authenticatorData(),
+			keepaliveParameters(),
 			ipAddress(),
 			ipAddressIsResolved(false),
 			ipAddressIsFixed(false),
@@ -32,6 +33,7 @@ namespace cql {
 		std::size_t maxPendingMessages;
 		std::string authenticatorClass;
 		std::string authenticatorData;
+		std::optional<seastar::net::keepalive_params> keepaliveParameters;
 		seastar::socket_address ipAddress;
 		bool ipAddressIsResolved;
 		bool ipAddressIsFixed;
@@ -105,6 +107,13 @@ namespace cql {
 		return *this;
 	}
 
+	/** Set keepalive parameters of connection */
+	NodeConfiguration& NodeConfiguration::setKeepaliveParameters(
+		std::optional<seastar::net::keepalive_params>&& keepaliveParameters) {
+		data_->keepaliveParameters = std::move(keepaliveParameters);
+		return *this;
+	}
+
 	/** Get the hostname and the port of this node */
 	const std::pair<std::string, std::uint16_t>& NodeConfiguration::getAddress() const& {
 		return data_->address;
@@ -144,7 +153,12 @@ namespace cql {
 	const std::string& NodeConfiguration::getAuthenticatorData() const& {
 		return data_->authenticatorData;
 	}
-	
+
+	/** Get keepalive parameters of connection */
+	const std::optional<seastar::net::keepalive_params>& NodeConfiguration::getKeepaliveParameters() const& {
+		return data_->keepaliveParameters;
+	}
+
 	/** Get the resolved ip address, return whether the ip address is available and not expired */
 	bool NodeConfiguration::getIpAddress(
 		seastar::socket_address& ipAddress,

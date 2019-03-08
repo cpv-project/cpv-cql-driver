@@ -15,6 +15,7 @@ TEST(TestNodeConfiguration, all) {
 		ASSERT_EQ(configuration.getMaxPendingMessages(), 100U);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::AuthenticatorClasses::AllowAllAuthenticator);
 		ASSERT_TRUE(configuration.getAuthenticatorData().empty());
+		ASSERT_FALSE(configuration.getKeepaliveParameters().has_value());
 		seastar::socket_address address;
 		ASSERT_FALSE(configuration.getIpAddress(address, std::chrono::milliseconds(1000)));
 	}
@@ -25,7 +26,9 @@ TEST(TestNodeConfiguration, all) {
 			.setUseCompression(true)
 			.setMaxStreams(21)
 			.setMaxPendingMessages(22)
-			.setPasswordAuthentication("abc", "asdfg");
+			.setPasswordAuthentication("abc", "asdfg")
+			.setKeepaliveParameters(seastar::net::tcp_keepalive_params(
+				{ std::chrono::seconds(1), std::chrono::seconds(2), 3 }));
 		ASSERT_EQ(configuration.getAddress().first, "127.0.0.1");
 		ASSERT_EQ(configuration.getAddress().second, 9000);
 		ASSERT_TRUE(configuration.getUseSSL());
@@ -34,6 +37,12 @@ TEST(TestNodeConfiguration, all) {
 		ASSERT_EQ(configuration.getMaxPendingMessages(), 22U);
 		ASSERT_EQ(configuration.getAuthenticatorClass(), cql::AuthenticatorClasses::PasswordAuthenticator);
 		ASSERT_EQ(configuration.getAuthenticatorData(), makeTestString("\x00""abc""\x00""asdfg"));
+		ASSERT_TRUE(configuration.getKeepaliveParameters().has_value());
+		auto& params = seastar::compat::get<
+			seastar::net::tcp_keepalive_params>(*configuration.getKeepaliveParameters());
+		ASSERT_EQ(params.idle.count(), 1U);
+		ASSERT_EQ(params.interval.count(), 2U);
+		ASSERT_EQ(params.count, 3U);
 		seastar::socket_address address;
 		ASSERT_TRUE(configuration.getIpAddress(address, std::chrono::milliseconds(1000)));
 		ASSERT_EQ(cql::joinString("", address), "127.0.0.1:9000");

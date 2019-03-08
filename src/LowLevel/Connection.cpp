@@ -32,7 +32,7 @@ namespace cql {
 			// log connect
 			auto& logger = self->sessionConfiguration_->getLogger();
 			if (logger->isEnabled(LogLevel::Info)) {
-				logger->log(LogLevel::Info, "create connection to",
+				logger->log(LogLevel::Info, "create connection", self.get(), "to",
 					self->nodeConfiguration_->getAddressAsString());
 			}
 			// connect to database server
@@ -58,6 +58,12 @@ namespace cql {
 		}).then([self] (seastar::connected_socket fd) {
 			// connect successful
 			self->socket_ = SocketHolder(std::move(fd));
+			// enable keepalive and set keepalive parameters to avoid dead connection persistent
+			self->socket_.socket().set_keepalive(true);
+			auto& keepaliveParameters = self->nodeConfiguration_->getKeepaliveParameters();
+			if (keepaliveParameters.has_value()) {
+				self->socket_.socket().set_keepalive_parameters(*keepaliveParameters);
+			}
 		}).handle_exception([self] (std::exception_ptr ex) {
 			// connect failed
 			return seastar::make_exception_future(NetworkException(
@@ -129,13 +135,13 @@ namespace cql {
 			// initialize connection failed
 			auto& logger = self->sessionConfiguration_->getLogger();
 			if (logger->isEnabled(LogLevel::Error)) {
-				logger->log(LogLevel::Error, "initialize connection to",
+				logger->log(LogLevel::Error, "initialize connection", self.get(), "to",
 					self->nodeConfiguration_->getAddressAsString(), "failed:", ex);
 			}
 			self->metricsData_->connection_initialize_errors += 1;
 			self->close("initialize connection failed", true);
 			return seastar::make_exception_future(ConnectionInitializeException(
-				CQL_CODEINFO, "initialize connection to",
+				CQL_CODEINFO, "initialize connection", self.get(), "to",
 				self->nodeConfiguration_->getAddressAsString(), "failed:\n", ex));
 		});
 	}
@@ -372,7 +378,7 @@ namespace cql {
 	/** Destructor */
 	Connection::~Connection() {
 		try {
-			close("close from destructor", false);
+			close("destruction", false);
 		} catch (...) {
 			std::cerr << std::current_exception() << std::endl;
 		}
@@ -448,7 +454,7 @@ namespace cql {
 			auto& logger = sessionConfiguration_->getLogger();
 			logger->log(
 				isError ? LogLevel::Error : LogLevel::Info,
-				"close connection:", errorMessage);
+				"close connection", this, "because of", errorMessage);
 		}
 		// close the socket and reset the ready state
 		socket_ = SocketHolder();

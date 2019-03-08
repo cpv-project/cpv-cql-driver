@@ -3,6 +3,8 @@
 #include <utility>
 #include <chrono>
 #include <memory>
+#include <optional>
+#include <seastar/net/api.hh>
 #include <seastar/net/socket_defs.hh>
 #include "./Utility/StringHolder.hpp"
 
@@ -32,6 +34,10 @@ namespace cql {
 		NodeConfiguration& setPasswordAuthentication(
 			std::string&& username, std::string&& password);
 
+		/** Set keepalive parameters of connection, default is use kernel settings which can modify by sysctl */
+		NodeConfiguration& setKeepaliveParameters(
+			std::optional<seastar::net::keepalive_params>&& keepaliveParameters);
+
 		/** Get the hostname and the port of this node */
 		const std::pair<std::string, std::uint16_t>& getAddress() const&;
 
@@ -55,6 +61,9 @@ namespace cql {
 
 		/** Get the authentication data, the format depends on the class */
 		const std::string& getAuthenticatorData() const&;
+
+		/** Get keepalive parameters of connection */
+		const std::optional<seastar::net::keepalive_params>& getKeepaliveParameters() const&;
 
 		/** Get the resolved ip address, return whether the ip address is available and not expired */
 		bool getIpAddress(
