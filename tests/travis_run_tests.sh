@@ -12,8 +12,8 @@ TESTS_DIR=$(realpath .)
 PROJECT_DIR=$(realpath ../)
 
 # start scylla containers (2 ssl and 1 simple)
-git clone https://github.com/cpv-project/cpv-manage-scripts
-cd ./cpv-manage-scripts/scylla
+git clone https://github.com/cpv-project/cpv-ops
+cd ./cpv-ops/ci/scylla
 sh setup_node.sh
 sh generate_ca_key.sh
 sh generate_db_key.sh ssl-1
