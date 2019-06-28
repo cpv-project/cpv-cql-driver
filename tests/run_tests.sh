@@ -6,6 +6,8 @@ BUILDDIR=../build/cqldriver-tests
 mkdir -p ${BUILDDIR}
 cd ${BUILDDIR}
 cmake -DCMAKE_BUILD_TYPE=Debug \
+	-DCMAKE_C_COMPILER=gcc-9 \
+	-DCMAKE_CXX_COMPILER=g++-9 \
 	-DDB_SIMPLE_IP=127.0.0.1 \
 	-DDB_SIMPLE_PORT=9043 \
 	-DDB_SSL_1_IP=localhost \
