@@ -21,10 +21,16 @@ namespace cql {
 		void set(const UnderlyingType& value) { value_ = value; }
 
 		/** Set the ip address by it's string representation */
-		void set(const std::string& value) { value_ = UnderlyingType(value); }
+		void set(const std::string& value) {
+			if (value.empty()) {
+				reset();
+			} else {
+				value_ = UnderlyingType(value);
+			}
+		}
 
 		/** Reset to initial state */
-		void reset() { value_ = {}; }
+		void reset() { value_ = UnderlyingType(::in_addr{}); }
 
 		/** Encode to binary data */
 		void encodeBody(std::string& data) const {
@@ -50,7 +56,7 @@ namespace cql {
 		}
 
 		/** Constructors */
-		Inet() : value_() { }
+		Inet() : value_(::in_addr{}) { }
 		template <class... Args>
 		explicit Inet(Args&&... args) : value_() {
 			set(std::forward<Args>(args)...);

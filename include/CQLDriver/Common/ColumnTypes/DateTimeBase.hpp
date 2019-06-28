@@ -61,13 +61,18 @@ namespace cql {
 		}
 
 		/** Allow cast to time_t implicitly */
-		operator std::time_t() const {
+		explicit operator std::time_t() const {
+			// explicit is used to prevent unintended conversion,
+			// when operator std::time_t and operator std::chrono::nanoseconds both exists,
+			// gcc 9 will pick std::time_t when using static_cast<std::chrono::nanoseconds>,
+			// it may be a compiler bug that doesn't exists in gcc 7,
+			// anyway this type shouldn't convert to an integer implicitly.
 			return std::chrono::system_clock::to_time_t(value_);
 		}
 
 		/** Allow cast to std::tm expressed in local timezone implicitly */
 		operator std::tm() const {
-			std::time_t utcTime = *this;
+			std::time_t utcTime = static_cast<std::time_t>(*this);
 			std::tm localTm = {};
 			::localtime_r(&utcTime, &localTm);
 			return localTm;
