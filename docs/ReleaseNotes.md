@@ -1,5 +1,19 @@
 # Release Notes
 
+## 0.5.1
+
+Changes:
+
+- add branch prediction hints
+- add option CQL_ENABLE_LOGGER_BY_DEFAULT
+- log sent and received message bytes for debug
+- disable enum to string if EnumDescriptions specialization is not provided
+- add backtrace information to exception message by default
+- print thread id on every log message
+- use seastar::data_sink instead of seastar::output_stream<char>
+- enable keepalive for all connection by default and allow configure parameters, update logging messages
+- fix bugs in inet/time column type for newer seastar (20190627) and gcc 9
+
 ## 0.5
 
 Changes:
