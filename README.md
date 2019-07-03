@@ -46,19 +46,29 @@ sudo apt-get update
 sudo apt-get install cqldriver
 ```
 
+In addition, you have to install gcc-9 because the seastar package is built with it.
+
+``` text
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo apt-get install g++-9
+```
+
 ### Install from source
 
 Before build the source code of this project you should:
 
 - install [seastar](https://github.com/scylladb/seastar) on system
+- install gcc 9 if you're using seastar package from ppa
 - ensure `pkg-config --cflags seastar` works
 - ensure `pkg-config --libs seastar` works
-- ensure the c++ compiler supports c++17
 
 ``` text
 mkdir -p build/cqldriver-custom
 cd build/cqldriver-custom
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../../src
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_C_COMPILER=gcc-9 \
+	-DCMAKE_CXX_COMPILER=g++-9 \
+	../../src
 make V=1
 make install V=1
 ```

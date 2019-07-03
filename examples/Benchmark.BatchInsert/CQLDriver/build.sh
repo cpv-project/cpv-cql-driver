@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 BIN_PATH="../../../build/example-benchmark-batch-insert/Main"
 mkdir -p $(dirname "${BIN_PATH}")
-g++ $(pkg-config --cflags seastar) \
+g++-9 $(pkg-config --cflags seastar) \
 	$(pkg-config --cflags cqldriver) \
 	Main.cpp \
 	$(pkg-config --libs seastar) \
