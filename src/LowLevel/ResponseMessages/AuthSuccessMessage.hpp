@@ -8,7 +8,7 @@ namespace cql {
 	public:
 		using ResponseMessageBase::freeResources;
 
-		/** For Object */
+		/** For Reusable */
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */

@@ -3,7 +3,7 @@
 #include <utility>
 #include <chrono>
 #include <optional>
-#include "./Utility/Object.hpp"
+#include "./Utility/Reusable.hpp"
 #include "./Utility/StringHolder.hpp"
 #include "./CommonDefinitions.hpp"
 #include "./ColumnTrait.hpp"
@@ -204,7 +204,7 @@ namespace cql {
 		}
 
 	private:
-		Object<CommandData> data_;
+		Reusable<CommandData> data_;
 	};
 }
 

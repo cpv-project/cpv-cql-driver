@@ -33,6 +33,11 @@ namespace cql {
 		}
 	};
 
+	/** The storage of HttpRequestData */
+	template <>
+	thread_local ReusableStorageType<BatchCommandData>
+		ReusableStorageInstance<BatchCommandData>;
+
 	/** Check whether this is a valid command (will be false if moved) */
 	bool BatchCommand::isValid() const {
 		return data_ != nullptr;
@@ -166,7 +171,7 @@ namespace cql {
 
 	/** Constructor */
 	BatchCommand::BatchCommand() :
-		data_(makeObject<BatchCommandData>()) { }
+		data_(makeReusable<BatchCommandData>()) { }
 
 	/** Constructor, build an empty(invalid) batch command */
 	BatchCommand::BatchCommand(std::nullptr_t) :

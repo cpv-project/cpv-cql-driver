@@ -1,4 +1,4 @@
-#include <CQLDriver/Common/Utility/Object.hpp>
+#include <CQLDriver/Common/Utility/Reusable.hpp>
 #include <TestUtility/GTestUtils.hpp>
 #include <seastar/core/shared_ptr.hh>
 
@@ -27,9 +27,18 @@ namespace {
 	};
 }
 
-TEST(TestObject, Simple) {
+template <>
+thread_local cql::ReusableStorageType<Foo> cql::ReusableStorageInstance<Foo>;
+
+template <>
+thread_local cql::ReusableStorageType<Derived> cql::ReusableStorageInstance<Derived>;
+
+template <>
+thread_local cql::ReusableStorageType<C> cql::ReusableStorageInstance<C>;
+
+TEST(TestReusable, Simple) {
 	for (std::size_t i = 0; i < 3; ++i) {
-		auto foo = cql::makeObject<Foo>();
+		auto foo = cql::makeReusable<Foo>();
 		ASSERT_TRUE(foo.get());
 		ASSERT_TRUE(foo->isFree);
 		ASSERT_TRUE(foo->isReset);
@@ -38,45 +47,45 @@ TEST(TestObject, Simple) {
 	}
 }
 
-TEST(TestObject, UpCasting) {
+TEST(TestReusable, UpCasting) {
 	auto record = seastar::make_shared<int>(0);
 	for (int i = 0; i < 3; ++i) {
 		ASSERT_EQ(*record, i);
 		{
-			auto base = cql::makeObject<Derived>(record).cast<Base>();
+			auto base = cql::makeReusable<Derived>(record).cast<Base>();
 		}
 		ASSERT_EQ(*record, i+1);
 	}
 }
 
-TEST(TestObject, DownCasting) {
+TEST(TestReusable, DownCasting) {
 	auto record = seastar::make_shared<int>(0);
 	for (int i = 0; i < 3; ++i) {
 		ASSERT_EQ(*record, i);
 		{
-			auto base = cql::makeObject<Derived>(record).cast<Base>();
+			auto base = cql::makeReusable<Derived>(record).cast<Base>();
 			auto derived = std::move(base).cast<Derived>();
 		}
 		ASSERT_EQ(*record, i+1);
 	}
 }
 
-TEST(TestObject, InvalidCasting) {
-	cql::makeObject<C>().cast<A>();
+TEST(TestReusable, InvalidCasting) {
+	cql::makeReusable<C>().cast<A>();
 	ASSERT_THROWS_CONTAINS(
 		cql::LogicException,
-		cql::makeObject<C>().cast<B>(),
+		cql::makeReusable<C>().cast<B>(),
 		"cast cause pointer address changed");
 }
 
-TEST(TestObject, moveAssignment) {
+TEST(TestReusable, moveAssignment) {
 	auto record = seastar::make_shared<int>(0);
 	for (int i = 0; i < 3; ++i) {
 		ASSERT_EQ(*record, i);
 		{
-			auto a = cql::makeObject<Derived>(record);
-			auto b = cql::Object<Derived>(nullptr).cast<Base>();
-			cql::Object<Derived> c(nullptr);
+			auto a = cql::makeReusable<Derived>(record);
+			auto b = cql::Reusable<Derived>(nullptr).cast<Base>();
+			cql::Reusable<Derived> c(nullptr);
 			b = std::move(a).cast<Base>();
 			b = std::move(b);
 			c = std::move(b).cast<Derived>();

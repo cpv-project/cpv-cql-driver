@@ -29,7 +29,7 @@ namespace cql {
 			static void freeResources() { }
 			void reset() { results.resize(0); }
 			PrepareResults() : results() { }
-			std::vector<std::pair<std::size_t, Object<ResponseMessageBase>>> results;
+			std::vector<std::pair<std::size_t, Reusable<ResponseMessageBase>>> results;
 		};
 
 		/** Used to control retry flow */
@@ -47,7 +47,7 @@ namespace cql {
 			/** Handle error message for "query" and "execute" */
 			template <class... Args>
 			seastar::future<Args...> handleErrorMessage(
-				Object<ErrorMessage>&& errorMessage,
+				Reusable<ErrorMessage>&& errorMessage,
 				Command& command,
 				seastar::lw_shared_ptr<Connection>& connection) {
 				auto errorCode = errorMessage->getErrorCode();
@@ -76,7 +76,7 @@ namespace cql {
 			/** Handle error message for "batchExecute" */
 			template <class... Args>
 			seastar::future<Args...> handleErrorMessage(
-				Object<ErrorMessage>&& errorMessage,
+				Reusable<ErrorMessage>&& errorMessage,
 				BatchCommand& command,
 				seastar::lw_shared_ptr<Connection>& connection) {
 				auto errorCode = errorMessage->getErrorCode();
@@ -115,7 +115,7 @@ namespace cql {
 			/** Handle unexpected message */
 			template <class... Args>
 			seastar::future<Args...> handleUnexpectMessage(
-				Object<ResponseMessageBase>&& message,
+				Reusable<ResponseMessageBase>&& message,
 				const char* requestType) {
 				maxRetries_ = 0;
 				return seastar::make_exception_future<Args...>(LogicException(
@@ -126,7 +126,7 @@ namespace cql {
 			/** Handle unexpected kind in result message */
 			template <class... Args>
 			seastar::future<Args...> handleUnexpectResultKind(
-				Object<ResultMessage>&& resultMessage,
+				Reusable<ResultMessage>&& resultMessage,
 				const char* requestType) {
 				maxRetries_ = 0;
 				return seastar::make_exception_future<Args...>(LogicException(
@@ -157,7 +157,7 @@ namespace cql {
 
 		/** For those who use query to execute statements that produce no result */
 		ResultSet getEmptyResultSet() {
-			return ResultSet(makeObject<ResultSetData>(
+			return ResultSet(makeReusable<ResultSetData>(
 				0, 0, "", seastar::temporary_buffer<char>(0), 0, 0));
 		}
 
@@ -192,7 +192,7 @@ namespace cql {
 		 * Return an EXECUTE message if the query is prepared,
 		 * otherwise return a QUERY message.
 		 */
-		seastar::future<Object<RequestMessageBase>> prepareQuery(
+		seastar::future<Reusable<RequestMessageBase>> prepareQuery(
 			Command& command,
 			RetryFlow& retryFlow,
 			seastar::lw_shared_ptr<Connection>& connection,
@@ -203,7 +203,7 @@ namespace cql {
 				auto& queryParameters = queryMessage->getQueryParameters();
 				queryParameters.setSkipMetadata(true);
 				queryParameters.setCommandRef(command);
-				return seastar::make_ready_future<Object<RequestMessageBase>>(
+				return seastar::make_ready_future<Reusable<RequestMessageBase>>(
 					std::move(queryMessage).cast<RequestMessageBase>());
 			}
 			auto& nodeConfiguration = connection->getNodeConfiguration();
@@ -219,7 +219,7 @@ namespace cql {
 				queryParameters.setSkipMetadata(true);
 				queryParameters.setCommandRef(command);
 				executeMessage->getPreparedQueryId().set(preparedQueryId);
-				return seastar::make_ready_future<Object<RequestMessageBase>>(
+				return seastar::make_ready_future<Reusable<RequestMessageBase>>(
 					std::move(executeMessage).cast<RequestMessageBase>());
 			}
 			// send PREPARE
@@ -248,18 +248,18 @@ namespace cql {
 						queryParameters.setCommandRef(command);
 						executeMessage->getPreparedQueryId().set(
 							std::move(resultMessage->getPreparedQueryId().get()));
-						return seastar::make_ready_future<Object<RequestMessageBase>>(
+						return seastar::make_ready_future<Reusable<RequestMessageBase>>(
 							std::move(executeMessage).cast<RequestMessageBase>());
 					} else {
-						return retryFlow.handleUnexpectResultKind<Object<RequestMessageBase>>(
+						return retryFlow.handleUnexpectResultKind<Reusable<RequestMessageBase>>(
 							std::move(resultMessage), "PREPARE");
 					}
 				} else if (message->getHeader().getOpCode() == MessageType::Error) {
 					auto errorMessage = std::move(message).template cast<ErrorMessage>();
-					return retryFlow.handleErrorMessage<Object<RequestMessageBase>>(
+					return retryFlow.handleErrorMessage<Reusable<RequestMessageBase>>(
 						std::move(errorMessage), command, connection);
 				} else {
-					return retryFlow.handleUnexpectMessage<Object<RequestMessageBase>>(
+					return retryFlow.handleUnexpectMessage<Reusable<RequestMessageBase>>(
 						std::move(message), "PREPARE");
 				}
 			});
@@ -277,8 +277,8 @@ namespace cql {
 			RetryFlow& retryFlow,
 			seastar::lw_shared_ptr<Connection>& connection,
 			ConnectionStream& stream,
-			Object<BatchMessage>& batchMessage,
-			Object<PrepareResults>& prepareResults) {
+			Reusable<BatchMessage>& batchMessage,
+			Reusable<PrepareResults>& prepareResults) {
 			auto& queries = command.getQueries();
 			auto& nodeConfiguration = connection->getNodeConfiguration();
 			auto& logger = connection->getSessionConfiguration().getLogger();
@@ -298,7 +298,7 @@ namespace cql {
 					continue; // use previous cached prepare result
 				}
 				auto queryView = query.queryStr.get();
-				prepareResults->results.emplace_back(i, Object<ResponseMessageBase>());
+				prepareResults->results.emplace_back(i, Reusable<ResponseMessageBase>());
 				if (CQL_UNLIKELY(logger->isEnabled(LogLevel::Debug))) {
 					logger->log(LogLevel::Debug, "prepare:", queryView);
 				}
@@ -352,6 +352,16 @@ namespace cql {
 			return result;
 		}
 	}
+
+	/** The storage of SessionData */
+	template <>
+	thread_local ReusableStorageType<SessionData>
+		ReusableStorageInstance<SessionData>;
+
+	/** The storage of PrepareResults */
+	template <>
+	thread_local ReusableStorageType<PrepareResults>
+		ReusableStorageInstance<PrepareResults>;
 
 	/** Check whether this is a valid session (will be false if moved) */
 	bool Session::isValid() const {
@@ -530,8 +540,8 @@ namespace cql {
 			RetryFlow(command.getMaxRetries()),
 			seastar::lw_shared_ptr<Connection>(),
 			ConnectionStream(),
-			Object<BatchMessage>(),
-			Object<PrepareResults>(), [] (
+			Reusable<BatchMessage>(),
+			Reusable<PrepareResults>(), [] (
 			auto& command,
 			auto& connectionPool,
 			auto& retryFlow,
@@ -559,7 +569,7 @@ namespace cql {
 					// prepare queries
 					batchMessage = RequestMessageFactory::makeRequestMessage<BatchMessage>();
 					batchMessage->getBatchParameters().setBatchCommandRef(command);
-					prepareResults = makeObject<PrepareResults>();
+					prepareResults = makeReusable<PrepareResults>();
 					return prepareQueries(
 						command, retryFlow, connection, stream, batchMessage, prepareResults);
 				}).then([&connection, &stream, &batchMessage] {
@@ -597,7 +607,7 @@ namespace cql {
 	}
 
 	/** Constructor */
-	Session::Session(Object<SessionData>&& data) :
+	Session::Session(Reusable<SessionData>&& data) :
 		data_(std::move(data)) { }
 }
 

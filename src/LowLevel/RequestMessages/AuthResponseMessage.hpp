@@ -12,7 +12,7 @@ namespace cql {
 	public:
 		using RequestMessageBase::freeResources;
 		
-		/** For Object */
+		/** For Reusable */
 		void reset(MessageHeader&& header);
 
 		/** Get description of this message */

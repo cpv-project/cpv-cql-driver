@@ -1,7 +1,12 @@
 #include "./ExecuteMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of ExecuteMessage */
+	template <>
+	thread_local ReusableStorageType<ExecuteMessage>
+		ReusableStorageInstance<ExecuteMessage>;
+
+	/** For Reusable */
 	void ExecuteMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		preparedQueryId_.reset();

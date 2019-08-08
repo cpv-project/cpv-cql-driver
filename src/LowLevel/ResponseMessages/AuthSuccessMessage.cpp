@@ -1,7 +1,12 @@
 #include "./AuthSuccessMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of AuthSuccessMessage */
+	template <>
+	thread_local ReusableStorageType<AuthSuccessMessage>
+		ReusableStorageInstance<AuthSuccessMessage>;
+
+	/** For Reusable */
 	void AuthSuccessMessage::reset(MessageHeader&& header) {
 		ResponseMessageBase::reset(std::move(header));
 		token_.reset();

@@ -1,5 +1,5 @@
 #pragma once
-#include <CQLDriver/Common/Utility/Object.hpp>
+#include <CQLDriver/Common/Utility/Reusable.hpp>
 #include "./RequestMessageBase.hpp"
 
 namespace cql {
@@ -14,15 +14,15 @@ namespace cql {
 
 	namespace RequestMessageFactory {
 		/** Creates a new request message instance with header set */
-		template <class T> Object<T> makeRequestMessage() = delete;
-		template <> Object<AuthResponseMessage> makeRequestMessage();
-		template <> Object<BatchMessage> makeRequestMessage();
-		template <> Object<ExecuteMessage> makeRequestMessage();
-		template <> Object<OptionsMessage> makeRequestMessage();
-		template <> Object<PrepareMessage> makeRequestMessage();
-		template <> Object<QueryMessage> makeRequestMessage();
-		template <> Object<RegisterMessage> makeRequestMessage();
-		template <> Object<StartupMessage> makeRequestMessage();
+		template <class T> Reusable<T> makeRequestMessage() = delete;
+		template <> Reusable<AuthResponseMessage> makeRequestMessage();
+		template <> Reusable<BatchMessage> makeRequestMessage();
+		template <> Reusable<ExecuteMessage> makeRequestMessage();
+		template <> Reusable<OptionsMessage> makeRequestMessage();
+		template <> Reusable<PrepareMessage> makeRequestMessage();
+		template <> Reusable<QueryMessage> makeRequestMessage();
+		template <> Reusable<RegisterMessage> makeRequestMessage();
+		template <> Reusable<StartupMessage> makeRequestMessage();
 	}
 }
 

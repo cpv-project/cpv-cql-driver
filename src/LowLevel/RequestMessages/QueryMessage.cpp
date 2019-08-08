@@ -2,7 +2,12 @@
 #include "../ProtocolTypes/ProtocolInt.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of QueryMessage */
+	template <>
+	thread_local ReusableStorageType<QueryMessage>
+		ReusableStorageInstance<QueryMessage>;
+
+	/** For Reusable */
 	void QueryMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		queryParameters_.reset();

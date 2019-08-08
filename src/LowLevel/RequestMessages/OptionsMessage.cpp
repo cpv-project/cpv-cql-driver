@@ -1,6 +1,11 @@
 #include "./OptionsMessage.hpp"
 
 namespace cql {
+	/** The storage of OptionsMessage */
+	template <>
+	thread_local ReusableStorageType<OptionsMessage>
+		ReusableStorageInstance<OptionsMessage>;
+
 	/** Get description of this message */
 	std::string OptionsMessage::toString() const {
 		return "OptionsMessage()";

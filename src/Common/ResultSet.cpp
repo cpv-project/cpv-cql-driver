@@ -2,6 +2,11 @@
 #include "./ResultSetData.hpp"
 
 namespace cql {
+	/** The storage of ResultSetData */
+	template <>
+	thread_local ReusableStorageType<ResultSetData>
+		ReusableStorageInstance<ResultSetData>;
+
 	/** Check whether this is a valid result set (will be false if moved) */
 	bool ResultSet::isValid() const {
 		return data_ != nullptr;
@@ -39,7 +44,7 @@ namespace cql {
 	}
 
 	/** Constructor */
-	ResultSet::ResultSet(Object<ResultSetData>&& data) :
+	ResultSet::ResultSet(Reusable<ResultSetData>&& data) :
 		data_(std::move(data)) { }
 
 	/** Constructor, build an empty(invalid) result set */

@@ -1,7 +1,12 @@
 #include "./SupportedMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of SupportedMessage */
+	template <>
+	thread_local ReusableStorageType<SupportedMessage>
+		ReusableStorageInstance<SupportedMessage>;
+
+	/** For Reusable */
 	void SupportedMessage::reset(MessageHeader&& header) {
 		ResponseMessageBase::reset(std::move(header));
 		options_.reset();

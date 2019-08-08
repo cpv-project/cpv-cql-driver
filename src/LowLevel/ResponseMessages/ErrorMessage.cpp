@@ -1,7 +1,12 @@
 #include "./ErrorMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of ErrorMessage */
+	template <>
+	thread_local ReusableStorageType<ErrorMessage>
+		ReusableStorageInstance<ErrorMessage>;
+
+	/** For Reusable */
 	void ErrorMessage::reset(MessageHeader&& header) {
 		ResponseMessageBase::reset(std::move(header));
 		errorCode_.reset();

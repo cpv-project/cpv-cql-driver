@@ -1,5 +1,5 @@
 #pragma once
-#include <CQLDriver/Common/Utility/Object.hpp>
+#include <CQLDriver/Common/Utility/Reusable.hpp>
 #include "./LowLevelDefinitions.hpp"
 #include "./MessageHeader.hpp"
 #include "./ConnectionInfo.hpp"
@@ -45,10 +45,10 @@ namespace cql {
 		virtual ~MessageBase() = default;
 
 	protected:
-		/** For Object support */
+		/** For Reusable support */
 		static void freeResources();
 
-		/** For Object support */
+		/** For Reusable support */
 		void reset(MessageHeader&& header);
 
 	protected:

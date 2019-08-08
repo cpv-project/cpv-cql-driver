@@ -10,52 +10,52 @@
 
 namespace cql {
 	namespace RequestMessageFactory {
-		template <> Object<AuthResponseMessage> makeRequestMessage() {
+		template <> Reusable<AuthResponseMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::AuthResponse, MessageDirection::Request);
-			return makeObject<AuthResponseMessage>(std::move(header));
+			return makeReusable<AuthResponseMessage>(std::move(header));
 		}
 
-		template <> Object<BatchMessage> makeRequestMessage() {
+		template <> Reusable<BatchMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Batch, MessageDirection::Request);
-			return makeObject<BatchMessage>(std::move(header));
+			return makeReusable<BatchMessage>(std::move(header));
 		}
 
-		template <> Object<ExecuteMessage> makeRequestMessage() {
+		template <> Reusable<ExecuteMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Execute, MessageDirection::Request);
-			return makeObject<ExecuteMessage>(std::move(header));
+			return makeReusable<ExecuteMessage>(std::move(header));
 		}
 
-		template <> Object<OptionsMessage> makeRequestMessage() {
+		template <> Reusable<OptionsMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Options, MessageDirection::Request);
-			return makeObject<OptionsMessage>(std::move(header));
+			return makeReusable<OptionsMessage>(std::move(header));
 		}
 
-		template <> Object<PrepareMessage> makeRequestMessage() {
+		template <> Reusable<PrepareMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Prepare, MessageDirection::Request);
-			return makeObject<PrepareMessage>(std::move(header));
+			return makeReusable<PrepareMessage>(std::move(header));
 		}
 
-		template <> Object<QueryMessage> makeRequestMessage() {
+		template <> Reusable<QueryMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Query, MessageDirection::Request);
-			return makeObject<QueryMessage>(std::move(header));
+			return makeReusable<QueryMessage>(std::move(header));
 		}
 
-		template <> Object<RegisterMessage> makeRequestMessage() {
+		template <> Reusable<RegisterMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Register, MessageDirection::Request);
-			return makeObject<RegisterMessage>(std::move(header));
+			return makeReusable<RegisterMessage>(std::move(header));
 		}
 
-		template <> Object<StartupMessage> makeRequestMessage() {
+		template <> Reusable<StartupMessage> makeRequestMessage() {
 			MessageHeader header;
 			header.setOpCode(MessageType::Startup, MessageDirection::Request);
-			return makeObject<StartupMessage>(std::move(header));
+			return makeReusable<StartupMessage>(std::move(header));
 		}
 	}
 }

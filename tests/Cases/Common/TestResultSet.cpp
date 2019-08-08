@@ -5,9 +5,9 @@
 #include <TestUtility/GTestUtils.hpp>
 
 TEST(TestResultSet, isValid) {
-	cql::ResultSet a(cql::makeObject<cql::ResultSetData>(
+	cql::ResultSet a(cql::makeReusable<cql::ResultSetData>(
 		0, 0, "", seastar::temporary_buffer<char>(0), 0, 0));
-	cql::ResultSet b(cql::makeObject<cql::ResultSetData>(
+	cql::ResultSet b(cql::makeReusable<cql::ResultSetData>(
 		0, 0, "", seastar::temporary_buffer<char>(0), 0, 0));
 	ASSERT_TRUE(a.isValid());
 	ASSERT_TRUE(b.isValid());
@@ -20,7 +20,7 @@ TEST(TestResultSet, isValid) {
 }
 
 TEST(TestResultSet, getters) {
-	cql::ResultSet resultSet(cql::makeObject<cql::ResultSetData>(
+	cql::ResultSet resultSet(cql::makeReusable<cql::ResultSetData>(
 		123, 321, "state", seastar::temporary_buffer<char>("abcde", 5), 1, 3));
 	ASSERT_EQ(resultSet.getRowsCount(), 123U);
 	ASSERT_EQ(resultSet.getColumnsCount(), 321U);
@@ -36,7 +36,7 @@ TEST(TestResultSet, fill) {
 		"\x00\x00\x00\x04""\x00\x00\x00\x65"
 		"\x00\x00\x00\x05""qwert"
 		"\x00");
-	cql::ResultSet resultSet(cql::makeObject<cql::ResultSetData>(
+	cql::ResultSet resultSet(cql::makeReusable<cql::ResultSetData>(
 		2, 2, "",
 		seastar::temporary_buffer<char>(data.data(), data.size()), 4, data.size() - 1));
 	cql::Int intValue;
@@ -53,15 +53,15 @@ TEST(TestResultSet, fill) {
 TEST(TestResultSet, error) {
 	ASSERT_THROWS_CONTAINS(
 		cql::LogicException,
-		cql::makeObject<cql::ResultSetData>(0, 0, "", seastar::temporary_buffer<char>(), 0, 0),
+		cql::makeReusable<cql::ResultSetData>(0, 0, "", seastar::temporary_buffer<char>(), 0, 0),
 		"invalid buffer");
 	ASSERT_THROWS_CONTAINS(
 		cql::LogicException,
-		cql::makeObject<cql::ResultSetData>(0, 0, "", seastar::temporary_buffer<char>(3), 0, 4),
+		cql::makeReusable<cql::ResultSetData>(0, 0, "", seastar::temporary_buffer<char>(3), 0, 4),
 		"invalid to offset");
 	ASSERT_THROWS_CONTAINS(
 		cql::LogicException,
-		cql::makeObject<cql::ResultSetData>(0, 0, "", seastar::temporary_buffer<char>(3), 2, 1),
+		cql::makeReusable<cql::ResultSetData>(0, 0, "", seastar::temporary_buffer<char>(3), 2, 1),
 		"invalid from offset");
 }
 

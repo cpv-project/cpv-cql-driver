@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <type_traits>
-#include "./Utility/Object.hpp"
+#include "./Utility/Reusable.hpp"
 #include "./ColumnTrait.hpp"
 
 namespace cql {
@@ -48,7 +48,7 @@ namespace cql {
 		}
 
 		/** Constructor */
-		explicit ResultSet(Object<ResultSetData>&& data);
+		explicit ResultSet(Reusable<ResultSetData>&& data);
 
 		/** Constructor, build an empty(invalid) result set */
 		explicit ResultSet(std::nullptr_t);
@@ -63,7 +63,7 @@ namespace cql {
 		}
 
 	private:
-		Object<ResultSetData> data_;
+		Reusable<ResultSetData> data_;
 	};
 }
 

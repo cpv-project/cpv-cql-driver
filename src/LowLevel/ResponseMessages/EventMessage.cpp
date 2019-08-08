@@ -1,7 +1,12 @@
 #include "./EventMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of EventMessage */
+	template <>
+	thread_local ReusableStorageType<EventMessage>
+		ReusableStorageInstance<EventMessage>;
+
+	/** For Reusable */
 	void EventMessage::reset(MessageHeader&& header) {
 		ResponseMessageBase::reset(std::move(header));
 		type_.reset();

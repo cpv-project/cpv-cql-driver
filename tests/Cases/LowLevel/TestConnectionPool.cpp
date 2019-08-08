@@ -163,7 +163,7 @@ TEST_FUTURE(TestConnectionPool, getConnectionThenReturn) {
 					if (count < totalMaxStreams-1) {
 						streams.emplace_back(std::move(stream));
 					} else {
-						seastar::sleep(std::chrono::milliseconds(1))
+						(void)seastar::sleep(std::chrono::milliseconds(1))
 						.then([connectionPool,
 							connection=std::move(connection),
 							stream=std::move(stream)] () mutable {
@@ -211,7 +211,7 @@ TEST_FUTURE(TestConnectionPool, getConnectionWithTimer) {
 					if (count < totalMaxStreams-1) {
 						streams.emplace_back(std::move(stream));
 					} else {
-						seastar::sleep(std::chrono::milliseconds(1))
+						(void)seastar::sleep(std::chrono::milliseconds(1))
 						.then([connectionPool, stream=std::move(stream)] () mutable {
 							stream = {};
 							// did not call returnConnection

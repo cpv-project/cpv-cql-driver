@@ -3,7 +3,7 @@
 #include <utility>
 #include <vector>
 #include <optional>
-#include "./Utility/Object.hpp"
+#include "./Utility/Reusable.hpp"
 #include "./CommonDefinitions.hpp"
 #include "./ColumnTrait.hpp"
 
@@ -205,7 +205,7 @@ namespace cql {
 		}
 
 	private:
-		Object<BatchCommandData> data_;
+		Reusable<BatchCommandData> data_;
 	};
 }
 

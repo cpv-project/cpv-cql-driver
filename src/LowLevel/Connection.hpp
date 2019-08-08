@@ -2,7 +2,7 @@
 #include <vector>
 #include <utility>
 #include <seastar/core/queue.hh>
-#include <CQLDriver/Common/Utility/Object.hpp>
+#include <CQLDriver/Common/Utility/Reusable.hpp>
 #include <CQLDriver/Common/Utility/SocketHolder.hpp>
 #include <CQLDriver/Common/SessionConfiguration.hpp>
 #include <CQLDriver/Common/NodeConfiguration.hpp>
@@ -57,14 +57,14 @@ namespace cql {
 
 		/** Send a message to the given stream and wait for success.  */
 		seastar::future<> sendMessage(
-			Object<RequestMessageBase>&& message,
+			Reusable<RequestMessageBase>&& message,
 			const ConnectionStream& stream);
 
 		/** Send a message to the given stream and wait for success.  */
 		template <class T,
 			std::enable_if_t<std::is_base_of<RequestMessageBase, T>::value, int> = 0>
 		seastar::future<> sendMessage(
-			Object<T>&& message,
+			Reusable<T>&& message,
 			const ConnectionStream& stream) {
 			return sendMessage(std::move(message).template cast<RequestMessageBase>(), stream);
 		}
@@ -73,7 +73,7 @@ namespace cql {
 		 * Wait for the next message from the given stream.
 		 * Only one waiter can register at a time for each stream.
 		 */
-		seastar::future<Object<ResponseMessageBase>> waitNextMessage(
+		seastar::future<Reusable<ResponseMessageBase>> waitNextMessage(
 			const ConnectionStream& stream);
 
 		/** Constructor */
@@ -101,11 +101,11 @@ namespace cql {
 
 	private:
 		/** Encode message to sending buffer */
-		void encodeMessage(const Object<RequestMessageBase>& message);
+		void encodeMessage(const Reusable<RequestMessageBase>& message);
 
 		/** Decode message from temporary buffer */
 		void decodeMessage(
-			Object<ResponseMessageBase>& message,
+			Reusable<ResponseMessageBase>& message,
 			seastar::temporary_buffer<char>&& buffer) const;
 
 		/** Close the connection */
@@ -130,8 +130,8 @@ namespace cql {
 		std::string sendingBufferPreCompress_;
 		std::string sendingBuffer_;
 
-		std::vector<std::pair<bool, seastar::promise<Object<ResponseMessageBase>>>> receivingPromiseMap_;
-		std::vector<seastar::queue<Object<ResponseMessageBase>>> receivedMessageQueueMap_;
+		std::vector<std::pair<bool, seastar::promise<Reusable<ResponseMessageBase>>>> receivingPromiseMap_;
+		std::vector<seastar::queue<Reusable<ResponseMessageBase>>> receivedMessageQueueMap_;
 		std::size_t receivingPromiseCount_;
 	};
 }

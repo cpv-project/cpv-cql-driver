@@ -5,7 +5,12 @@
 #include "../ProtocolTypes/ProtocolInt.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of BatchMessage */
+	template <>
+	thread_local ReusableStorageType<BatchMessage>
+		ReusableStorageInstance<BatchMessage>;
+
+	/** For Reusable */
 	void BatchMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		batchParameters_.reset();

@@ -171,7 +171,7 @@ namespace cql {
 
 	/** Send a message to the given stream and wait for success */
 	seastar::future<> Connection::sendMessage(
-		Object<RequestMessageBase>&& message,
+		Reusable<RequestMessageBase>&& message,
 		const ConnectionStream& stream) {
 		// ensure only one message is sending at the same time
 		message->getHeader().setStreamId(stream.getStreamId());
@@ -230,18 +230,18 @@ namespace cql {
 	}
 
 	/** Wait for the next message from the given stream */
-	seastar::future<Object<ResponseMessageBase>> Connection::waitNextMessage(
+	seastar::future<Reusable<ResponseMessageBase>> Connection::waitNextMessage(
 		const ConnectionStream& stream) {
 		// try getting message directly from received queue
 		auto streamId = stream.getStreamId();
 		auto& queue = receivedMessageQueueMap_.at(streamId);
 		if (!queue.empty()) {
-			return seastar::make_ready_future<Object<ResponseMessageBase>>(queue.pop());
+			return seastar::make_ready_future<Reusable<ResponseMessageBase>>(queue.pop());
 		}
 		// message not available, try receiving it from network
 		auto& promiseSlot = receivingPromiseMap_.at(streamId);
 		if (CQL_UNLIKELY(promiseSlot.first)) {
-			return seastar::make_exception_future<Object<ResponseMessageBase>>(
+			return seastar::make_exception_future<Reusable<ResponseMessageBase>>(
 				LogicException(CQL_CODEINFO, "there already a message waiter registered for this stream"));
 		}
 		promiseSlot.first = true;
@@ -251,7 +251,7 @@ namespace cql {
 			auto self = shared_from_this();
 			(void)seastar::do_with(
 				std::move(self),
-				Object<ResponseMessageBase>(), [] (
+				Reusable<ResponseMessageBase>(), [] (
 				auto& self,
 				auto& message) {
 				return seastar::repeat([&self, &message] {
@@ -385,7 +385,7 @@ namespace cql {
 	}
 
 	/** Encode message to sending buffer */
-	void Connection::encodeMessage(const Object<RequestMessageBase>& message) {
+	void Connection::encodeMessage(const Reusable<RequestMessageBase>& message) {
 		auto& header = message->getHeader();
 		sendingBuffer_.resize(0);
 		if (isReady_ && compressor_ != nullptr) {
@@ -405,7 +405,7 @@ namespace cql {
 
 	/** Decode message from temporary buffer */
 	void Connection::decodeMessage(
-		Object<ResponseMessageBase>& message,
+		Reusable<ResponseMessageBase>& message,
 		seastar::temporary_buffer<char>&& buffer) const {
 		auto flags = message->getHeader().getFlags();
 		if (enumTrue(flags & MessageHeaderFlags::Tracing)) {

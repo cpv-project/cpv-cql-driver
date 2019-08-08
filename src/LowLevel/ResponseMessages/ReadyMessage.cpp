@@ -1,6 +1,11 @@
 #include "./ReadyMessage.hpp"
 
 namespace cql {
+	/** The storage of ReadyMessage */
+	template <>
+	thread_local ReusableStorageType<ReadyMessage>
+		ReusableStorageInstance<ReadyMessage>;
+
 	/** Get description of this message */
 	std::string ReadyMessage::toString() const {
 		return "ReadyMessage()";

@@ -7,7 +7,12 @@ namespace cql {
 		ProtocolString VersionValue("3.0.0");
 	}
 
-	/** For Object */
+	/** The storage of StartupMessage */
+	template <>
+	thread_local ReusableStorageType<StartupMessage>
+		ReusableStorageInstance<StartupMessage>;
+
+	/** For Reusable */
 	void StartupMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		options_.reset();

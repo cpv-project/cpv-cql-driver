@@ -27,7 +27,7 @@ namespace cql {
 
 	/** Create a new session instance */
 	Session SessionFactory::getSession() {
-		return Session(makeObject<SessionData>(data_->connectionPool));
+		return Session(makeReusable<SessionData>(data_->connectionPool));
 	}
 
 	/** Constructor */

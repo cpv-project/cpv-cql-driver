@@ -1,6 +1,6 @@
 #pragma once
 #include <seastar/core/future.hh>
-#include "../Common/Utility/Object.hpp"
+#include "../Common/Utility/Reusable.hpp"
 #include "../Common/Command.hpp"
 #include "../Common/BatchCommand.hpp"
 #include "../Common/ResultSet.hpp"
@@ -25,10 +25,10 @@ namespace cql {
 		seastar::future<> batchExecute(BatchCommand&& command);
 
 		/** Constructor */
-		explicit Session(Object<SessionData>&& data);
+		explicit Session(Reusable<SessionData>&& data);
 
 	private:
-		Object<SessionData> data_;
+		Reusable<SessionData> data_;
 	};
 }
 

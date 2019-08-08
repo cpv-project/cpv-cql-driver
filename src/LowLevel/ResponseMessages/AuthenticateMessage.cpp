@@ -1,7 +1,12 @@
 #include "./AuthenticateMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of AuthenticateMessage */
+	template <>
+	thread_local ReusableStorageType<AuthenticateMessage>
+		ReusableStorageInstance<AuthenticateMessage>;
+
+	/** For Reusable */
 	void AuthenticateMessage::reset(MessageHeader&& header) {
 		ResponseMessageBase::reset(std::move(header));
 		authenticatorClass_.reset();

@@ -189,7 +189,7 @@ namespace cql {
 		}
 		findIdleConnectionTimerIsRunning_ = true;
 		auto self = shared_from_this();
-		seastar::do_with(std::move(self), [] (auto& self) {
+		(void)seastar::do_with(std::move(self), [] (auto& self) {
 			return seastar::repeat([&self] {
 				return seastar::sleep(std::chrono::milliseconds(SleepInterval)).then([&self] {
 					// feed waiters
@@ -225,7 +225,7 @@ namespace cql {
 		}
 		dropIdleConnectionTimerIsRunning_ = true;
 		auto self = shared_from_this();
-		seastar::do_with(std::move(self), [] (auto& self) {
+		(void)seastar::do_with(std::move(self), [] (auto& self) {
 			return seastar::repeat([&self] {
 				return seastar::sleep(std::chrono::milliseconds(SleepInterval)).then([&self] {
 					auto existCount = self->allConnections_.size();

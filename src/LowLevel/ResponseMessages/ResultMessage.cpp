@@ -3,6 +3,11 @@
 #include "./ResultMessage.hpp"
 
 namespace cql {
+	/** The storage of ResultMessage */
+	template <>
+	thread_local ReusableStorageType<ResultMessage>
+		ReusableStorageInstance<ResultMessage>;
+
 	/** Reset to initial state */
 	void ResultMessage::reset(MessageHeader&& header) {
 		ResponseMessageBase::reset(std::move(header));
@@ -44,7 +49,7 @@ namespace cql {
 			auto columnsCount = rowsMetadata_.getColumnsCount();
 			auto fromOffset = ptr - buffer.begin();
 			auto toOffset = end - buffer.begin();
-			resultSet_ = ResultSet(makeObject<ResultSetData>(
+			resultSet_ = ResultSet(makeReusable<ResultSetData>(
 				rowsCount,
 				columnsCount,
 				std::move(rowsMetadata_.getPagingState()),

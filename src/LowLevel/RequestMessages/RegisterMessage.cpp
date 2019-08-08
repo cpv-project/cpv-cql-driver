@@ -1,7 +1,12 @@
 #include "./RegisterMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of RegisterMessage */
+	template <>
+	thread_local ReusableStorageType<RegisterMessage>
+		ReusableStorageInstance<RegisterMessage>;
+
+	/** For Reusable */
 	void RegisterMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		events_.reset();

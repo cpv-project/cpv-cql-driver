@@ -1,7 +1,12 @@
 #include "./PrepareMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of PrepareMessage */
+	template <>
+	thread_local ReusableStorageType<PrepareMessage>
+		ReusableStorageInstance<PrepareMessage>;
+
+	/** For Reusable */
 	void PrepareMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		query_.reset();

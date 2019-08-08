@@ -11,10 +11,10 @@ namespace cql {
 		return header_;
 	}
 
-	/** For Object support */
+	/** For Reusable support */
 	void MessageBase::freeResources() { }
 
-	/** For Object support */
+	/** For Reusable support */
 	void MessageBase::reset(MessageHeader&& header) {
 		header_ = std::move(header);
 	}

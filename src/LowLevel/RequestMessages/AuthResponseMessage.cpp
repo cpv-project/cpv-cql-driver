@@ -1,7 +1,12 @@
 #include "./AuthResponseMessage.hpp"
 
 namespace cql {
-	/** For Object */
+	/** The storage of AuthResponseMessage */
+	template <>
+	thread_local ReusableStorageType<AuthResponseMessage>
+		ReusableStorageInstance<AuthResponseMessage>;
+
+	/** For Reusable */
 	void AuthResponseMessage::reset(MessageHeader&& header) {
 		RequestMessageBase::reset(std::move(header));
 		token_.reset();

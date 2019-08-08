@@ -53,6 +53,11 @@ namespace cql {
 		}
 	};
 
+	/** The storage of CommandData */
+	template <>
+	thread_local ReusableStorageType<CommandData>
+		ReusableStorageInstance<CommandData>;
+
 	/** Check whether this is a valid command (will be false if moved) */
 	bool Command::isValid() const {
 		return data_ != nullptr;
@@ -165,11 +170,11 @@ namespace cql {
 
 	/** Constructor */
 	Command::Command(std::string&& query) :
-		data_(makeObject<CommandData>(std::move(query))) { }
+		data_(makeReusable<CommandData>(std::move(query))) { }
 
 	/** Constructor */
 	Command::Command(const char* query, std::size_t size) :
-		data_(makeObject<CommandData>(query, size)) { }
+		data_(makeReusable<CommandData>(query, size)) { }
 
 	/** Constructor, build an empty(invalid) command */
 	Command::Command(std::nullptr_t) :
