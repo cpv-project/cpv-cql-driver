@@ -249,7 +249,7 @@ namespace cql {
 		if (receivingPromiseCount_++ == 0) {
 			// the first who made promise has responsibility to start the receiver
 			auto self = shared_from_this();
-			seastar::do_with(
+			(void)seastar::do_with(
 				std::move(self),
 				Object<ResponseMessageBase>(), [] (
 				auto& self,

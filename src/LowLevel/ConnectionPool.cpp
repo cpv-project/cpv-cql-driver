@@ -114,7 +114,7 @@ namespace cql {
 	void ConnectionPool::spawnConnection() {
 		++connectingCount_;
 		auto self = shared_from_this();
-		seastar::do_with(
+		(void)seastar::do_with(
 			std::move(self),
 			static_cast<std::size_t>(0),
 			[] (auto& self, auto& count) {

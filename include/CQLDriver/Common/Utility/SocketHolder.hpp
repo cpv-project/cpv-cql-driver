@@ -23,7 +23,7 @@ namespace cql {
 		/** Get the socket */
 		seastar::connected_socket& socket() {
 			if (CQL_UNLIKELY(state_ == nullptr)) {
-				throw LogicException(CQL_CODEINFO, "socket is not connected");
+				throwNotConnectedError();
 			}
 			return state_->socket;
 		}
@@ -31,7 +31,7 @@ namespace cql {
 		/** Get the input data source of the socket */
 		seastar::input_stream<char>& in() {
 			if (CQL_UNLIKELY(state_ == nullptr)) {
-				throw LogicException(CQL_CODEINFO, "socket is not connected");
+				throwNotConnectedError();
 			}
 			return state_->in;
 		}
@@ -39,7 +39,7 @@ namespace cql {
 		/** Get the output data sink of the socket */
 		seastar::data_sink& out() {
 			if (CQL_UNLIKELY(state_ == nullptr)) {
-				throw LogicException(CQL_CODEINFO, "socket is not connected");
+				throwNotConnectedError();
 			}
 			return state_->out;
 		}
@@ -74,7 +74,7 @@ namespace cql {
 		/** Move assignment */
 		SocketHolder& operator=(SocketHolder&& socket) noexcept {
 			if (CQL_LIKELY(&socket != this)) {
-				close();
+				(void)close();
 				state_ = std::move(socket.state_);
 			}
 			return *this;
@@ -87,10 +87,14 @@ namespace cql {
 		/** Destructor */
 		~SocketHolder() {
 			// ignore exceptions
-			close();
+			(void)close();
 		}
 
 	private:
+		static void throwNotConnectedError() {
+			throw LogicException(CQL_CODEINFO, "socket is not connected");
+		}
+
 		struct State {
 			seastar::connected_socket socket;
 			seastar::input_stream<char> in;
