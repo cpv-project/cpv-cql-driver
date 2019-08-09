@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.5.2
+
+Changes:
+
+- replace Object with Reusable (utility change)
+
 ## 0.5.1
 
 Changes:
