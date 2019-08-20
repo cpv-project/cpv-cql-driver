@@ -1,3 +1,10 @@
+cqldriver (0.5.2.0) bionic; urgency=low
+
+  * Use seastar-20190820
+  * Replace Object with Reusable
+
+ -- compiv <compiv@tutanota.com>  Tue, 20 Aug 2019 23:18:00 +0000
+
 cqldriver (0.5.1.1) bionic; urgency=low
 
   * Use seastar-20190627
