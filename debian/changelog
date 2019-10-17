@@ -1,8 +1,8 @@
-cqldriver (0.5.2.1) bionic; urgency=low
+cqldriver (0.5.2.2) bionic; urgency=low
 
-  * Use seastar-20191016
+  * Use seastar-20191017
 
- -- compiv <compiv@tutanota.com>  Wed, 16 Oct 2019 21:56:00 +0000
+ -- compiv <compiv@tutanota.com>  Thu, 17 Oct 2019 01:59:00 +0000
 
 cqldriver (0.5.2.0) bionic; urgency=low
 
